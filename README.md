@@ -4,6 +4,11 @@ El Sistema Terapéutico de la Marcha (S.M.M) es una herramienta de monitoreo bas
 
 # Guardar Cambios en ramas y repositorio
 
+Traer los Cambios a la rama que estes trabajando
+```shell
+git pull origin pruebas --rebase
+```
+
 comando de guardado de cambios
 ```shell
 git add .
@@ -13,11 +18,6 @@ git commit -m "Descripción de los cambios"
 Actualizar cambios solamente en tu rama propia
 ```shell
 git push -u origin nombre_de_rama
-```
-
-Subir Cambios a la rama principal
-```shell
-git pull origin main
 ```
 
 # configurar proyecto
