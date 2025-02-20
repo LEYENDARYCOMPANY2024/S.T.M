@@ -1,9 +1,12 @@
-from typing import Union
-
 from fastapi import FastAPI
-from models.terapeuta import index  # Importar la función index desde el archivo modelo
+from fastapi.templating import Jinja2Templates
+from fastapi.responses import HTMLResponse
+from fastapi import Request
 
 app = FastAPI()
 
-# Usar la función importada de models.terapeuta
-app.get("/")(index)
+templates = Jinja2Templates(directory="templates")
+
+@app.get("/", response_class=HTMLResponse)
+def index(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request})
