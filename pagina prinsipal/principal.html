@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Pacientes</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="prinsipal.css">
+</head>
+<body>
+    <header>
+        <div class="top-bar">
+            <div class="user-icon"><i class="fas fa-user-circle"></i></div>
+        </div>
+    </header>
+    <main>
+        <div class="search-bar">
+            <input type="text" placeholder="Buscar paciente...">
+            <button class="close-btn">🔍</button>
+        </div>
+        <div class="patients-list">
+            <div class="patient-card">
+                <i class="fas fa-user-circle"></i>
+                <span><strong>Nombre paciente</strong></span>
+                <span class="code">Código:</span>
+                <button class="enter-btn"><i class="fas fa-arrow-right"></i></button>
+            </div>
+            <div class="patient-card">
+                <i class="fas fa-user-circle"></i>
+                <span><strong>Nombre paciente 2</strong></span>
+                <span class="code">Código:</span>
+                <button class="enter-btn"><i class="fas fa-arrow-right"></i></button>
+            </div>
+        </div>
+        <button class="add-btn"><i class="fa-solid fa-plus"></i></button>
+    </main>
+</body>
+</html>

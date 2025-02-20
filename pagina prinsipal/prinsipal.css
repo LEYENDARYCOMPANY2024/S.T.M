@@ -1,0 +1,98 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+}
+
+.top-bar {
+    background-color: #2c4a75;
+    padding: 50px; /* Más alto */
+    text-align: right;
+}
+
+.user-icon i {
+    color: white;
+    font-size: 60px; /* Ícono más grande */
+}
+
+.search-bar {
+    display: flex;
+    justify-content: center;
+    margin: 30px;
+}
+
+.search-bar input {
+    width: 400px; /* Más ancho */
+    padding: 15px; /* Más alto */
+    font-size: 18px; /* Texto más grande */
+    border: 2px solid #ccc;
+    border-radius: 8px;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 24px; /* Más grande */
+    margin-left: 15px;
+    cursor: pointer;
+}
+
+.patients-list {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.patient-card {
+    background-color: #2c4a75;
+    color: white;
+    padding: 20px; /* Más espacio */
+    border-radius: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 70%; /* Más ancho */
+    margin: 15px;
+    font-size: 20px; /* Texto más grande */
+    box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s;
+}
+
+.patient-card:hover {
+    transform: scale(1.08);
+}
+
+.enter-btn {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 24px; /* Más grande */
+    cursor: pointer;
+}
+
+.add-btn {
+    background-color: #2c4a75;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 70px; /* Más grande */
+    height: 70px; /* Más grande */
+    font-size: 30px; /* Más grande */
+    position: fixed;
+    bottom: 30px; /* Más arriba */
+    right: 30px; /* Más a la izquierda */
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.add-btn i {
+    font-size: 36px; /* Ícono más grande */
+    color: white;
+}
+
+.add-btn:hover {
+    background-color: #1e3653;
+}
