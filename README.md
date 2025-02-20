@@ -73,6 +73,12 @@ pip install "fastapi[standard]"
 pip freeze > requirements.txt
 ```
 
+## Si ya creaste el requirements.txt
+
+```shell
+pip install -r requirements.txt
+```
+
 ## Crear el archivo runtime.txt
 
 ```shell
