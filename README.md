@@ -97,5 +97,13 @@ neofetch
 uname -a > os.txt
 ```
 
+# Iniciar la ejecucion del proyecto 
+
+
+
+```shell
+fastapi dev app.py
+```
+
 ## 📧 Contacto
 Para cualquier duda o sugerencia, puedes contactar a [leyendary2024@gmail.com].
