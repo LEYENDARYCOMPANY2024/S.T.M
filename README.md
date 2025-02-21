@@ -21,7 +21,6 @@ git push -u origin nombre_de_rama
 ```
 
 # configurar proyecto
-
 ## Creacion del virtual environment
 
 ```
@@ -42,6 +41,11 @@ deactivate
 ```
 
 # Instalar las librerias 
+## Si ya creaste el archivo instala el requirements.txt
+
+```shell
+pip install -r requirements.txt
+```
 
 ## Instalar NeoFetch
 
@@ -52,7 +56,7 @@ sudo apt-get neofetch -y
 ## Actualizar Pip
 
 ```shell
-pip install  --upgrade pip
+pip install --upgrade pip
 ```
 
 ## Actualizar versiones de librerias y paquetes instalables
@@ -66,17 +70,32 @@ sudo apt-get update
 pip install "fastapi[standard]"
 ```
 
-# Requirements y Runtime
+## Para conexión a la base de datos de [supabase](https://supabase.com/)
+
+```shell
+pip install supabase
+```
+
+## Otras librerias necesarias para la base de datos (si no están instaladas)
+
+```shell
+pip install python-dotenv uvicorn
+```
+
+# Crear archivos para la ejecución
+## Crear el archivo .env (necesario para la conexión a la abse de datos)
+
+```
+SUPABASE_URL="URL_DE_TU_BD"
+SUPABASE_KEY="KEY_DE_TU_BD"
+```
+## Archivo app_prueba_bd.py
+
+Contiene la configuración para validar la conexión con la base de datos, cabe aclarar que para validar que si hay conexión con la base de datos se debe de hacer una consulta a una tabla, es por ello que se realiza la consulta a la tabla 'test' que contiene 1 registro el cual deberá imprimir, de otra forma, arrojará un error.
 
 ## Crear el archivo requirements.txt
 ```shell
 pip freeze > requirements.txt
-```
-
-## Si ya creaste el requirements.txt
-
-```shell
-pip install -r requirements.txt
 ```
 
 ## Crear el archivo runtime.txt
@@ -97,12 +116,21 @@ neofetch
 uname -a > os.txt
 ```
 
+## Crear el archivo .gitignore
+
+```
+_pycache_/
+*.pyc
+smm/
+.env/
+```
+
 # Iniciar la ejecucion del proyecto 
 
 
 
 ```shell
-fastapi dev app.py
+uvicorn app_prueba_bd:app --reload
 ```
 
 ## 📧 Contacto
