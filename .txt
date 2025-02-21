@@ -1,0 +1,31 @@
+# database.py
+import os
+from dotenv import load_dotenv
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
+from sqlalchemy.orm import sessionmaker, declarative_base
+
+# Cargar variables de entorno
+load_dotenv()
+
+# Obtener la URL de la base de datos
+DATABASE_URL = os.getenv("DATABASE_URL")
+
+# Verificar que DATABASE_URL no sea None o vacía
+if not DATABASE_URL:
+    raise ValueError("ERROR: La variable de entorno DATABASE_URL no está configurada correctamente.")
+
+# Crear el motor de la base de datos
+engine = create_async_engine(DATABASE_URL, echo=True)
+
+# Crear la sesión de la base de datos
+SessionLocal = sessionmaker(bind=engine, class_=AsyncSession, expire_on_commit=False)
+
+# Base para los modelos de SQLAlchemy
+Base = declarative_base()
+
+# Dependencia para obtener la sesión
+async def get_db():
+    async with SessionLocal() as session:
+        yield session
+
+print(f"Conectando a: {DATABASE_URL}")  # Esto imprimirá la URL en la consola
