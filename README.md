@@ -130,8 +130,19 @@ smm/
 
 
 ```shell
-uvicorn app_prueba_bd:app --reload
+uvicorn app:app --reload
 ```
+
+# NOTAS:
+
+## Si un archivo el cual quieres ignorar ya fue agregado al repositorio, debes eliminarlo del seguimiento de Git con los siguientes comandos:
+
+```shell
+git rm --cached <archivo ignorado>
+git commit -m "Ignorar archivo <archivo ignorado>"
+git push origin <tu_rama>
+```
+
 
 ## 📧 Contacto
 Para cualquier duda o sugerencia, puedes contactar a [leyendary2024@gmail.com].
