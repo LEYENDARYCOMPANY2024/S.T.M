@@ -1,12 +1,11 @@
 from fastapi import FastAPI
-from fastapi.templating import Jinja2Templates
-from fastapi.responses import HTMLResponse
-from fastapi import Request
+from controllers import main_controller
 
 app = FastAPI()
 
-templates = Jinja2Templates(directory="templates")
+# Incluimos los controladores
+app.include_router(main_controller.router)
 
-@app.get("/", response_class=HTMLResponse)
-def index(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
+@app.get("/")
+def index():
+    return {"status": "200", "message": "todo bien"}
