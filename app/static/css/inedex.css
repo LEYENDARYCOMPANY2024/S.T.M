@@ -1,0 +1,219 @@
+        /* Estilos generales */
+        body {
+            font-family: 'Arial', sans-serif;
+            font-size: 20px; /* Aumenta el tamaño del texto general */
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #9b59b6, #71b7e6); /* Nuevo gradiente */
+            color: #333;
+            box-sizing: border-box;
+        }
+
+        /* Encabezado */
+        header {
+            background: linear-gradient(135deg, #71b7e6, #9b59b6);
+            color: white;
+            text-align: center;
+            padding: 25px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 3rem; /* Título más grande */
+            font-weight: bold;
+        }
+
+        /* Contenedor principal */
+        main {
+            padding: 50px 25px;
+        }
+
+        /* Secciones sin fondo */
+        section {
+            background: none;
+            padding: 40px;
+            margin: 120px auto;
+            width: 85%;
+            max-width: 900px;
+            opacity: 1;
+            transform: none;
+            transition: none;
+            box-shadow: none;
+            border-radius: 0;
+            position: relative;
+            text-align: center;
+        }
+
+        /* Títulos dentro de las secciones */
+        section h2 {
+            font-size: 2.5rem; /* Aumentado */
+            font-weight: bold;
+            color: #0000;
+        }
+
+        /* Texto dentro de las secciones */
+        section p {
+            font-size: 1.3rem; /* Aumentado */
+            line-height: 1.6;
+        }
+
+        /* Botón de inicio */
+        #btn-inicio {
+            font-size: 1.5rem; /* Botón más grande */
+            padding: 18px 35px;
+            border-radius: 8px;
+            background-color: #9b59b6;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            outline: none;
+        }
+
+        /* Efecto hover */
+        #btn-inicio:hover {
+            background-color: #9b59b6;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(217, 59, 140, 0.4);
+        }
+
+        /* Rectángulo separador */
+        .section-separator {
+            width: 0%;
+            height: 10px;
+            background: #9b59b6;
+            margin: 60px auto;
+            border-radius: 8px;
+            transition: width 1s ease-out;
+        }
+
+        .section-separator.visible {
+            width: 100%;
+        }
+
+
+        /* Estilos generales */
+        body {
+            font-family: 'Arial', sans-serif;
+            font-size: 20px; /* Aumenta el tamaño del texto general */
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #71b7e6, #9b59b6); /* Nuevo gradiente */
+            color: #333;
+            box-sizing: border-box;
+        }
+
+        /* Encabezado */
+        header {
+            background-color: #732d91;
+            color: white;
+            text-align: center;
+            padding: 25px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 3rem; /* Título más grande */
+            font-weight: bold;
+        }
+
+        /* Contenedor principal */
+        main {
+            padding: 50px 25px;
+        }
+
+        /* Secciones sin fondo */
+        section {
+            background: none;
+            padding: 40px;
+            margin: 120px auto;
+            width: 85%;
+            max-width: 900px;
+            opacity: 1;
+            transform: none;
+            transition: none;
+            box-shadow: none;
+            border-radius: 0;
+            position: relative;
+            text-align: center;
+        }
+
+        /* Títulos dentro de las secciones */
+        section h2 {
+            font-size: 2.5rem; /* Aumentado */
+            font-weight: bold;
+            color: white;
+        }
+
+        /* Texto dentro de las secciones */
+        section p {
+            font-size: 1.3rem; /* Aumentado */
+            line-height: 1.6;
+        }
+
+        /* Botón de inicio */
+        #btn-inicio {
+            font-size: 1.5rem; /* Botón más grande */
+            padding: 18px 35px;
+            border-radius: 8px;
+            background-color: #9b59b6;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            outline: none;
+        }
+
+        /* Efecto hover */
+        #btn-inicio:hover {
+            background-color: #0000;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(217, 59, 140, 0.4);
+        }
+
+        /* Rectángulo separador */
+        .section-separator {
+            width: 0%;
+            height: 10px;
+            background: #9b59b6;
+            margin: 60px auto;
+            border-radius: 8px;
+            transition: width 1s ease-out;
+        }
+
+        .section-separator.visible {
+            width: 100%;
+        }
+
+        /* Footer */
+        footer {
+            background-color: #9b59b6;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            margin-top: 40px;
+        }
+
+        /* Redes sociales */
+        .social-button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            transition: background 0.3s;
+        }
+
+        .social-button:hover {
+            background: rgba(217, 59, 140, 0.2);
+        }
+
+        .social-button svg {
+            width: 32px;
+            height: 32px;
+            fill: #9b59b6;
+        }
