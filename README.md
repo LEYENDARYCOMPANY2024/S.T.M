@@ -143,6 +143,11 @@ git commit -m "Ignorar archivo <archivo ignorado>"
 git push origin <tu_rama>
 ```
 
+# si tiene cambios desatados ocupa este comando y 
+
+```shell
+git reset --hard
+```
 
 ## 📧 Contacto
 Para cualquier duda o sugerencia, puedes contactar a [leyendary2024@gmail.com].
