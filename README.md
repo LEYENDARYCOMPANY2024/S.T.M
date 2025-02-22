@@ -89,7 +89,7 @@ pip install python-dotenv uvicorn
 SUPABASE_URL="URL_DE_TU_BD"
 SUPABASE_KEY="KEY_DE_TU_BD"
 ```
-## Archivo app_prueba_bd.py
+## Archivo de la carpeta test app_prueba_bd.py
 
 Contiene la configuración para validar la conexión con la base de datos, cabe aclarar que para validar que si hay conexión con la base de datos se debe de hacer una consulta a una tabla, es por ello que se realiza la consulta a la tabla 'test' que contiene 1 registro el cual deberá imprimir, de otra forma, arrojará un error.
 
