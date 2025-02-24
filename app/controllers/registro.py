@@ -16,7 +16,6 @@ supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 def hash_password(password: str) -> str:
     return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
 
-# 📌 Función para registrar terapeuta
 def registrar_terapeuta(terapeuta_data: TerapeutaBase):
     """Registra un terapeuta en la base de datos con contraseña encriptada."""
     try:
