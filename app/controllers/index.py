@@ -9,10 +9,18 @@ templates = Jinja2Templates(directory="templates")
 # Creamos un enrutador
 router = APIRouter()
 
-# Define las rutas relacionadas con el terapeuta
-router.add_api_route("/registro", registro_terapeuta, methods=["POST"])
-router.add_api_route("/login", login, methods=["POST"])
-
 @router.get("/", response_class=HTMLResponse)
 def index(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
+
+# Ruta para login.html
+@router.get("/login", response_class=HTMLResponse)
+async def login(request: Request):
+    return templates.TemplateResponse("login.html", {"request": request})
+
+# Ruta para registro.html
+@router.get("/registro", response_class=HTMLResponse)
+async def registro(request: Request):
+    return templates.TemplateResponse("registro.html", {"request": request})
+
+

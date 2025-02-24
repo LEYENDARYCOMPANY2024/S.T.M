@@ -4,12 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
-    <link rel="stylesheet" href="/app/static/css/login.css">
+    <link rel="stylesheet" href="/static/css/login.css">
 </head>
 <body>
     <div class="login-container">
         <h2>Iniciar Sesión</h2>
-        <form>
+        <form action="/login" method="POST">
             <div class="input-container">
                 <label for="username" class="icon">👤</label>
                 <input type="text" id="username" name="username" placeholder="Nombre de usuario" required>
@@ -19,7 +19,7 @@
                 <input type="password" id="password" name="password" placeholder="Contraseña" required>
             </div>
             <button type="submit">Iniciar Sesión</button>
-        </form>
+        </form>        
         <div class="login-link">
             ¿No tienes una cuenta? <a href="/registro">Regístrate</a>
         </div>        
