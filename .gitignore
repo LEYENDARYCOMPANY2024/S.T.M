@@ -3,3 +3,6 @@ _pycache_/
 smm/
 .env
 diseño_temp/
+__init__.py
+hola.txt
+ejemplo.txt
