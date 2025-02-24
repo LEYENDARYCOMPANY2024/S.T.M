@@ -4,12 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registro</title>
-        <link rel="stylesheet" href="/static/css/registro.css">
+    <link rel="stylesheet" href="/static/css/registro.css">
 </head>
 <body>
     <div class="register-container">
         <h2>Registro</h2>
-        <form action="/registro" method="POST">
+        <form id="registerForm">
             <div class="input-container">
                 <span class="icon">👤</span>
                 <input type="text" name="nombre_usuario" placeholder="Nombre de usuario" required>
@@ -24,7 +24,7 @@
             </div>
             <div class="input-container">
                 <span class="icon">🆎</span>
-                <input type="text" name="segundo_apellido" placeholder="Segundo apellido" required>
+                <input type="text" name="segundo_apellido" placeholder="Segundo apellido">
             </div>
             <div class="input-container">
                 <span class="icon">📧</span>
@@ -37,14 +37,15 @@
             <button type="submit">Registrarse</button>
             <div class="login-link">
                 ¿Ya tienes una cuenta? <a href="/login">Inicia sesión</a>
-            </div> 
-                <!-- Alerta de éxito -->
+            </div>
+            
             <div class="alert" id="successAlert">
                 <span class="alert-icon">✅</span>
                 <span>¡Registro exitoso!</span>
             </div>
-        </form>               
+        </form>
     </div>
-    <script src="registro.js"></script>
+
+    <script src="/static/js/registro.js"></script>
 </body>
 </html>

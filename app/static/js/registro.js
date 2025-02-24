@@ -1,13 +1,14 @@
 document.getElementById('registerForm').addEventListener('submit', function(event) {
-    event.preventDefault();
+    event.preventDefault();  // Evitar envío tradicional del formulario
     
     // Mostrar alerta de éxito
     const alert = document.getElementById('successAlert');
-    alert.classList.add('show');
+    alert.classList.add('show');  // Añadir la clase para mostrar la alerta
     
-    // Ocultar la alerta después de 3 segundos
+    // Esperar 3 segundos, luego ocultar la alerta y redirigir
     setTimeout(function() {
-        alert.classList.remove('show');
+        alert.classList.remove('show');  // Remover la clase para ocultar la alerta
+        window.location.href = "/login";  // Redirigir a la página de login
     }, 3000);
     
     // Opcional: limpiar el formulario
