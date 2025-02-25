@@ -121,7 +121,7 @@ body {
 .alert.show {
     opacity: 1;
     visibility: visible;
-    top: -100px; /* Cuando se muestra, sube un poco más */
+    top: -90px; /* Cuando se muestra, sube un poco más */
 }
 
 .alert-icon {
