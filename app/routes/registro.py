@@ -27,4 +27,4 @@ async def registro_action(
         raise HTTPException(status_code=400, detail=resultado["error"])
     
     # En lugar de redirigir, devolver un mensaje de éxito
-    return JSONResponse({"message": "Registro exitoso. Redirigiendo a inicio de sesión."})
+    return JSONResponse({"message": "✅Registro exitoso"})
