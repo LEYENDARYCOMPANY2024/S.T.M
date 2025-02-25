@@ -273,7 +273,7 @@ document.addEventListener('DOMContentLoaded', function() {
       campoTexto.disabled = true;
     }
   
-  // Función adicional: Mostrar/ocultar toda la sección para mujeres según el sexo seleccionado
+
   // Esto es opcional, solo si tienes un selector de sexo en tu formulario
   const sexoFemenino = document.getElementById('sexoFemenino'); // Ajusta este ID según tu formulario
   const sexoMasculino = document.getElementById('sexoMasculino'); // Ajusta este ID según tu formulario
