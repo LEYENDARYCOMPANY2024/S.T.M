@@ -216,3 +216,88 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 });
+
+
+
+// Función para configurar el campo de embarazo en la sección de mujeres
+document.addEventListener('DOMContentLoaded', function() {
+    // Obtener referencias a los elementos
+    const radioSi = document.getElementById('embarazoSi');
+    const radioNo = document.getElementById('embarazoNo');
+    
+    // Verificar que existan los elementos
+    if (!radioSi || !radioNo) return;
+    
+    // El campo de texto será el input que está en el mismo contenedor
+    const contenedor = radioSi.closest('.inline-field');
+    const campoTexto = contenedor.querySelector('input[type="text"]');
+    
+    if (!campoTexto) return;
+    
+    // Función para actualizar el estado del campo de texto
+    function actualizarCampoEmbarazo() {
+      // Si "Sí" está seleccionado, habilitamos el campo de texto
+      if (radioSi.checked) {
+        campoTexto.disabled = false;
+        campoTexto.placeholder = "Semanas de gestación";
+        
+        // Opcional: cambiar el estilo para destacar este campo importante
+        campoTexto.classList.add('campo-importante');
+      } 
+      // Si "No" está seleccionado, deshabilitamos y limpiamos el campo
+      else if (radioNo.checked) {
+        campoTexto.disabled = true;
+        campoTexto.value = "";
+        campoTexto.placeholder = "No aplica";
+        
+        // Remover cualquier estilo adicional
+        campoTexto.classList.remove('campo-importante');
+      }
+    }
+    
+    // Configuramos los event listeners para los radio buttons
+    radioSi.addEventListener('change', actualizarCampoEmbarazo);
+    radioNo.addEventListener('change', actualizarCampoEmbarazo);
+    
+    // Inicializamos el estado basado en la selección actual
+    if (radioSi.checked) {
+      campoTexto.disabled = false;
+      campoTexto.placeholder = "Semanas de gestación";
+      campoTexto.classList.add('campo-importante');
+    } else if (radioNo.checked) {
+      campoTexto.disabled = true;
+      campoTexto.value = "";
+      campoTexto.placeholder = "No aplica";
+    } else {
+      // Por defecto, si ninguno está seleccionado
+      campoTexto.disabled = true;
+    }
+  
+  // Función adicional: Mostrar/ocultar toda la sección para mujeres según el sexo seleccionado
+  // Esto es opcional, solo si tienes un selector de sexo en tu formulario
+  const sexoFemenino = document.getElementById('sexoFemenino'); // Ajusta este ID según tu formulario
+  const sexoMasculino = document.getElementById('sexoMasculino'); // Ajusta este ID según tu formulario
+  const seccionMujeres = document.querySelector('.women-section');
+  
+  if (sexoFemenino && sexoMasculino && seccionMujeres) {
+    function actualizarVisibilidadSeccion() {
+      if (sexoFemenino.checked) {
+        seccionMujeres.style.display = 'block';
+      } else if (sexoMasculino.checked) {
+        seccionMujeres.style.display = 'none';
+        // Opcional: Resetear los valores
+        if (radioNo) radioNo.checked = true;
+        if (campoTexto) {
+          campoTexto.disabled = true;
+          campoTexto.value = "";
+        }
+      }
+    }
+    
+    sexoFemenino.addEventListener('change', actualizarVisibilidadSeccion);
+    sexoMasculino.addEventListener('change', actualizarVisibilidadSeccion);
+    
+    // Inicializar visibilidad
+    actualizarVisibilidadSeccion();
+  }
+});  
