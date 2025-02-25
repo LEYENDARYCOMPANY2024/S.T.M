@@ -9,7 +9,7 @@ document.getElementById('registerForm').addEventListener('submit', function(even
     setTimeout(function() {
         alert.classList.remove('show');  // Remover la clase para ocultar la alerta
         window.location.href = "/login";  // Redirigir a la página de login
-    }, 3000);
+    }, 1000);
     
     // Opcional: limpiar el formulario
     this.reset();

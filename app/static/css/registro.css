@@ -102,7 +102,7 @@ body {
 /* Estilos para la alerta de éxito */
 .alert {
     position: fixed;
-    top: 50px; /* Changed from 20px to 10px to move it higher */
+    top: 20px; /* Antes era 50px, ahora la subimos más */
     left: 50%;
     transform: translateX(-50%);
     padding: 15px 30px;
@@ -115,12 +115,13 @@ body {
     align-items: center;
     opacity: 0;
     visibility: hidden;
-    transition: opacity 0.3s, visibility 0.3s;
+    transition: opacity 0.3s, visibility 0.3s, top 0.3s ease-in-out; /* Agregamos transición para que suba suavemente */
 }
 
 .alert.show {
     opacity: 1;
     visibility: visible;
+    top: -100px; /* Cuando se muestra, sube un poco más */
 }
 
 .alert-icon {
