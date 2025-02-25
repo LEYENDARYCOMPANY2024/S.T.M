@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulario Médico</title>
+    <link rel="stylesheet" href="hitorial.css">
+    <script src="historial.js" defer></script>
+</head>
+<body>
+    <div class="top-bar">
+        <div class="menu-icon">☰</div>
+        <div class="user-icon">👤</div>
+    </div>
+    <nav class="navigation">
+        <a href="#">Historia Clinica</a>
+        <a href="#">Sesiones</a>
+        <a href="#">Dispositivos</a>
+        <a href="#">Ejercicios</a>
+        <a href="#">Chat</a>
+    </nav>
+    
+    <div class="container">
+        <h1>Formulario de Evaluación Médica</h1>
+        
+        <div class="grid-layout">
+            <!-- Datos del Paciente -->
+            <div class="section full-width">
+                <h3>Datos del Paciente</h3>
+                <div class="fields">
+                    <div>
+                        <label for="nombre">Nombre:</label>
+                        <input type="text" id="nombre">
+                    </div>
+                    <div>
+                        <label for="sexo">Sexo:</label>
+                        <select id="sexo">
+                            <option value="">Seleccionar</option>
+                            <option value="masculino">Masculino</option>
+                            <option value="femenino">Femenino</option>
+                            <option value="otro">Otro</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="edad">Edad:</label>
+                        <input type="number" id="edad">
+                    </div>
+                    <div>
+                        <label for="estadoCivil">Estado Civil:</label>
+                        <select id="estadoCivil">
+                            <option value="">Seleccionar</option>
+                            <option value="soltero">Soltero/a</option>
+                            <option value="casado">Casado/a</option>
+                            <option value="divorciado">Divorciado/a</option>
+                            <option value="viudo">Viudo/a</option>
+                            <option value="unionLibre">Unión Libre</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="ocupacion">Ocupación:</label>
+                        <input type="text" id="ocupacion">
+                    </div>
+                    <div>
+                        <label for="escolaridad">Escolaridad:</label>
+                        <input type="text" id="escolaridad">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Expediente -->
+            <div class="section">
+                <h3>Expediente</h3>
+                <div class="fields">
+                    <div>
+                        <label for="expediente">Número de Expediente:</label>
+                        <input type="text" id="expediente">
+                    </div>
+                    <div>
+                        <label for="fecha">Fecha:</label>
+                        <input type="date" id="fecha">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Exploración Física -->
+            <div class="section">
+                <h3>Exploración Física</h3>
+                <div class="fields">
+                    <div>
+                        <label for="peso">Peso (kg):</label>
+                        <input type="number" id="peso" step="0.1">
+                    </div>
+                    <div>
+                        <label for="estatura">Estatura (cm):</label>
+                        <input type="number" id="estatura">
+                    </div>
+                    <div>
+                        <label for="imc">IMC:</label>
+                        <input type="text" id="imc">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Antecedentes Patológicos y Heredofamiliares -->
+            <div class="section full-width">
+                <h3>Antecedentes Patológicos y Heredofamiliares</h3>
+                
+                <div class="fields">
+                    <div>
+                        <label>Diabetes:</label>
+                        <div class="inline-field">
+                            <span class="checkbox-label">
+                                <input type="radio" name="diabetes" id="diabetesSi"> 
+                                <span>Sí</span>
+                            </span>
+                            <span class="checkbox-label">
+                                <input type="radio" name="diabetes" id="diabetesNo">
+                                <span>No</span>
+                            </span>
+                            <input type="text" placeholder="Especifique">
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label>Alergia:</label>
+                        <div class="inline-field">
+                            <span class="checkbox-label">
+                                <input type="radio" name="alergia" id="alergiaSi"> 
+                                <span>Sí</span>
+                            </span>
+                            <span class="checkbox-label">
+                                <input type="radio" name="alergia" id="alergiaNo">
+                                <span>No</span>
+                            </span>
+                            <input type="text" placeholder="Especifique">
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label>HTA:</label>
+                        <div class="inline-field">
+                            <span class="checkbox-label">
+                                <input type="radio" name="hta" id="htaSi"> 
+                                <span>Sí</span>
+                            </span>
+                            <span class="checkbox-label">
+                                <input type="radio" name="hta" id="htaNo">
+                                <span>No</span>
+                            </span>
+                            <input type="text" placeholder="Especifique">
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label>Cáncer:</label>
+                        <div class="inline-field">
+                            <span class="checkbox-label">
+                                <input type="radio" name="cancer" id="cancerSi"> 
+                                <span>Sí</span>
+                            </span>
+                            <span class="checkbox-label">
+                                <input type="radio" name="cancer" id="cancerNo">
+                                <span>No</span>
+                            </span>
+                            <input type="text" placeholder="Especifique">
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label>Transfusiones:</label>
+                        <div class="inline-field">
+                            <span class="checkbox-label">
+                                <input type="radio" name="transfusiones" id="transfusionesSi"> 
+                                <span>Sí</span>
+                            </span>
+                            <span class="checkbox-label">
+                                <input type="radio" name="transfusiones" id="transfusionesNo">
+                                <span>No</span>
+                            </span>
+                            <input type="text" placeholder="Especifique">
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label>Enf. Reumáticas:</label>
+                        <div class="inline-field">
+                            <span class="checkbox-label">
+                                <input type="radio" name="reumaticas" id="reumaticasSi"> 
+                                <span>Sí</span>
+                            </span>
+                            <span class="checkbox-label">
+                                <input type="radio" name="reumaticas" id="reumaticasNo">
+                                <span>No</span>
+                            </span>
+                            <input type="text" placeholder="Especifique">
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label for="encames">Encames:</label>
+                        <input type="text" id="encames">
+                    </div>
+                    
+                    <div>
+                        <label for="accidentes">Accidentes:</label>
+                        <input type="text" id="accidentes">
+                    </div>
+                    
+                    <div>
+                        <label for="cardiopatias">Cardiopatías:</label>
+                        <input type="text" id="cardiopatias">
+                    </div>
+                    
+                    <div>
+                        <label for="cirugias">Cirugías:</label>
+                        <input type="text" id="cirugias">
+                    </div>
+                    
+                    <div>
+                        <label>Fracturas:</label>
+                        <div class="inline-field">
+                            <span class="checkbox-label">
+                                <input type="radio" name="fracturas" id="fracturasSi"> 
+                                <span>Sí</span>
+                            </span>
+                            <span class="checkbox-label">
+                                <input type="radio" name="fracturas" id="fracturasNo">
+                                <span>No</span>
+                            </span>
+                            <input type="text" placeholder="Especifique">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Espasmos o Contractura Muscular -->
+            <div class="section">
+                <h3>Espasmos o Contractura Muscular</h3>
+                <div>
+                    <div class="inline-field">
+                        <span class="checkbox-label">
+                            <input type="radio" name="espasmos" id="espasmosSi"> 
+                            <span>Sí</span>
+                        </span>
+                        <span class="checkbox-label">
+                            <input type="radio" name="espasmos" id="espasmosNo">
+                            <span>No</span>
+                        </span>
+                    </div>
+                </div>
+                <div>
+                    <label for="sitioEspasmos">Sitio/Características:</label>
+                    <input type="text" id="sitioEspasmos">
+                </div>
+            </div>
+            
+            <!-- Hábitos de Salud -->
+            <div class="section full-width">
+                <h3>Hábitos de Salud</h3>
+                <div class="fields">
+                    <div>
+                        <label>Tabaquismo:</label>
+                        <div class="inline-field">
+                            <span class="checkbox-label">
+                                <input type="radio" name="tabaquismo" id="tabaquismoSi"> 
+                                <span>Sí</span>
+                            </span>
+                            <span class="checkbox-label">
+                                <input type="radio" name="tabaquismo" id="tabaquismoNo">
+                                <span>No</span>
+                            </span>
+                            <input type="text" placeholder="Especifique">
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label>Alcoholismo:</label>
+                        <div class="inline-field">
+                            <span class="checkbox-label">
+                                <input type="radio" name="alcoholismo" id="alcoholismoSi"> 
+                                <span>Sí</span>
+                            </span>
+                            <span class="checkbox-label">
+                                <input type="radio" name="alcoholismo" id="alcoholismoNo">
+                                <span>No</span>
+                            </span>
+                            <input type="text" placeholder="Especifique">
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label>Drogas:</label>
+                        <div class="inline-field">
+                            <span class="checkbox-label">
+                                <input type="radio" name="drogas" id="drogasSi"> 
+                                <span>Sí</span>
+                            </span>
+                            <span class="checkbox-label">
+                                <input type="radio" name="drogas" id="drogasNo">
+                                <span>No</span>
+                            </span>
+                            <input type="text" placeholder="Especifique">
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label>Actividad Física:</label>
+                        <div class="inline-field">
+                            <span class="checkbox-label">
+                                <input type="radio" name="actividadFisica" id="actividadFisicaSi"> 
+                                <span>Sí</span>
+                            </span>
+                            <span class="checkbox-label">
+                                <input type="radio" name="actividadFisica" id="actividadFisicaNo">
+                                <span>No</span>
+                            </span>
+                            <input type="text" placeholder="Especifique">
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label>Se Automedica:</label>
+                        <div class="inline-field">
+                            <span class="checkbox-label">
+                                <input type="radio" name="automedica" id="automedicaSi"> 
+                                <span>Sí</span>
+                            </span>
+                            <span class="checkbox-label">
+                                <input type="radio" name="automedica" id="automedicaNo">
+                                <span>No</span>
+                            </span>
+                            <input type="text" placeholder="Especifique">
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label for="pasatiempo">Pasatiempo:</label>
+                        <input type="text" id="pasatiempo">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Información Específica para Mujeres -->
+            <div class="section women-section full-width">
+                <h2>Información Específica para Mujeres</h2>
+                <div class="fields">
+                    <div>
+                        <label>Está embarazada:</label>
+                        <div class="inline-field">
+                            <span class="checkbox-label">
+                                <input type="radio" name="embarazo" id="embarazoSi"> 
+                                <span>Sí</span>
+                            </span>
+                            <span class="checkbox-label">
+                                <input type="radio" name="embarazo" id="embarazoNo">
+                                <span>No</span>
+                            </span>
+                            <input type="text" placeholder="Especifique">
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label for="hijos">Cuántos hijos tiene:</label>
+                        <input type="number" id="hijos" min="0">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Diagnóstico Médico en Rehabilitación -->
+            <div class="section full-width">
+                <h3>Diagnóstico Médico en Rehabilitación</h3>
+                <div class="fields">
+                    <div>
+                        <label for="reflejos">Reflejos:</label>
+                        <input type="text" id="reflejos">
+                    </div>
+                    
+                    <div>
+                        <label for="sensibilidad">Sensibilidad:</label>
+                        <input type="text" id="sensibilidad">
+                    </div>
+                    
+                    <div>
+                        <label for="lenguaje">Lenguaje/Orientación:</label>
+                        <input type="text" id="lenguaje">
+                    </div>
+                    
+                    <div>
+                        <label for="otrosDiag">Otros:</label>
+                        <input type="text" id="otrosDiag">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Cicatriz Quirúrgica -->
+            <div class="section">
+                <h3>Cicatriz Quirúrgica</h3>
+                <div>
+                    <label for="sitioCicatriz">Sitio:</label>
+                    <input type="text" id="sitioCicatriz">
+                </div>
+                <div class="fields">
+                    <div>
+                        <label>Queloide:</label>
+                        <div class="inline-field">
+                            <span class="checkbox-label">
+                                <input type="radio" name="queloide" id="queloideSi"> 
+                                <span>Sí</span>
+                            </span>
+                            <span class="checkbox-label">
+                                <input type="radio" name="queloide" id="queloideNo">
+                                <span>No</span>
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label>Retráctil:</label>
+                        <div class="inline-field">
+                            <span class="checkbox-label">
+                                <input type="radio" name="retractil" id="retractilSi"> 
+                                <span>Sí</span>
+                            </span>
+                            <span class="checkbox-label">
+                                <input type="radio" name="retractil" id="retractilNo">
+                                <span>No</span>
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label>Abierta:</label>
+                        <div class="inline-field">
+                            <span class="checkbox-label">
+                                <input type="radio" name="abierta" id="abiertaSi"> 
+                                <span>Sí</span>
+                            </span>
+                            <span class="checkbox-label">
+                                <input type="radio" name="abierta" id="abiertaNo">
+                                <span>No</span>
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label>Con Adherencia:</label>
+                        <div class="inline-field">
+                            <span class="checkbox-label">
+                                <input type="radio" name="adherencia" id="adherenciaSi"> 
+                                <span>Sí</span>
+                            </span>
+                            <span class="checkbox-label">
+                                <input type="radio" name="adherencia" id="adherenciaNo">
+                                <span>No</span>
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label>Hipertrófica:</label>
+                        <div class="inline-field">
+                            <span class="checkbox-label">
+                                <input type="radio" name="hipertrofica" id="hipertroficaSi"> 
+                                <span>Sí</span>
+                            </span>
+                            <span class="checkbox-label">
+                                <input type="radio" name="hipertrofica" id="hipertroficaNo">
+                                <span>No</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Traslados -->
+            <div class="section full-width">
+                <h3>Traslados</h3>
+                <div class="fields">
+                    <div>
+                        <label>Valoración Inicial:</label>
+                        <div class="checkbox-group">
+                            <span class="checkbox-label">
+                                <input type="checkbox" id="inicialIndependiente"> 
+                                <span>Independiente</span>
+                            </span>
+                            <span class="checkbox-label">
+                                <input type="checkbox" id="inicialSillaRuedas">
+                                <span>Silla de Ruedas</span>
+                            </span>
+                            <span class="checkbox-label">
+                                <input type="checkbox" id="inicialConAyudas">
+                                <span>Con Ayudas</span>
+                            </span>
+                            <span class="checkbox-label">
+                                <input type="checkbox" id="inicialCamillas">
+                                <span>Camillas</span>
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label>Valoración Final:</label>
+                        <div class="checkbox-group">
+                            <span class="checkbox-label">
+                                <input type="checkbox" id="finalIndependiente"> 
+                                <span>Independiente</span>
+                            </span>
+                            <span class="checkbox-label">
+                                <input type="checkbox" id="finalSillaRuedas">
+                                <span>Silla de Ruedas</span>
+                            </span>
+                            <span class="checkbox-label">
+                                <input type="checkbox" id="finalConAyudas">
+                                <span>Con Ayudas</span>
+                            </span>
+                            <span class="checkbox-label">
+                                <input type="checkbox" id="finalCamillas">
+                                <span>Camillas</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Marcha / Deambulación -->
+            <div class="section">
+                <h3>Marcha / Deambulación</h3>
+                <div class="fields">
+                    <div>
+                        <label>Libre:</label>
+                        <div class="inline-field">
+                            <span class="checkbox-label">
+                                <input type="radio" name="libre" id="libreSi"> 
+                                <span>Sí</span>
+                            </span>
+                            <span class="checkbox-label">
+                                <input type="radio" name="libre" id="libreNo">
+                                <span>No</span>
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label>Espásticas:</label>
+                        <div class="inline-field">
+                            <span class="checkbox-label">
+                                <input type="radio" name="espasticas" id="espasticasSi"> 
+                                <span>Sí</span>
+                            </span>
+                            <span class="checkbox-label">
+                                <input type="radio" name="espasticas" id="espasticasNo">
+                                <span>No</span>
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label>Claudicante:</label>
+                        <div class="inline-field">
+                            <span class="checkbox-label">
+                                <input type="radio" name="claudicante" id="claudicanteSi"> 
+                                <span>Sí</span>
+                            </span>
+                            <span class="checkbox-label">
+                                <input type="radio" name="claudicante" id="claudicanteNo">
+                                <span>No</span>
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label>Atáxica:</label>
+                        <div class="inline-field">
+                            <span class="checkbox-label">
+                                <input type="radio" name="ataxica" id="ataxicaSi"> 
+                                <span>Sí</span>
+                            </span>
+                            <span class="checkbox-label">
+                                <input type="radio" name="ataxica" id="ataxicaNo">
+                                <span>No</span>
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label>Con Ayuda:</label>
+                        <div class="inline-field">
+                            <span class="checkbox-label">
+                                <input type="radio" name="conAyuda" id="conAyudaSi"> 
+                                <span>Sí</span>
+                            </span>
+                            <span class="checkbox-label">
+                                <input type="radio" name="conAyuda" id="conAyudaNo">
+                                <span>No</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div>
+                    <label for="otrosMarcha">Otros:</label>
+                    <input type="text" id="otrosMarcha">
+                </div>
+                
+                <div>
+                    <label for="observacionesMarcha">Observaciones:</label>
+                    <textarea id="observacionesMarcha" rows="3"></textarea>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>© 2025 Formulario de Evaluación Médica</p>
+        </div>
+    </div>
+    
+
+</body>
+</html>
