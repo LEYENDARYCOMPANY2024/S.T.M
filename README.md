@@ -82,6 +82,12 @@ pip install supabase
 pip install python-dotenv uvicorn
 ```
 
+## instalar la libreria para la encryptation de la contraseña, para mas seguridad.
+```shell
+pip install bcrypt
+```
+
+
 # Crear archivos para la ejecución
 ## Crear el archivo .env (necesario para la conexión a la abse de datos)
 
