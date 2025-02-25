@@ -62,3 +62,45 @@ function configurarCamposCondicionales() {
       campoTexto.disabled = true;
     });
   }
+
+  
+// Ejecutar la configuración cuando el DOM esté completamente cargado
+document.addEventListener('DOMContentLoaded', function() {
+    configurarCamposCondicionales();
+    
+    // También podemos añadir una validación al formulario
+    const formulario = document.querySelector('form');
+    if (formulario) {
+      formulario.addEventListener('submit', function(event) {
+        // Verificar que todos los campos con "Sí" seleccionado tengan texto
+        const condiciones = [
+          'diabetes',
+          'alergia',
+          'hta',
+          'cancer',
+          'transfusiones',
+          'reumaticas',
+          'fracturas'
+        ];
+        
+        let formularioValido = true;
+        
+        condiciones.forEach(condicion => {
+          const radioSi = document.getElementById(`${condicion}Si`);
+          const contenedor = radioSi.closest('.inline-field');
+          const campoTexto = contenedor.querySelector('input[type="text"]');
+          
+          // Si se seleccionó "Sí" pero no se especificó detalles
+          if (radioSi.checked && campoTexto.value.trim() === '') {
+            alert(`Por favor especifique detalles para ${condicion}.`);
+            formularioValido = false;
+          }
+        });
+        
+        if (!formularioValido) {
+          event.preventDefault(); // Evitar que se envíe el formulario
+        }
+      });
+    }
+  });
+  
