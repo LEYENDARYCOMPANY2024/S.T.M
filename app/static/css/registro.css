@@ -102,7 +102,7 @@ body {
 /* Estilos para la alerta de éxito */
 .alert {
     position: fixed;
-    top: 20px;
+    top: 50px; /* Changed from 20px to 10px to move it higher */
     left: 50%;
     transform: translateX(-50%);
     padding: 15px 30px;
