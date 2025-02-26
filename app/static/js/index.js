@@ -1,134 +1,100 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const btn = document.getElementById('btn-inicio');
+document.addEventListener("DOMContentLoaded", function() {
+    // Animación original para las letras S.M.M.
+    const smm = document.querySelector(".smm");
+    smm.addEventListener("mouseover", function() {
+        let colors = [
+            "#FFD700", // Dorado
+            "#C0C0C0", // Plateado
+            "#CD7F32", // Bronce
+            "#B8860B", // Oro viejo
+            "#E5E4E2", // Platino
+            "#B87333", // Cobre
+            "#B76E79"  // Oro rosa
+          ];
+          
+        let i = 0;
+        let interval = setInterval(() => {
+            smm.style.webkitTextStrokeColor = colors[i];
+            i = (i + 1) % colors.length;
+        }, 200);
+        smm.addEventListener("mouseleave", function() {
+            clearInterval(interval);
+            smm.style.webkitTextStrokeColor = "white";
+        }, { once: true });
+    });
     
-    // Agregar clases para los efectos iniciales
-    btn.classList.add('glow', 'fade-in');
+    // Añadir partículas flotantes
+    const particles = document.querySelector(".particles");
+    for (let i = 0; i < 20; i++) {
+        createParticle();
+    }
     
-    // Efecto de pulso al cargar la página
-    setTimeout(() => {
-        btn.classList.add('pulse');
-    }, 1000);
-    
-    // Efecto de click
-    btn.addEventListener('click', (event) => {
-        btn.classList.remove('pulse', 'glow');
+    function createParticle() {
+        const particle = document.createElement("span");
+        particle.className = "particle";
         
-        // Efecto de "ripple" al hacer click
-        const ripple = document.createElement('div');
-        ripple.classList.add('ripple-effect');
+        // Posición aleatoria
+        const posX = Math.random() * 100;
+        const posY = Math.random() * 100 + 100; // Empieza debajo de la pantalla
         
-        const rect = btn.getBoundingClientRect();
-        ripple.style.left = `${event.clientX - rect.left}px`;
-        ripple.style.top = `${event.clientY - rect.top}px`;
+        // Tamaño aleatorio
+        const size = Math.random() * 10 + 5;
         
-        btn.appendChild(ripple);
+        // Duración aleatoria
+        const duration = Math.random() * 15 + 10;
         
-        // Eliminar el efecto después de la animación
+        // Aplicar estilos
+        particle.style.left = `${posX}%`;
+        particle.style.width = `${size}px`;
+        particle.style.height = `${size}px`;
+        particle.style.opacity = `${Math.random() * 0.5 + 0.5}`;
+        particle.style.animationDuration = `${duration}s`;
+        particle.style.animationDelay = `${Math.random() * 5}s`;
+        
+        particles.appendChild(particle);
+        
+        // Eliminar la partícula después de que termine la animación
         setTimeout(() => {
-            ripple.remove();
-            btn.classList.add('pulse', 'glow');
-        }, 600);
+            particle.remove();
+            createParticle();
+        }, duration * 1000);
+    }
+    
+    // Efecto 3D en hover para cada letra
+    const letras = document.querySelectorAll(".smm span");
+    letras.forEach(letra => {
+        letra.addEventListener("mouseover", function() {
+            this.style.transform = `rotateY(${Math.random() * 40 - 20}deg) rotateX(${Math.random() * 40 - 20}deg) scale(1.2)`;
+            this.style.transition = "transform 0.3s ease";
+        });
+        
+        letra.addEventListener("mouseleave", function() {
+            this.style.transform = "rotateY(0) rotateX(0) scale(1)";
+        });
     });
 });
 
 // Agregar estilos CSS dinámicamente
-const style = document.createElement('style');
-style.textContent = `
-    @keyframes ripple {
-        from {
-            transform: scale(0);
-            opacity: 1;
-        }
-        to {
-            transform: scale(20);
-            opacity: 0;
-        }
-    }
-    
-    @keyframes pulse {
-        0% { transform: scale(1); }
-        50% { transform: scale(1.1); }
-        100% { transform: scale(1); }
-    }
-    
-    @keyframes glow {
-        0% { box-shadow: 0 0 5px #ff00ff; }
-        50% { box-shadow: 0 0 20px #ff00ff; }
-        100% { box-shadow: 0 0 5px #ff00ff; }
-    }
-    
-    .pulse {
-        animation: pulse 1.5s infinite;
-    }
-    
-    .glow {
-        animation: glow 1.5s infinite alternate;
-    }
-    
-    .fade-in {
-        animation: fade-in 1s ease-in-out;
-    }
-    
-    @keyframes fade-in {
-        from { opacity: 0; transform: translateY(-20px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-    
-    .ripple-effect {
-        position: absolute;
-        border-radius: 50%;
-        background-color: rgba(255, 255, 255, 0.7);
-        width: 40px;
-        height: 40px;
-        transform: scale(0);
-        animation: ripple 0.6s linear;
-        pointer-events: none;
-    }
-    
-    section {
-        opacity: 0;
-        transform: translateY(50px);
-        transition: opacity 1s ease-out, transform 1s ease-out;
-    }
-    
-    .visible {
-        opacity: 1;
-        transform: translateY(0);
-    }
-`;
-document.head.appendChild(style);
+let lastScrollTop = 0;
+window.addEventListener("scroll", function () {
+    let scrollMessage = document.getElementById("scroll-message");
+    let currentScroll = window.scrollY;
 
-document.addEventListener("DOMContentLoaded", function () {
-    const sections = document.querySelectorAll("section");
-
-    function mostrarSecciones() {
-        sections.forEach((section) => {
-            const sectionTop = section.getBoundingClientRect().top;
-            const windowHeight = window.innerHeight;
-
-            if (sectionTop < windowHeight - 100) {
-                section.classList.add("visible");
-            }
-        });
+    if (currentScroll > lastScrollTop) {
+        // Usuario baja
+        scrollMessage.classList.add("visible");
+    } else {
+        // Usuario sube
+        scrollMessage.classList.remove("visible");
     }
-
-    window.addEventListener("scroll", mostrarSecciones);
-    mostrarSecciones(); // Mostrar las secciones visibles al cargar la página
+    lastScrollTop = currentScroll <= 0 ? 0 : currentScroll;
 });
 
-
-document.addEventListener("DOMContentLoaded", function () {
-    const separators = document.querySelectorAll(".section-separator");
-
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add("visible");
-            }
-        });
-    }, { threshold: 0.5 });
-
-    separators.forEach((separator) => {
-        observer.observe(separator);
-    });
+window.addEventListener("scroll", function () {
+    let bell = document.getElementById("floating-bell");
+    if (window.scrollY > 300) {
+        bell.style.display = "block";
+    } else {
+        bell.style.display = "none";
+    }
 });
