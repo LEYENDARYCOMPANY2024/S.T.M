@@ -11,4 +11,4 @@ async def login_action(nombre_usuario: str = Form(...), contrasena: str = Form(.
     if "error" in resultado:
         raise HTTPException(status_code=401, detail=resultado["error"])
     
-    return RedirectResponse(url="static/templates/principal.html", status_code=303)
+    return RedirectResponse(url="/principal", status_code=303)
