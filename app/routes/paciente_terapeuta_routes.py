@@ -1,14 +1,10 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from database import get_db
-from app.controllers.paciente_terapeuta_principal_controller import get_pacientes, create_paciente
+from controllers.paciente_terapeuta_principal_controller import create_paciente
 
 router = APIRouter()
 
-@router.get("/pacientes")
-def listar_pacientes(db: Session = Depends(get_db)):
-    return get_pacientes(db)
-
 @router.post("/pacientes")
-def agregar_paciente(paciente_data: dict, db: Session = Depends(get_db)):
-    return create_paciente(db, paciente_data)
+def agregar_paciente(paciente_data: dict, id_terapeuta: int, db: Session = Depends(get_db)):
+    return create_paciente(db, paciente_data, id_terapeuta)
