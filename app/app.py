@@ -1,10 +1,11 @@
 from fastapi import FastAPI
 from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 from controllers import index
 from routes.inicio_sesion import router as login_router
 from routes.registro import router as registro_router
-from routes.inicio_sesion import router as patient_router  # ✅ Agregar rutas de pacientes
-from fastapi.staticfiles import StaticFiles
+from routes.inicio_sesion import router as patient_router  # ✅ Rutas de pacientes
+from routes.terapeuta_perfil import router as perfil_router  # ✅ Importamos el router de perfil
 
 app = FastAPI()
 
@@ -14,7 +15,8 @@ app.include_router(index.router)
 # 📌 Registramos las rutas de autenticación
 app.include_router(login_router)
 app.include_router(registro_router)
-app.include_router(patient_router)  # ✅ Agregamos rutas para pacientes
+app.include_router(patient_router)  # ✅ Rutas para pacientes
+app.include_router(perfil_router)   # ✅ Rutas para perfil de terapeuta
 
 # 📌 Montamos archivos estáticos
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -27,3 +29,7 @@ def home():
 @app.get("/principal")
 def serve_principal():
     return FileResponse("templates/principal.html")  # Asegúrate de que la ruta es correcta
+
+@app.get("/perfil")
+def serve_principal():
+    return FileResponse("templates/perfil.html")  # Asegúrate de que la ruta es correcta
