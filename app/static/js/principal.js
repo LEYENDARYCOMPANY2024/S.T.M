@@ -1,4 +1,38 @@
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", async function () {
+    const token = localStorage.getItem("session_token");
+
+    // 📌 Si no hay token, redirigir al login
+    if (!token) {
+        window.location.href = "/login";
+        return;
+    }
+
+    // 📌 Decodificar el token para obtener el id_terapeuta
+    function parseJwt(token) {
+        try {
+            return JSON.parse(atob(token.split(".")[1]));
+        } catch (e) {
+            return null;
+        }
+    }
+
+    const decodedToken = parseJwt(token);
+    if (!decodedToken || !decodedToken.sub) {
+        localStorage.removeItem("session_token"); // Eliminar token corrupto
+        window.location.href = "/login";
+        return;
+    }
+
+    const idTerapeuta = decodedToken.sub; // ID del terapeuta desde el token
+    const nombreUsuario = decodedToken.nombre_usuario;
+
+    // 📌 Mostrar el nombre del usuario en la interfaz
+    const userIcon = document.querySelector(".user-icon");
+    if (nombreUsuario) {
+        userIcon.innerHTML = `<i class="fas fa-user-circle"></i> <span>${nombreUsuario}</span>`;
+    }
+
+    // 📌 Evento para abrir el modal
     const openModalBtn = document.getElementById("openModalBtn");
     const modal = document.getElementById("addPatientModal");
     const closeModalBtn = document.querySelector(".close-modal-btn");
@@ -6,51 +40,31 @@ document.addEventListener("DOMContentLoaded", function () {
     const successAlert = document.getElementById("successAlert");
     const patientsList = document.querySelector(".patients-list");
 
-    // 📌 Evento para abrir el modal
-    openModalBtn.addEventListener("click", () => {
-        modal.style.display = "flex";
-    });
+    openModalBtn.addEventListener("click", () => modal.style.display = "flex");
+    closeModalBtn.addEventListener("click", () => modal.style.display = "none");
 
-    // 📌 Evento para cerrar el modal con el botón X
-    closeModalBtn.addEventListener("click", () => {
-        modal.style.display = "none";
-    });
-
-    // 📌 Evento para cerrar el modal al hacer clic fuera de él
     window.addEventListener("click", (event) => {
-        if (event.target === modal) {
-            modal.style.display = "none";
-        }
+        if (event.target === modal) modal.style.display = "none";
     });
 
-    // 📌 Manejar el envío del formulario
+    // 📌 Manejar el envío del formulario con el token
     addPatientForm.addEventListener("submit", async function (event) {
         event.preventDefault();
 
         const formData = new FormData(addPatientForm);
         const patientData = Object.fromEntries(formData.entries());
 
-        // Eliminar cualquier código que haya en el formulario (el backend lo generará)
-        delete patientData.codigo;
-
-        // Obtener ID del terapeuta desde localStorage
-        const idTerapeuta = localStorage.getItem("id_terapeuta");
-
-        if (!idTerapeuta) {
-            alert("Error: No se encontró el terapeuta.");
-            return;
-        }
-
         const response = await fetch(`/pacientes?id_terapeuta=${idTerapeuta}`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: { 
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}` // 🔹 Enviar token en la petición
+            },
             body: JSON.stringify(patientData)
         });
 
         if (response.ok) {
             const newPatient = await response.json();
-
-            // 📌 Crear nueva tarjeta de paciente con el código generado
             const newPatientCard = document.createElement("div");
             newPatientCard.className = "patient-card";
             newPatientCard.innerHTML = `
@@ -59,21 +73,24 @@ document.addEventListener("DOMContentLoaded", function () {
                 <span class="code">Código: ${newPatient.codigo}</span>
                 <button class="enter-btn"><i class="fas fa-arrow-right"></i></button>
             `;
-
-            // 📌 Añadir la nueva tarjeta a la lista
             patientsList.appendChild(newPatientCard);
-
-            // 📌 Mostrar alerta de éxito
             successAlert.classList.add("show");
-
-            // 📌 Ocultar la alerta después de 3 segundos
             setTimeout(() => successAlert.classList.remove("show"), 3000);
-
-            // 📌 Cerrar modal y resetear formulario
             modal.style.display = "none";
             addPatientForm.reset();
         } else {
             alert("Error al agregar paciente.");
         }
+    });
+
+    // 📌 Redirigir al perfil cuando se hace clic en el icono de usuario
+    document.getElementById("profileIcon").addEventListener("click", function () {
+        window.location.href = "/perfil";
+    });
+
+    // 📌 Cerrar sesión eliminando el token
+    document.getElementById("logoutBtn")?.addEventListener("click", function () {
+        localStorage.removeItem("session_token");
+        window.location.href = "/login";
     });
 });

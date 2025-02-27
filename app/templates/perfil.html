@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Perfil de Usuario</title>
-    <link rel="stylesheet" href="/static/css/index.css">
-    <script src="/static/js/index.js" defer></script>
+    <link rel="stylesheet" href="/static/css/perfil.css">
+    
 </head>
 <body>
     <header class="header">
@@ -35,17 +35,20 @@
 
                 <div class="profile-info">
                     <div class="info-field">
-                        <input type="text" placeholder="Nombre completo" disabled />
+                        <input type="text" placeholder="Nombre" disabled /><br>
+                        <input type="text" placeholder="Primer apellido" disabled /><br>
+                        <input type="text" placeholder="Segundo apellido" disabled />
                     </div>
                     <div class="info-field">
                         <input type="email" placeholder="Correo electrónico" disabled />
                     </div>
                     <div class="address-field">
                         <label>Domicilio:</label>
-                        <input type="text" placeholder="Colonia" disabled />
-                        <input type="text" placeholder="Calle y número" disabled />
                         <input type="text" placeholder="Código Postal" disabled />
-                        <input type="text" placeholder="País" disabled />
+                        <input type="text" placeholder="Calle" disabled />
+                        <input type="text" placeholder="Colonia" disabled />
+                        <input type="text" placeholder="Número exterior" disabled />
+                        <input type="text" placeholder="Número interior" disabled />
                     </div>
                     <div class="professional-id">
                         <div class="professional-id-input">
@@ -84,5 +87,6 @@
             </div>
         </form>
     </main>
+    <script src="/static/js/principal.js"></script>
 </body>
 </html>
