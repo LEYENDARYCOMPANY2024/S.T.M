@@ -7,4 +7,5 @@ router = APIRouter()
 
 @router.post("/pacientes")
 def agregar_paciente(paciente_data: dict, id_terapeuta: int, db: Session = Depends(get_db)):
-    return create_paciente(db, paciente_data, id_terapeuta)
+    nuevo_paciente = create_paciente(db, paciente_data, id_terapeuta)
+    return nuevo_paciente  # Devuelve el paciente con su código
