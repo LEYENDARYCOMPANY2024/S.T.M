@@ -47,27 +47,38 @@ document.addEventListener("DOMContentLoaded", async function () {
             });
 
             if (!response.ok) {
-                throw new Error("❌ Error al obtener la lista de pacientes.");
+                // Si el backend devuelve 404, no mostrar alerta de error
+                if (response.status === 404) {
+                    console.warn("ℹ️ No hay pacientes registrados para este terapeuta.");
+                    patientsList.innerHTML = "<p>No hay pacientes registrados.</p>";
+                    return;
+                }
+
+                throw new Error(`❌ Error al obtener la lista de pacientes (${response.status}).`);
             }
 
             const pacientes = await response.json();
-            console.log("📋 Pacientes obtenidos:", pacientes); // Depuración
+            console.log("📋 Pacientes obtenidos:", pacientes);
 
             // 📌 Limpiar la lista antes de agregar pacientes
             patientsList.innerHTML = "";
 
             // 📌 Renderizar la lista de pacientes
-            pacientes.forEach(paciente => {
-                const patientCard = document.createElement("div");
-                patientCard.className = "patient-card";
-                patientCard.innerHTML = `
-                    <i class="fas fa-user-circle"></i>
-                    <span><strong>${paciente.nombre} ${paciente.primer_apellido} ${paciente.segundo_apellido || ""}</strong></span>
-                    <span class="code">Código: ${paciente.codigo}</span>
-                    <button class="enter-btn"><i class="fas fa-arrow-right"></i></button>
-                `;
-                patientsList.appendChild(patientCard);
-            });
+            if (pacientes.length === 0) {
+                patientsList.innerHTML = "<p>No hay pacientes registrados.</p>";
+            } else {
+                pacientes.forEach(paciente => {
+                    const patientCard = document.createElement("div");
+                    patientCard.className = "patient-card";
+                    patientCard.innerHTML = `
+                        <i class="fas fa-user-circle"></i>
+                        <span><strong>${paciente.nombre} ${paciente.primer_apellido} ${paciente.segundo_apellido || ""}</strong></span>
+                        <span class="code">Código: ${paciente.codigo}</span>
+                        <button class="enter-btn"><i class="fas fa-arrow-right"></i></button>
+                    `;
+                    patientsList.appendChild(patientCard);
+                });
+            }
 
         } catch (error) {
             console.error(error);
