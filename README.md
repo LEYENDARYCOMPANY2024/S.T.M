@@ -171,5 +171,12 @@ git reset --hard
 
 `Presiona Ctrl + Shift + R (Windows/Linux) o Cmd + Shift + R (Mac).`
 
+## eliminar pycache y archivo temporales de python
+
+```shell
+find . -name "__pycache__" -type d -exec rm -r {} +
+find . -name "*.pyc" -delete
+```
+
 ## 📧 Contacto
 Para cualquier duda o sugerencia, puedes contactar a [leyendary2024@gmail.com].
