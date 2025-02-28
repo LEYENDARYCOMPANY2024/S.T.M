@@ -334,7 +334,7 @@ label {
 /* Estilos para la alerta de éxito */
 .alert {
     position: fixed;
-    top: 20px;
+    top: -70px; /* Cambié el valor de 20px a 10px para subirla más */
     left: 50%;
     transform: translateX(-50%);
     padding: 15px 30px;
@@ -349,6 +349,7 @@ label {
     visibility: hidden;
     transition: opacity 0.3s, visibility 0.3s;
 }
+
 
 .alert.show {
     opacity: 1;
