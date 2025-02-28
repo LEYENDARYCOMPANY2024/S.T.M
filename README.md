@@ -86,7 +86,19 @@ pip install python-dotenv uvicorn
 ```shell
 pip install bcrypt
 ```
+## instalar librerias necesarias para las sesiones de supabase
 
+```shell
+pip install sqlalchemy
+```
+
+```shell
+pip install pyjwt
+```
+
+```shell
+pip install psycopg2-binary
+```
 
 # Crear archivos para la ejecución
 ## Crear el archivo .env (necesario para la conexión a la abse de datos)
@@ -154,6 +166,10 @@ git push origin <tu_rama>
 ```shell
 git reset --hard
 ```
+
+## si el navegador no hace cambios
+
+`Presiona Ctrl + Shift + R (Windows/Linux) o Cmd + Shift + R (Mac).`
 
 ## 📧 Contacto
 Para cualquier duda o sugerencia, puedes contactar a [leyendary2024@gmail.com].
