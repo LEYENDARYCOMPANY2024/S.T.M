@@ -20,6 +20,14 @@ document.addEventListener("DOMContentLoaded", async function () {
         }
     }
 
+    // Agregar funcionalidad para el botón de regreso
+    const backButton = document.querySelector(".back-button");
+    if (backButton) {
+        backButton.addEventListener("click", function () {
+            window.history.back();
+        });
+    }
+
     const decodedToken = parseJwt(token);
     if (!decodedToken || !decodedToken.sub || !decodedToken.exp) {
         console.warn("⚠️ Token inválido o corrupto, eliminando...");
@@ -163,6 +171,6 @@ document.addEventListener("DOMContentLoaded", async function () {
         console.warn("⚠️ Cerrando sesión...");
         localStorage.removeItem("session_token");
         localStorage.removeItem("nombre_usuario");
-        window.location.replace("/login");
+        window.location.replace("/");
     };
 });
