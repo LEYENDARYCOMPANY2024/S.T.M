@@ -12,7 +12,6 @@
     <header>
         <div class="top-bar">
             <div class="user-icon" id="profileIcon"><i class="fas fa-user-circle"></i></div>
-
         </div>
     </header>
     <main>
@@ -20,9 +19,7 @@
             <input type="text" placeholder="Buscar paciente...">
             <button class="close-btn">🔍</button>
         </div>
-        <div class="patients-list">
-            <!-- La lista de pacientes estará vacía inicialmente -->
-        </div>
+        <div class="patients-list"></div>
         <button class="add-btn" id="openModalBtn"><i class="fa-solid fa-plus"></i></button>
 
         <div class="modal" id="addPatientModal">
@@ -30,25 +27,27 @@
                 <button class="close-modal-btn">&times;</button>
                 <h2>Agregar paciente</h2>
                 <form id="addPatientForm">
-                    <input type="text" placeholder="Nombre" required>
-                    <input type="text" placeholder="Primer Apellido" required>
-                    <input type="text" placeholder="Segundo Apellido">
-                    <input type="number" placeholder="Edad" required>
-                    <select required>
-                        <option value="" disabled selected>Sexo</option>
+                    <input type="text" name="nombre" placeholder="Nombre" required>
+                    <input type="text" name="primer_apellido" placeholder="Primer Apellido" required>
+                    <input type="text" name="segundo_apellido" placeholder="Segundo Apellido">
+                    <input type="number" name="edad" placeholder="Edad" required>
+                    
+                    <select name="genero" required>
+                        <option value="" disabled hidden>Selecciona un género</option>
                         <option value="masculino">Masculino</option>
                         <option value="femenino">Femenino</option>
                     </select>
+
                     <button type="submit" class="submit-btn">Agregar</button>
-                </form>
+                </form>                          
             </div>
         </div>
         
-        <!-- Alerta de éxito -->
         <div class="alert" id="successAlert">
             <span class="alert-icon">✅</span>
             <span>¡Paciente agregado exitosamente!</span>
         </div>
+        
         <script src="/static/js/principal.js"></script>
     </main>
 </body>
