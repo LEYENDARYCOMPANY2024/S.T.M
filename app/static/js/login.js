@@ -1,41 +1,41 @@
 document.addEventListener("DOMContentLoaded", function () {
-    const loginForm = document.getElementById("loginForm");
+    const token = localStorage.getItem("session_token");
 
-    if (!loginForm) {
-        console.error("❌ Error: No se encontró el formulario de login. Verifica que tenga id='loginForm'.");
+    if (token) {
+        console.log("📌 Token detectado en localStorage:", token); // 🔹 Verificar el token guardado
+        window.location.replace("/principal");
         return;
     }
 
-    loginForm.addEventListener("submit", async function (event) {
+    document.getElementById("loginForm").addEventListener("submit", async function (event) {
         event.preventDefault();
 
         const formData = new FormData(this);
+        const loginData = Object.fromEntries(formData.entries());
 
         try {
             const response = await fetch("/login", {
                 method: "POST",
-                headers: { "Content-Type": "application/x-www-form-urlencoded" },
-                body: new URLSearchParams(formData),
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(loginData),
             });
 
-            // 📌 Verificar si la respuesta es HTML en lugar de JSON
-            const contentType = response.headers.get("content-type");
-            if (!contentType || !contentType.includes("application/json")) {
-                throw new Error("❌ Error inesperado: El servidor devolvió HTML en lugar de JSON.");
-            }
-
             if (!response.ok) {
-                throw new Error("❌ Credenciales incorrectas o error del servidor.");
+                const errorResponse = await response.json();
+                console.error("❌ Error en la respuesta del servidor:", JSON.stringify(errorResponse, null, 2));
+                throw new Error("Usuario o contraseña incorrectos");
             }
 
             const data = await response.json();
-            
-            // 📌 Guardar token y datos en localStorage
+
+            // 📌 Guardar el token y el usuario en `localStorage`
             localStorage.setItem("session_token", data.token);
             localStorage.setItem("nombre_usuario", data.terapeuta.nombre_usuario);
 
-            // 📌 Redirigir a la página principal
-            window.location.href = "/principal";
+            console.log("📌 Token guardado correctamente:", data.token); // 🔹 Mostrar token guardado
+
+            // 📌 Redirigir inmediatamente a la página principal
+            window.location.replace("/principal");
         } catch (error) {
             alert(error.message);
         }

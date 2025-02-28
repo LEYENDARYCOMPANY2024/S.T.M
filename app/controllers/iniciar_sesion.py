@@ -12,9 +12,10 @@ load_dotenv()
 SUPABASE_URL = os.getenv("SUPABASE_URL")  # 🔹 API REST de Supabase
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")  # 🔹 Clave de Supabase API
 DATABASE_URL = os.getenv("DATABASE_URL")  # 🔹 PostgreSQL para SQLAlchemy
-SECRET_KEY = os.getenv("SECRET_KEY", "laMejorsuperkeydelMundo")  # 🔹 Secreto para JWT
+SECRET_KEY = os.getenv("SECRET_KEY")  # 🔹 Secreto para JWT
 ALGORITHM = "HS256"  # 🔹 Algoritmo de encriptación del token
 TOKEN_EXPIRATION_MINUTES = 60  # 🔹 Tiempo de expiración (1 hora)
+
 
 # 🔹 Crear cliente Supabase (API REST)
 if not SUPABASE_URL or not SUPABASE_KEY:
@@ -37,11 +38,13 @@ def verify_password(password: str, stored_password: str) -> bool:
 def generar_token(id_terapeuta: int, nombre_usuario: str):
     expiration = datetime.datetime.utcnow() + datetime.timedelta(minutes=TOKEN_EXPIRATION_MINUTES)
     payload = {
-        "sub": id_terapeuta,
+        "sub": str(id_terapeuta),  # ✅ Convertir a string para evitar el error
         "nombre_usuario": nombre_usuario,
         "exp": expiration
     }
-    return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
+    token = jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
+    return token
+
 
 # 📌 Función para autenticar terapeuta (inicio de sesión)
 def autenticar_terapeuta(nombre_usuario: str, contrasena: str):
@@ -69,3 +72,5 @@ def autenticar_terapeuta(nombre_usuario: str, contrasena: str):
             return {"error": "❌ Usuario o contraseña incorrectos"}
     except Exception as e:
         return {"error": f"❌ Error al iniciar sesión: {str(e)}"}
+    
+    
