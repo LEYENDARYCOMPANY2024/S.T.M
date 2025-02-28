@@ -361,3 +361,8 @@ section {
         height: 32px;
         fill: #000;
     }
+
+    .hidden {
+        display: none !important;
+    }
+    

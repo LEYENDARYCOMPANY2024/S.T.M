@@ -1,49 +1,71 @@
 document.addEventListener("DOMContentLoaded", async function () {
     const token = localStorage.getItem("session_token");
 
-    // 📌 Función para limpiar los valores antes de enviarlos
-    function sanitizeValue(value) {
-        return value.trim() === "" ? null : value; // Si el valor es vacío, devolver `null`
-    }
-
     // 📌 Si no hay token, redirigir al login
     if (!token) {
-        window.location.href = "/";
+        console.warn("⚠️ No hay token en localStorage, redirigiendo al login...");
+        
         return;
     }
 
-    // 📌 Decodificar el token para obtener el id_terapeuta
+    console.log("📌 Token detectado en `perfil.js` antes de enviar:", token);
+
+    // 📌 Función para decodificar el token y obtener el ID del terapeuta
     function parseJwt(token) {
         try {
             return JSON.parse(atob(token.split(".")[1]));
         } catch (e) {
+            console.error("❌ Error al decodificar el token:", e);
             return null;
         }
     }
 
     const decodedToken = parseJwt(token);
-    if (!decodedToken || !decodedToken.sub) {
-        localStorage.removeItem("session_token"); // Eliminar token corrupto
-        window.location.href = "/";
+    if (!decodedToken || !decodedToken.sub || !decodedToken.exp) {
+        console.warn("⚠️ Token inválido o corrupto, eliminando...");
+        localStorage.removeItem("session_token");
+        window.location.replace("/login");
         return;
     }
 
-    const idTerapeuta = decodedToken.sub; // ID del terapeuta desde el token
+    // 📌 Verificar si el token ha expirado
+    const currentTime = Math.floor(Date.now() / 1000);
+    if (decodedToken.exp < currentTime) {
+        console.warn("⏳ Token expirado, eliminando y redirigiendo a login...");
+        localStorage.removeItem("session_token");
+        
+        return;
+    }
+
+    const idTerapeuta = decodedToken.sub;
+    console.log(`📌 Usuario autenticado en perfil. ID: ${idTerapeuta}, Token: ${token}`);
 
     // 📌 Obtener datos del perfil desde la API
     try {
         const response = await fetch(`/perfil/${idTerapeuta}`, {
             method: "GET",
             headers: {
-                "Authorization": `Bearer ${token}`
+                "Authorization": `Bearer ${token}`,  // ✅ Asegurar que el formato sea correcto
+                "Content-Type": "application/json"
             }
         });
+        
+
+        console.log(`📌 Enviando token a backend: ${token}`);
 
         if (!response.ok) {
+            console.error(`❌ Error en la solicitud: ${response.status}`);
+            if (response.status === 401) {
+                console.error("❌ Token inválido o expirado. Redirigiendo al login...");
+                localStorage.removeItem("session_token");
+                
+                return;
+            }
             throw new Error("Error al obtener los datos del perfil");
         }
 
         const data = await response.json();
+        console.log("📌 Datos del perfil obtenidos correctamente:", data);
 
         // 📌 Guardar `nombre_usuario` en localStorage para enviarlo en `PUT`
         localStorage.setItem("nombre_usuario", data.nombre_usuario);
@@ -74,14 +96,11 @@ document.addEventListener("DOMContentLoaded", async function () {
         uploadButtons.forEach(button => button.disabled = isEditing);
         saveBtn.disabled = isEditing;
 
-        editBtn.innerHTML = isEditing
-            ? `Cancelar`
-            : `Editar`;
+        editBtn.innerHTML = isEditing ? `Cancelar` : `Editar`;
     });
 
     // 📌 Guardar cambios
     saveBtn.addEventListener("click", async function () {
-
         const updatedData = {};
 
         // 📌 Definir los campos a actualizar
@@ -139,29 +158,11 @@ document.addEventListener("DOMContentLoaded", async function () {
         saveBtn.disabled = true;
     });
 
-    // 📌 Subir foto de perfil
-    document.getElementById("photo-upload").addEventListener("change", function (event) {
-        const reader = new FileReader();
-        reader.onload = function () {
-            document.getElementById("profile-photo").src = reader.result;
-        };
-        reader.readAsDataURL(event.target.files[0]);
-    });
-
-    // 📌 Subir cédula profesional
-    document.getElementById("cedula-upload").addEventListener("change", function (event) {
-        const reader = new FileReader();
-        reader.onload = function () {
-            document.getElementById("cedula-image").src = reader.result;
-            document.getElementById("cedula-preview").style.display = "block";
-        };
-        reader.readAsDataURL(event.target.files[0]);
-    });
-
     // 📌 Cerrar sesión
     window.cerrarSesion = function () {
+        console.warn("⚠️ Cerrando sesión...");
         localStorage.removeItem("session_token");
         localStorage.removeItem("nombre_usuario");
-        window.location.href = "/";
+        window.location.replace("/login");
     };
 });

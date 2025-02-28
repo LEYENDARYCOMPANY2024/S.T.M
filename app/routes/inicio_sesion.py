@@ -1,22 +1,23 @@
-from fastapi import APIRouter, Form, HTTPException
-from fastapi.responses import JSONResponse
+from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel
 from controllers.iniciar_sesion import autenticar_terapeuta
 
 router = APIRouter()
 
+# 📌 Modelo para recibir `JSON` en lugar de `FormData`
+class LoginRequest(BaseModel):
+    nombre_usuario: str
+    contrasena: str
+
 @router.post("/login")
-async def login_action(nombre_usuario: str = Form(...), contrasena: str = Form(...)):
-    try:
-        resultado = autenticar_terapeuta(nombre_usuario, contrasena)
-
-        if "error" in resultado:
-            return JSONResponse(status_code=401, content={"error": resultado["error"]})
-
-        return JSONResponse(status_code=200, content={
-            "message": "✅ Inicio de sesión exitoso",
-            "terapeuta": resultado["terapeuta"],
-            "token": resultado["token"]
-        })
+async def login_action(request: LoginRequest):
+    resultado = autenticar_terapeuta(request.nombre_usuario, request.contrasena)
     
-    except Exception as e:
-        return JSONResponse(status_code=500, content={"error": f"❌ Error interno del servidor: {str(e)}"})
+    if "error" in resultado:
+        raise HTTPException(status_code=401, detail=resultado["error"])
+
+    return {
+        "message": "✅ Inicio de sesión exitoso",
+        "terapeuta": resultado["terapeuta"],
+        "token": resultado["token"]
+    }
