@@ -6,6 +6,7 @@ document.addEventListener("DOMContentLoaded", function () {
         window.location.replace("/principal");
         return;
     }
+    
 
     document.getElementById("loginForm").addEventListener("submit", async function (event) {
         event.preventDefault();
