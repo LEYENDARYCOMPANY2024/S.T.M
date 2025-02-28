@@ -6,17 +6,22 @@ from models.terapeutas import Terapeuta as TerapeutaModel, TerapeutaResponse, Te
 def obtener_perfil(terapeuta_id: int, db: Session = Depends(get_db)):
     terapeuta = db.query(TerapeutaModel).filter(TerapeutaModel.id_terapeuta == terapeuta_id).first()
     if not terapeuta:
-        raise HTTPException(status_code=404, detail="Terapeuta no encontrado")
+        raise HTTPException(status_code=404, detail="❌ Terapeuta no encontrado")
     
     return TerapeutaResponse(**terapeuta.__dict__)  # Convertir en el esquema de respuesta
 
-def actualizar_perfil(terapeuta_id: int, datos: TerapeutaBase, db: Session = Depends(get_db)):
+def actualizar_perfil(terapeuta_id: int, datos: TerapeutaBase, db: Session):
     terapeuta = db.query(TerapeutaModel).filter(TerapeutaModel.id_terapeuta == terapeuta_id).first()
     if not terapeuta:
-        raise HTTPException(status_code=404, detail="Terapeuta no encontrado")
-    
-    # Evitar actualizar la contraseña desde este endpoint
-    datos_dict = datos.dict(exclude_unset=True, exclude={"contrasena"})
+        raise HTTPException(status_code=404, detail="❌ Terapeuta no encontrado")
+
+    # 📌 Convertir el modelo a diccionario excluyendo `contrasena`
+    datos_dict = datos.dict(exclude_unset=True)
+
+    # 📌 Si `contrasena` no está en los datos, mantener la existente
+    if "contrasena" not in datos_dict:
+        datos_dict["contrasena"] = terapeuta.contrasena  # ✅ Mantener la contraseña actual
+
     for key, value in datos_dict.items():
         setattr(terapeuta, key, value)
 

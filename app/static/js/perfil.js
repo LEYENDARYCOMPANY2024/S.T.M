@@ -1,6 +1,11 @@
 document.addEventListener("DOMContentLoaded", async function () {
     const token = localStorage.getItem("session_token");
 
+    // 📌 Función para limpiar los valores antes de enviarlos
+    function sanitizeValue(value) {
+        return value.trim() === "" ? null : value; // Si el valor es vacío, devolver `null`
+    }
+
     // 📌 Si no hay token, redirigir al login
     if (!token) {
         window.location.href = "/";
@@ -40,6 +45,9 @@ document.addEventListener("DOMContentLoaded", async function () {
 
         const data = await response.json();
 
+        // 📌 Guardar `nombre_usuario` en localStorage para enviarlo en `PUT`
+        localStorage.setItem("nombre_usuario", data.nombre_usuario);
+
         // 📌 Llenar los campos con los datos obtenidos
         document.querySelector("input[placeholder='Nombre']").value = data.nombre;
         document.querySelector("input[placeholder='Primer apellido']").value = data.primer_apellido;
@@ -67,23 +75,42 @@ document.addEventListener("DOMContentLoaded", async function () {
         saveBtn.disabled = isEditing;
 
         editBtn.innerHTML = isEditing
-            ? `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg> Cancelar`
-            : `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg> Editar`;
+            ? `Cancelar`
+            : `Editar`;
     });
 
     // 📌 Guardar cambios
     saveBtn.addEventListener("click", async function () {
-        const updatedData = {
-            nombre: document.querySelector("input[placeholder='Nombre']").value,
-            primer_apellido: document.querySelector("input[placeholder='Primer apellido']").value,
-            segundo_apellido: document.querySelector("input[placeholder='Segundo apellido']").value,
-            correo: document.querySelector("input[placeholder='Correo electrónico']").value,
-            codigo_postal: document.querySelector("input[placeholder='Código Postal']").value,
-            calle: document.querySelector("input[placeholder='Calle']").value,
-            colonia: document.querySelector("input[placeholder='Colonia']").value,
-            num_ext: document.querySelector("input[placeholder='Número exterior']").value,
-            num_int: document.querySelector("input[placeholder='Número interior']").value
-        };
+
+        const updatedData = {};
+
+        // 📌 Definir los campos a actualizar
+        const fields = [
+            { selector: "input[placeholder='Nombre']", key: "nombre" },
+            { selector: "input[placeholder='Primer apellido']", key: "primer_apellido" },
+            { selector: "input[placeholder='Segundo apellido']", key: "segundo_apellido" },
+            { selector: "input[placeholder='Correo electrónico']", key: "correo" },
+            { selector: "input[placeholder='Código Postal']", key: "codigo_postal" },
+            { selector: "input[placeholder='Calle']", key: "calle" },
+            { selector: "input[placeholder='Colonia']", key: "colonia" },
+            { selector: "input[placeholder='Número exterior']", key: "num_ext" },
+            { selector: "input[placeholder='Número interior']", key: "num_int" }
+        ];
+
+        fields.forEach(field => {
+            const element = document.querySelector(field.selector);
+            if (element) {
+                const value = element.value.trim();
+                if (value !== "") {  
+                    updatedData[field.key] = value;
+                }
+            }
+        });
+
+        // 📌 Agregar `nombre_usuario` porque FastAPI lo requiere
+        updatedData["nombre_usuario"] = localStorage.getItem("nombre_usuario");
+
+        console.log("📌 Datos enviados al servidor:", JSON.stringify(updatedData, null, 2));
 
         try {
             const response = await fetch(`/perfil/${idTerapeuta}`, {
@@ -96,6 +123,8 @@ document.addEventListener("DOMContentLoaded", async function () {
             });
 
             if (!response.ok) {
+                const errorResponse = await response.json();
+                console.error("❌ Error en la respuesta del servidor:", JSON.stringify(errorResponse, null, 2));
                 throw new Error("Error al actualizar el perfil");
             }
 
@@ -132,6 +161,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     // 📌 Cerrar sesión
     window.cerrarSesion = function () {
         localStorage.removeItem("session_token");
+        localStorage.removeItem("nombre_usuario");
         window.location.href = "/";
     };
 });
