@@ -10,7 +10,7 @@ class TerapeutaBase(BaseModel):
     primer_apellido: constr(strip_whitespace=True, min_length=1, max_length=100)
     segundo_apellido: Optional[constr(strip_whitespace=True, max_length=100)] = None
     correo: EmailStr
-    contrasena: constr(min_length=6)
+    contrasena: Optional[constr(min_length=6)] = None  # ✅ Ahora no es obligatoria
     codigo_postal: Optional[constr(strip_whitespace=True, max_length=10)] = None
     calle: Optional[constr(strip_whitespace=True, max_length=255)] = None
     colonia: Optional[constr(strip_whitespace=True, max_length=255)] = None
