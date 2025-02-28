@@ -155,7 +155,13 @@ document.addEventListener("DOMContentLoaded", async function () {
                 throw new Error("Error al actualizar el perfil");
             }
 
-            alert("✅ Perfil actualizado correctamente");
+            const successAlert = document.getElementById("successAlert");
+            successAlert.classList.add("show");
+
+            setTimeout(() => {
+                successAlert.classList.remove("show");
+            }, 3000);
+
         } catch (error) {
             console.error("❌ Error al actualizar perfil:", error);
         }
