@@ -6,6 +6,9 @@ from routes.inicio_sesion import router as login_router
 from routes.registro import router as registro_router
 from routes.inicio_sesion import router as patient_router  # ✅ Rutas de pacientes
 from routes.terapeuta_perfil import router as perfil_router  # ✅ Importamos el router de perfil
+from routes.paciente_terapeuta_routes import router as paciente_terapeuta_router
+
+
 
 app = FastAPI()
 
@@ -17,6 +20,7 @@ app.include_router(login_router)
 app.include_router(registro_router)
 app.include_router(patient_router)  # ✅ Rutas para pacientes
 app.include_router(perfil_router)   # ✅ Rutas para perfil de terapeuta
+app.include_router(paciente_terapeuta_router)
 
 # 📌 Montamos archivos estáticos
 app.mount("/static", StaticFiles(directory="static"), name="static")

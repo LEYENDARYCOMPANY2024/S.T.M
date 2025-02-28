@@ -26,8 +26,6 @@ document.addEventListener("DOMContentLoaded", async function () {
     const idTerapeuta = decodedToken.sub;
     const nombreUsuario = decodedToken.nombre_usuario;
 
-    
-
     // 📌 Elementos del DOM
     const openModalBtn = document.getElementById("openModalBtn");
     const modal = document.getElementById("addPatientModal");
@@ -37,6 +35,48 @@ document.addEventListener("DOMContentLoaded", async function () {
     const patientsList = document.querySelector(".patients-list");
     const profileIcon = document.getElementById("profileIcon");
     const logoutBtn = document.getElementById("logoutBtn");
+
+    // 📌 Función para obtener los pacientes del backend
+    async function cargarPacientes() {
+        try {
+            const response = await fetch(`/pacientes?id_terapeuta=${idTerapeuta}`, {
+                method: "GET",
+                headers: { 
+                    "Authorization": `Bearer ${token}`
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error("❌ Error al obtener la lista de pacientes.");
+            }
+
+            const pacientes = await response.json();
+            console.log("📋 Pacientes obtenidos:", pacientes); // Depuración
+
+            // 📌 Limpiar la lista antes de agregar pacientes
+            patientsList.innerHTML = "";
+
+            // 📌 Renderizar la lista de pacientes
+            pacientes.forEach(paciente => {
+                const patientCard = document.createElement("div");
+                patientCard.className = "patient-card";
+                patientCard.innerHTML = `
+                    <i class="fas fa-user-circle"></i>
+                    <span><strong>${paciente.nombre} ${paciente.primer_apellido} ${paciente.segundo_apellido || ""}</strong></span>
+                    <span class="code">Código: ${paciente.codigo}</span>
+                    <button class="enter-btn"><i class="fas fa-arrow-right"></i></button>
+                `;
+                patientsList.appendChild(patientCard);
+            });
+
+        } catch (error) {
+            console.error(error);
+            alert("❌ Error al cargar la lista de pacientes.");
+        }
+    }
+
+    // 📌 Llamar a la función para cargar pacientes cuando se cargue la página
+    cargarPacientes();
 
     // 📌 Evento para abrir el modal
     openModalBtn?.addEventListener("click", () => {
@@ -55,7 +95,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         }
     });
 
-    // 📌 Manejar el envío del formulario con el token
+    // 📌 Manejar el envío del formulario para agregar un paciente
     addPatientForm?.addEventListener("submit", async function (event) {
         event.preventDefault();
 
@@ -67,7 +107,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                 method: "POST",
                 headers: { 
                     "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}` // 🔹 Enviar token en la petición
+                    "Authorization": `Bearer ${token}`
                 },
                 body: JSON.stringify(patientData)
             });
@@ -76,22 +116,17 @@ document.addEventListener("DOMContentLoaded", async function () {
                 throw new Error("❌ Error al agregar paciente.");
             }
 
-            const newPatient = await response.json();
-            const newPatientCard = document.createElement("div");
-            newPatientCard.className = "patient-card";
-            newPatientCard.innerHTML = `
-                <i class="fas fa-user-circle"></i>
-                <span><strong>${newPatient.nombre} ${newPatient.primer_apellido} ${newPatient.segundo_apellido || ""}</strong></span>
-                <span class="code">Código: ${newPatient.codigo}</span>
-                <button class="enter-btn"><i class="fas fa-arrow-right"></i></button>
-            `;
-            patientsList?.appendChild(newPatientCard);
+            console.log("✅ Paciente agregado con éxito");
+            addPatientForm.reset();
 
+            // 📌 Cargar pacientes nuevamente para actualizar la lista
+            cargarPacientes();
+
+            // 📌 Cerrar modal y mostrar mensaje de éxito
             successAlert?.classList.add("show");
             setTimeout(() => successAlert?.classList.remove("show"), 3000);
-
             modal.style.display = "none";
-            addPatientForm.reset();
+
         } catch (error) {
             console.error(error);
             alert("❌ Error al agregar paciente.");
