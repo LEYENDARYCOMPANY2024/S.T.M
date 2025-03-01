@@ -122,9 +122,13 @@ document.addEventListener("DOMContentLoaded", async function () {
                 </button>
             `;
     
+            // 📌 **Aquí se vuelve a mostrar el código del paciente**
             patientCard.innerHTML = `
                 <i class="fas fa-user-circle user-icon"></i>
-                <span><strong>${paciente.nombre} ${paciente.primer_apellido} ${paciente.segundo_apellido || ""}</strong></span>
+                <div class="patient-info">
+                    <span><strong>${paciente.nombre} ${paciente.primer_apellido} ${paciente.segundo_apellido || ""}</strong></span>
+                    <span class="patient-code">Código: ${paciente.codigo}</span>
+                </div>
                 ${estadoBoton}
             `;
     
@@ -148,10 +152,11 @@ document.addEventListener("DOMContentLoaded", async function () {
     
                     // Remover la animación para permitir otro cambio
                     this.classList.remove("toggle-anim");
-                }, 0); // Duración de la animación
+                }, 500); // Duración de la animación
             });
         });
     }
+    
     
 
     // Función de paginación dinámica
