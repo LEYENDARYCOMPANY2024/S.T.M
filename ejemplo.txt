@@ -1,0 +1,504 @@
+document.addEventListener("DOMContentLoaded", async function () {
+    const token = localStorage.getItem("session_token");
+
+    if (!token) {
+        window.location.href = "/login";
+        return;
+    }
+
+    function parseJwt(token) {
+        try {
+            return JSON.parse(atob(token.split(".")[1]));
+        } catch (e) {
+            return null;
+        }
+    }
+
+    const decodedToken = parseJwt(token);
+    if (!decodedToken || !decodedToken.sub) {
+        localStorage.removeItem("session_token");
+        window.location.href = "/login";
+        return;
+    }
+
+    const idTerapeuta = decodedToken.sub;
+
+    // 📌 Elementos del DOM
+    const openModalBtn = document.getElementById("openModalBtn");
+    const modal = document.getElementById("addPatientModal");
+    const closeModalBtn = document.querySelector(".close-modal-btn");
+    const addPatientForm = document.getElementById("addPatientForm");
+    const successAlert = document.getElementById("successAlert");
+    const patientsList = document.querySelector(".patients-list");
+    const profileIcon = document.getElementById("profileIcon");
+    const logoutBtn = document.getElementById("logoutBtn");
+
+    let currentPage = 1;
+    let patientsPerPage = 5;
+
+    // 📌 Función para obtener los pacientes con paginación
+    async function cargarPacientes(page = currentPage) {
+        try {
+            const response = await fetch(`/pacientes?id_terapeuta=${idTerapeuta}&page=${page}&per_page=${patientsPerPage}`, {
+                method: "GET",
+                headers: { 
+                    "Authorization": `Bearer ${token}`
+                }
+            });
+
+            if (!response.ok) {
+                if (response.status === 404) {
+                    console.warn("ℹ️ No hay pacientes registrados.");
+                    patientsList.innerHTML = "<p>No hay pacientes registrados.</p>";
+                    actualizarPaginacion(0, 1);
+                    return;
+                }
+                throw new Error(`❌ Error al obtener la lista de pacientes (${response.status}).`);
+            }
+
+            const data = await response.json();
+            console.log("📋 Pacientes obtenidos:", data);
+
+            patientsList.innerHTML = "";
+
+            if (data.pacientes.length === 0) {
+                patientsList.innerHTML = "<p>No hay pacientes registrados.</p>";
+            } else {
+                data.pacientes.forEach(paciente => {
+                    const patientCard = document.createElement("div");
+                    patientCard.className = "patient-card";
+                    
+                    // 🔹 Determinar el icono según el estado
+                    let estadoIcono = paciente.estado_paciente === "activo" ? "✅" : "❌";
+
+                    patientCard.innerHTML = `
+                        <i class="fas fa-user-circle"></i>
+                        <span><strong>${paciente.nombre} ${paciente.primer_apellido} ${paciente.segundo_apellido || ""}</strong></span>
+                        <span class="code">Código: ${paciente.codigo}</span>
+                        <button class="estado-btn" data-id="${paciente.id_paciente}" data-estado="${paciente.estado_paciente}">
+                            ${estadoIcono}
+                        </button>
+                        <button class="enter-btn"><i class="fas fa-arrow-right"></i></button>
+                    `;
+
+                    patientsList.appendChild(patientCard);
+                });
+            }
+
+            actualizarPaginacion(data.total_pages, page);
+            currentPage = page; 
+
+            // 📌 Añadir eventos para cambiar el estado del paciente
+            document.querySelectorAll(".estado-btn").forEach(button => {
+                button.addEventListener("click", async function () {
+                    const idPaciente = this.getAttribute("data-id");
+                    await cambiarEstadoPaciente(idPaciente);
+                });
+            });
+
+        } catch (error) {
+            console.error(error);
+            alert("❌ Error al cargar la lista de pacientes.");
+        }
+    }
+
+    // 📌 Función para cambiar el estado de un paciente
+    async function cambiarEstadoPaciente(idPaciente) {
+        try {
+            let totalPacientesActivos = 0;
+            let currentPageCount = 1;
+            let morePages = true;
+
+            // 🔹 Obtener el total de pacientes activos sin exceder el límite del backend
+            while (morePages) {
+                const responsePacientes = await fetch(`/pacientes?id_terapeuta=${idTerapeuta}&page=${currentPageCount}&per_page=100`, {
+                    method: "GET",
+                    headers: { "Authorization": `Bearer ${token}` }
+                });
+
+                if (!responsePacientes.ok) {
+                    throw new Error("❌ Error al contar pacientes activos.");
+                }
+
+                const dataPacientes = await responsePacientes.json();
+                
+                // 🔹 Contamos solo los pacientes activos
+                totalPacientesActivos += dataPacientes.pacientes.filter(p => p.estado_paciente === "activo").length;
+
+                // 🔹 Si ya no hay más páginas, detenemos el loop
+                if (dataPacientes.total_pages <= currentPageCount) {
+                    morePages = false;
+                } else {
+                    currentPageCount++;
+                }
+            }
+
+            // 🔹 Cambiar el estado del paciente
+            const responseEstado = await fetch(`/pacientes/${idPaciente}/estado`, {
+                method: "PUT",
+                headers: { "Authorization": `Bearer ${token}` }
+            });
+
+            if (!responseEstado.ok) {
+                throw new Error("❌ Error al cambiar el estado del paciente.");
+            }
+
+            const dataEstado = await responseEstado.json();
+            console.log(`🔄 Estado cambiado para paciente ${idPaciente}: ${dataEstado.estado_paciente}`);
+
+            // 🔹 Si el paciente pasó a "inactivo", moverlo a la última página
+            if (dataEstado.estado_paciente === "inactivo") {
+                currentPage = Math.ceil(totalPacientesActivos / patientsPerPage);
+            }
+
+            // 🔹 Recargar la lista de pacientes manteniendo el orden correcto
+            cargarPacientes(currentPage);
+
+        } catch (error) {
+            console.error(error);
+            alert("❌ Error al cambiar el estado del paciente.");
+        }
+    }
+
+
+
+
+    // 📌 Paginación Dinámica
+    function actualizarPaginacion(totalPages, currentPage) {
+        let paginationContainer = document.getElementById("pagination");
+
+        if (!paginationContainer) {
+            console.warn("⚠️ No se encontró el contenedor de paginación en el DOM. Creándolo...");
+            paginationContainer = document.createElement("div");
+            paginationContainer.id = "pagination";
+            paginationContainer.classList.add("pagination-container");
+            document.querySelector("main").appendChild(paginationContainer);
+        }
+
+        paginationContainer.innerHTML = "";
+
+        if (totalPages > 1) {
+            let maxVisiblePages = 10; 
+            let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2)); 
+            let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+            if (endPage - startPage < maxVisiblePages - 1) {
+                startPage = Math.max(1, endPage - maxVisiblePages + 1);
+            }
+
+            if (startPage > 1) {
+                let firstPageBtn = document.createElement("button");
+                firstPageBtn.textContent = "1";
+                firstPageBtn.classList.add("pagination-btn");
+                firstPageBtn.addEventListener("click", () => cargarPacientes(1));
+                paginationContainer.appendChild(firstPageBtn);
+
+                if (startPage > 2) {
+                    let dots = document.createElement("span");
+                    dots.textContent = "...";
+                    dots.classList.add("pagination-dots");
+                    paginationContainer.appendChild(dots);
+                }
+            }
+
+            for (let i = startPage; i <= endPage; i++) {
+                const button = document.createElement("button");
+                button.textContent = i;
+                button.classList.add("pagination-btn");
+                if (i === currentPage) {
+                    button.classList.add("active");
+                }
+                button.addEventListener("click", () => cargarPacientes(i));
+                paginationContainer.appendChild(button);
+            }
+
+            if (endPage < totalPages) {
+                if (endPage < totalPages - 1) {
+                    let dots = document.createElement("span");
+                    dots.textContent = "...";
+                    dots.classList.add("pagination-dots");
+                    paginationContainer.appendChild(dots);
+                }
+
+                let lastPageBtn = document.createElement("button");
+                lastPageBtn.textContent = totalPages;
+                lastPageBtn.classList.add("pagination-btn");
+                lastPageBtn.addEventListener("click", () => cargarPacientes(totalPages));
+                paginationContainer.appendChild(lastPageBtn);
+            }
+        }
+    }
+
+    cargarPacientes();
+
+    profileIcon?.addEventListener("click", () => window.location.href = "/perfil");
+
+    logoutBtn?.addEventListener("click", () => {
+        localStorage.removeItem("session_token");
+        window.location.href = "/login";
+    });
+});
+
+
+
+
+
+
+
+
+@router.get("/pacientes")
+def obtener_pacientes(
+    id_terapeuta: int,
+    page: int = Query(1, alias="page", ge=1),  # Página mínima 1
+    per_page: int = Query(5, alias="per_page", ge=1, le=100),  # Máximo 100 por página
+    db: Session = Depends(get_db)
+):
+    offset = (page - 1) * per_page
+
+    # 🔹 Obtenemos la lista paginada de pacientes
+    pacientes = (
+    db.query(Paciente)
+    .join(TerapeutaPaciente, TerapeutaPaciente.id_paciente_tp_fk == Paciente.id_paciente)
+    .filter(TerapeutaPaciente.id_terapeuta_tp_fk == id_terapeuta)
+    .order_by(Paciente.estado_paciente.desc(), Paciente.id_paciente.asc())
+    .offset(offset)
+    .limit(per_page)
+    .all()
+)
+
+
+    # 🔹 Contamos el total de pacientes para calcular el número total de páginas
+    total_pacientes = (
+        db.query(func.count(Paciente.id_paciente))
+        .join(TerapeutaPaciente, TerapeutaPaciente.id_paciente_tp_fk == Paciente.id_paciente)
+        .filter(TerapeutaPaciente.id_terapeuta_tp_fk == id_terapeuta)
+        .scalar()
+    )
+
+    # 🔹 Calculamos el total de páginas
+    total_pages = (total_pacientes // per_page) + (1 if total_pacientes % per_page > 0 else 0)
+
+    # 🔹 Si no hay pacientes y la página es mayor a 1, devolvemos error
+    if not pacientes and page > 1:
+        raise HTTPException(status_code=404, detail="No hay más pacientes.")
+
+    return {
+        "page": page,
+        "per_page": per_page,
+        "total_pacientes": total_pacientes,
+        "total_pages": total_pages,
+        "pacientes": pacientes
+    }
+
+
+
+
+
+
+
+document.addEventListener("DOMContentLoaded", async function () {
+    const token = localStorage.getItem("session_token");
+    if (!token) {
+        window.location.href = "/login";
+        return;
+    }
+
+    function parseJwt(token) {
+        try {
+            return JSON.parse(atob(token.split(".")[1]));
+        } catch (e) {
+            return null;
+        }
+    }
+
+    const decodedToken = parseJwt(token);
+    if (!decodedToken || !decodedToken.sub) {
+        localStorage.removeItem("session_token");
+        window.location.href = "/login";
+        return;
+    }
+    const idTerapeuta = decodedToken.sub;
+
+    let currentPageActivos = 1;
+    let currentPageInactivos = 1;
+    let patientsPerPage = 5;
+
+    // Elementos de las pestañas y secciones
+    const btnActivos = document.getElementById("btn-activos");
+    const btnInactivos = document.getElementById("btn-inactivos");
+    const sectionActivos = document.getElementById("section-activos");
+    const sectionInactivos = document.getElementById("section-inactivos");
+
+    // Función para cambiar de pestaña
+    function cambiarPestaña(tipo) {
+        if (tipo === "activos") {
+            btnActivos.classList.add("active");
+            btnInactivos.classList.remove("active");
+            sectionActivos.classList.remove("hidden");
+            sectionInactivos.classList.add("hidden");
+        } else {
+            btnActivos.classList.remove("active");
+            btnInactivos.classList.add("active");
+            sectionActivos.classList.add("hidden");
+            sectionInactivos.classList.remove("hidden");
+        }
+    }
+    btnActivos.addEventListener("click", () => cambiarPestaña("activos"));
+    btnInactivos.addEventListener("click", () => cambiarPestaña("inactivos"));
+
+    // Función para cargar pacientes activos
+    async function cargarPacientesActivos(page = currentPageActivos) {
+        try {
+            const response = await fetch(`/pacientes/activos?id_terapeuta=${idTerapeuta}&page=${page}&per_page=${patientsPerPage}`, {
+                method: "GET",
+                headers: { "Authorization": `Bearer ${token}` }
+            });
+            if (!response.ok) throw new Error("❌ Error al obtener pacientes activos.");
+            const data = await response.json();
+            renderPacientes(data.pacientes, "#patients-list-activos");
+            actualizarPaginacion(data.total_pages, page, cargarPacientesActivos, "#pagination-activos");
+            currentPageActivos = page;
+        } catch (error) {
+            console.error(error);
+            alert(error.message);
+        }
+    }
+
+    // Función para cargar pacientes inactivos
+    async function cargarPacientesInactivos(page = currentPageInactivos) {
+        try {
+            const response = await fetch(`/pacientes/inactivos?id_terapeuta=${idTerapeuta}&page=${page}&per_page=${patientsPerPage}`, {
+                method: "GET",
+                headers: { "Authorization": `Bearer ${token}` }
+            });
+            if (!response.ok) throw new Error("❌ Error al obtener pacientes inactivos.");
+            const data = await response.json();
+            renderPacientes(data.pacientes, "#patients-list-inactivos");
+            actualizarPaginacion(data.total_pages, page, cargarPacientesInactivos, "#pagination-inactivos");
+            currentPageInactivos = page;
+        } catch (error) {
+            console.error(error);
+            alert(error.message);
+        }
+    }
+
+    // Función para cambiar el estado de un paciente
+    async function cambiarEstadoPaciente(idPaciente) {
+        try {
+            const responseEstado = await fetch(`/pacientes/${idPaciente}/estado`, {
+                method: "PUT",
+                headers: { "Authorization": `Bearer ${token}` }
+            });
+            if (!responseEstado.ok) throw new Error("❌ Error al cambiar el estado del paciente.");
+            const dataEstado = await responseEstado.json();
+            // Al cambiar el estado, recargamos ambas secciones para mantener las listas actualizadas
+            cargarPacientesActivos();
+            cargarPacientesInactivos();
+        } catch (error) {
+            console.error(error);
+            alert(error.message);
+        }
+    }
+
+    // Función para renderizar la lista de pacientes
+    function renderPacientes(pacientes, selector) {
+        const patientsList = document.querySelector(selector);
+        if (!patientsList) return;
+        patientsList.innerHTML = "";
+        pacientes.forEach(paciente => {
+            const patientCard = document.createElement("div");
+            patientCard.className = "patient-card";
+            let estadoIcono = paciente.estado_paciente === "activo" ? "✅" : "❌";
+            patientCard.innerHTML = `
+                <i class="fas fa-user-circle"></i>
+                <span><strong>${paciente.nombre} ${paciente.primer_apellido} ${paciente.segundo_apellido || ""}</strong></span>
+                <button class="estado-btn" data-id="${paciente.id_paciente}">
+                    ${estadoIcono}
+                </button>
+            `;
+            patientsList.appendChild(patientCard);
+        });
+        // Agregar evento a cada botón de estado
+        document.querySelectorAll(`${selector} .estado-btn`).forEach(button => {
+            button.addEventListener("click", async function () {
+                const idPaciente = this.getAttribute("data-id");
+                await cambiarEstadoPaciente(idPaciente);
+            });
+        });
+    }
+
+    // Función de paginación dinámica
+    function actualizarPaginacion(totalPages, currentPage, cargarFuncion, selector) {
+        let paginationContainer = document.querySelector(selector);
+        if (!paginationContainer) return;
+        paginationContainer.innerHTML = "";
+        if (totalPages > 1) {
+            let maxVisiblePages = 10;
+            let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+            let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+            if (endPage - startPage < maxVisiblePages - 1) {
+                startPage = Math.max(1, endPage - maxVisiblePages + 1);
+            }
+            if (startPage > 1) {
+                let firstPageBtn = document.createElement("button");
+                firstPageBtn.textContent = "1";
+                firstPageBtn.classList.add("pagination-btn");
+                firstPageBtn.addEventListener("click", () => cargarFuncion(1));
+                paginationContainer.appendChild(firstPageBtn);
+                if (startPage > 2) {
+                    let dots = document.createElement("span");
+                    dots.textContent = "...";
+                    dots.classList.add("pagination-dots");
+                    paginationContainer.appendChild(dots);
+                }
+            }
+            for (let i = startPage; i <= endPage; i++) {
+                const button = document.createElement("button");
+                button.textContent = i;
+                button.classList.add("pagination-btn");
+                if (i === currentPage) {
+                    button.classList.add("active");
+                }
+                button.addEventListener("click", () => cargarFuncion(i));
+                paginationContainer.appendChild(button);
+            }
+            if (endPage < totalPages) {
+                if (endPage < totalPages - 1) {
+                    let dots = document.createElement("span");
+                    dots.textContent = "...";
+                    dots.classList.add("pagination-dots");
+                    paginationContainer.appendChild(dots);
+                }
+                let lastPageBtn = document.createElement("button");
+                lastPageBtn.textContent = totalPages;
+                lastPageBtn.classList.add("pagination-btn");
+                lastPageBtn.addEventListener("click", () => cargarFuncion(totalPages));
+                paginationContainer.appendChild(lastPageBtn);
+            }
+        }
+    }
+
+    // Manejo del logout solo si existe el botón
+    const logoutBtn = document.getElementById("logoutBtn");
+    if (logoutBtn) {
+        logoutBtn.addEventListener("click", () => {
+            localStorage.removeItem("session_token");
+            window.location.href = "/login";
+        });
+    }
+
+    // Función para iniciar la vista: mostrar activos por defecto
+    function iniciarPestañas() {
+        cambiarPestaña("activos");
+        cargarPacientesActivos();
+        cargarPacientesInactivos(); // Cargamos ambas para actualizar paginación
+    }
+    iniciarPestañas();
+
+    profileIcon?.addEventListener("click", () => window.location.href = "/perfil");
+
+    logoutBtn?.addEventListener("click", () => {
+        localStorage.removeItem("session_token");
+        window.location.href = "/login";
+    });
+});
