@@ -112,47 +112,43 @@ document.addEventListener("DOMContentLoaded", async function () {
             const patientCard = document.createElement("div");
             patientCard.className = "patient-card";
     
-            // Determinar el icono según el estado
-            let estadoIcono = paciente.estado_paciente === "activo" 
-                ? '<i class="fas fa-toggle-on status-icon active"></i>' 
-                : '<i class="fas fa-toggle-off status-icon inactive"></i>';
+            // Determinar el estado del paciente
+            let estadoActivo = paciente.estado_paciente === "activo";
+    
+            // Crear el botón con animación
+            let estadoBoton = `
+                <button class="toggle-btn ${estadoActivo ? 'active' : 'inactive'}" data-id="${paciente.id_paciente}">
+                    <span class="toggle-slider"></span>
+                </button>
+            `;
     
             patientCard.innerHTML = `
                 <i class="fas fa-user-circle user-icon"></i>
                 <span><strong>${paciente.nombre} ${paciente.primer_apellido} ${paciente.segundo_apellido || ""}</strong></span>
-                <button class="estado-btn" data-id="${paciente.id_paciente}">
-                    ${estadoIcono}
-                </button>
+                ${estadoBoton}
             `;
     
             patientsList.appendChild(patientCard);
         });
     
-        // Agregar evento a cada botón de estado con animación mejorada
-        document.querySelectorAll(`${selector} .estado-btn`).forEach(button => {
+        // Evento para manejar el cambio de estado
+        document.querySelectorAll(`${selector} .toggle-btn`).forEach(button => {
             button.addEventListener("click", async function () {
                 const idPaciente = this.getAttribute("data-id");
-                const icon = this.querySelector(".status-icon");
     
-                // Aplicar la animación visual antes del cambio
-                icon.classList.add("status-flicker");
+                // Agregar animación de deslizamiento
+                this.classList.add("toggle-anim");
     
                 setTimeout(async () => {
-                    // Ejecutar el cambio de estado en el backend
                     await cambiarEstadoPaciente(idPaciente);
     
-                    // Remover la animación y cambiar el estado visualmente
-                    icon.classList.remove("status-flicker");
-                    if (icon.classList.contains("active")) {
-                        icon.classList.remove("active");
-                        icon.classList.add("inactive");
-                        icon.classList.replace("fa-toggle-on", "fa-toggle-off");
-                    } else {
-                        icon.classList.remove("inactive");
-                        icon.classList.add("active");
-                        icon.classList.replace("fa-toggle-off", "fa-toggle-on");
-                    }
-                }, 800); // Duración total de la animación
+                    // Alternar el estado después del cambio
+                    this.classList.toggle("active");
+                    this.classList.toggle("inactive");
+    
+                    // Remover la animación para permitir otro cambio
+                    this.classList.remove("toggle-anim");
+                }, 0); // Duración de la animación
             });
         });
     }
