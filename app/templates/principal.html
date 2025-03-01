@@ -14,14 +14,36 @@
             <div class="user-icon" id="profileIcon"><i class="fas fa-user-circle"></i></div>
         </div>
     </header>
+
     <main>
+        <!-- 🔹 Barra de búsqueda de pacientes -->
         <div class="search-bar">
             <input type="text" placeholder="Buscar paciente...">
             <button class="close-btn">🔍</button>
         </div>
-        <div class="patients-list"></div>
+
+        <!-- 🔹 Botones de pestañas -->
+        <div class="tab-container">
+            <button class="tab-btn active" id="btn-activos">Pacientes Activos</button>
+            <button class="tab-btn" id="btn-inactivos">Pacientes Inactivos</button>
+        </div>
+
+        <!-- 🔹 Sección de Pacientes Activos -->
+        <section id="section-activos" class="tab-content">
+            <div id="patients-list-activos" class="patients-list"></div>
+            <div id="pagination-activos" class="pagination-container"></div>
+        </section>
+
+        <!-- 🔹 Sección de Pacientes Inactivos (Oculta por defecto) -->
+        <section id="section-inactivos" class="tab-content hidden">
+            <div id="patients-list-inactivos" class="patients-list"></div>
+            <div id="pagination-inactivos" class="pagination-container"></div>
+        </section>
+
+        <!-- 🔹 Botón para abrir el modal -->
         <button class="add-btn" id="openModalBtn"><i class="fa-solid fa-plus"></i></button>
 
+        <!-- 🔹 Modal para agregar pacientes -->
         <div class="modal" id="addPatientModal">
             <div class="modal-content">
                 <button class="close-modal-btn">&times;</button>
@@ -31,7 +53,7 @@
                     <input type="text" name="primer_apellido" placeholder="Primer Apellido" required>
                     <input type="text" name="segundo_apellido" placeholder="Segundo Apellido">
                     <input type="number" name="edad" placeholder="Edad" required>
-                    
+
                     <select name="genero" required>
                         <option value="" disabled hidden>Selecciona un género</option>
                         <option value="masculino">Masculino</option>
@@ -42,13 +64,14 @@
                 </form>                          
             </div>
         </div>
-        
+
+        <!-- 🔹 Alerta de éxito al agregar paciente -->
         <div class="alert" id="successAlert">
             <span class="alert-icon">✅</span>
             <span>¡Paciente agregado exitosamente!</span>
         </div>
-        
-        <script src="/static/js/principal.js"></script>
     </main>
+
+    <script src="/static/js/principal.js"></script>
 </body>
 </html>
