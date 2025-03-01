@@ -107,53 +107,91 @@ document.addEventListener("DOMContentLoaded", async function () {
         const patientsList = document.querySelector(selector);
         if (!patientsList) return;
         patientsList.innerHTML = "";
+    
         pacientes.forEach(paciente => {
             const patientCard = document.createElement("div");
             patientCard.className = "patient-card";
-            let estadoIcono = paciente.estado_paciente === "activo" ? "✅" : "❌";
+    
+            // Determinar el icono según el estado
+            let estadoIcono = paciente.estado_paciente === "activo" 
+                ? '<i class="fas fa-toggle-on status-icon active"></i>' 
+                : '<i class="fas fa-toggle-off status-icon inactive"></i>';
+    
             patientCard.innerHTML = `
-                <i class="fas fa-user-circle"></i>
+                <i class="fas fa-user-circle user-icon"></i>
                 <span><strong>${paciente.nombre} ${paciente.primer_apellido} ${paciente.segundo_apellido || ""}</strong></span>
                 <button class="estado-btn" data-id="${paciente.id_paciente}">
                     ${estadoIcono}
                 </button>
             `;
+    
             patientsList.appendChild(patientCard);
         });
-        // Agregar evento a cada botón de estado
+    
+        // Agregar evento a cada botón de estado con animación mejorada
         document.querySelectorAll(`${selector} .estado-btn`).forEach(button => {
             button.addEventListener("click", async function () {
                 const idPaciente = this.getAttribute("data-id");
-                await cambiarEstadoPaciente(idPaciente);
+                const icon = this.querySelector(".status-icon");
+    
+                // Aplicar la animación visual antes del cambio
+                icon.classList.add("status-flicker");
+    
+                setTimeout(async () => {
+                    // Ejecutar el cambio de estado en el backend
+                    await cambiarEstadoPaciente(idPaciente);
+    
+                    // Remover la animación y cambiar el estado visualmente
+                    icon.classList.remove("status-flicker");
+                    if (icon.classList.contains("active")) {
+                        icon.classList.remove("active");
+                        icon.classList.add("inactive");
+                        icon.classList.replace("fa-toggle-on", "fa-toggle-off");
+                    } else {
+                        icon.classList.remove("inactive");
+                        icon.classList.add("active");
+                        icon.classList.replace("fa-toggle-off", "fa-toggle-on");
+                    }
+                }, 800); // Duración total de la animación
             });
         });
     }
+    
 
     // Función de paginación dinámica
     function actualizarPaginacion(totalPages, currentPage, cargarFuncion, selector) {
         let paginationContainer = document.querySelector(selector);
         if (!paginationContainer) return;
-        paginationContainer.innerHTML = "";
+        
+        paginationContainer.innerHTML = ""; // Limpiar la paginación anterior
+    
         if (totalPages > 1) {
             let maxVisiblePages = 10;
             let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
             let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+    
             if (endPage - startPage < maxVisiblePages - 1) {
                 startPage = Math.max(1, endPage - maxVisiblePages + 1);
             }
-            if (startPage > 1) {
+    
+            // Botón "Primero"
+            if (currentPage > 1) {
                 let firstPageBtn = document.createElement("button");
-                firstPageBtn.textContent = "1";
-                firstPageBtn.classList.add("pagination-btn");
+                firstPageBtn.textContent = "«";
+                firstPageBtn.classList.add("pagination-btn", "pagination-nav");
                 firstPageBtn.addEventListener("click", () => cargarFuncion(1));
                 paginationContainer.appendChild(firstPageBtn);
-                if (startPage > 2) {
-                    let dots = document.createElement("span");
-                    dots.textContent = "...";
-                    dots.classList.add("pagination-dots");
-                    paginationContainer.appendChild(dots);
-                }
             }
+    
+            // Puntos suspensivos
+            if (startPage > 1) {
+                let dots = document.createElement("span");
+                dots.textContent = "...";
+                dots.classList.add("pagination-dots");
+                paginationContainer.appendChild(dots);
+            }
+    
+            // Números de página
             for (let i = startPage; i <= endPage; i++) {
                 const button = document.createElement("button");
                 button.textContent = i;
@@ -164,21 +202,25 @@ document.addEventListener("DOMContentLoaded", async function () {
                 button.addEventListener("click", () => cargarFuncion(i));
                 paginationContainer.appendChild(button);
             }
+    
+            // Puntos suspensivos al final
             if (endPage < totalPages) {
-                if (endPage < totalPages - 1) {
-                    let dots = document.createElement("span");
-                    dots.textContent = "...";
-                    dots.classList.add("pagination-dots");
-                    paginationContainer.appendChild(dots);
-                }
+                let dots = document.createElement("span");
+                dots.textContent = "...";
+                dots.classList.add("pagination-dots");
+                paginationContainer.appendChild(dots);
+            }
+    
+            // Botón "Último"
+            if (currentPage < totalPages) {
                 let lastPageBtn = document.createElement("button");
-                lastPageBtn.textContent = totalPages;
-                lastPageBtn.classList.add("pagination-btn");
+                lastPageBtn.textContent = "»";
+                lastPageBtn.classList.add("pagination-btn", "pagination-nav");
                 lastPageBtn.addEventListener("click", () => cargarFuncion(totalPages));
                 paginationContainer.appendChild(lastPageBtn);
             }
         }
-    }
+    }    
 
 
     // 📌 Elementos del DOM para el modal de agregar pacientes
