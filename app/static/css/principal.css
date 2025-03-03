@@ -695,17 +695,20 @@ body {
     align-items: center; /* Mantener el código y el nombre en la misma línea */
 }
 
-/* Código del paciente con colores que combinan con la interfaz */
+/* Código del paciente con mejor contraste y visibilidad */
 .patient-code {
     font-size: 1rem;
     font-weight: bold;
-    color: #d4a3ff; /* Lila claro, para combinar con el morado */
-    background: rgba(212, 163, 255, 0.2); /* Fondo con transparencia */
-    padding: 5px 12px;
-    border-radius: 8px;
+    color: #ffffff; /* Blanco puro para mayor contraste */
+    background: rgba(255, 255, 255, 0.3); /* Fondo más sólido con transparencia */
+    padding: 6px 14px;
+    border-radius: 10px;
     display: inline-block;
     margin-left: 20px; /* Espacio a la derecha del nombre */
-    box-shadow: 0px 0px 10px rgba(212, 163, 255, 0.5); /* Efecto de brillo */
-    border: 1px solid rgba(212, 163, 255, 0.4); /* Borde sutil */
+    box-shadow: 0px 0px 12px rgba(255, 255, 255, 0.6); /* Brillo más fuerte */
+    border: 1px solid rgba(255, 255, 255, 0.5); /* Borde blanco semitransparente */
+    text-shadow: 0px 0px 5px rgba(255, 255, 255, 0.7); /* Efecto de resplandor */
 }
+
+
 
