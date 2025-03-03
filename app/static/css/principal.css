@@ -712,3 +712,13 @@ body {
 
 
 
+.reset-btn {
+    /* Ajusta colores y dimensiones a tu gusto */
+    cursor: pointer;
+    transition: transform 0.3s ease;
+  }
+  
+  .reset-btn:hover {
+    transform: rotate(360deg);
+  }
+  
