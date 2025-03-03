@@ -26,19 +26,30 @@ document.addEventListener("DOMContentLoaded", async function () {
     let patientsPerPage = 5;
 
     // -------------------------
-    // Capturar elementos del DOM
+    // Referencias del DOM
     // -------------------------
-    const btnActivos      = document.getElementById("btn-activos");
-    const btnInactivos    = document.getElementById("btn-inactivos");
-    const sectionActivos  = document.getElementById("section-activos");
-    const sectionInactivos= document.getElementById("section-inactivos");
-    
+    const btnActivos       = document.getElementById("btn-activos");
+    const btnInactivos     = document.getElementById("btn-inactivos");
+    const sectionActivos   = document.getElementById("section-activos");
+    const sectionInactivos = document.getElementById("section-inactivos");
+
     // Barra de búsqueda
-    const searchInput = document.querySelector(".search-bar input");
-    const searchBtn   = document.querySelector(".search-bar button.close-btn");
+    const searchInput = document.getElementById("searchInput");
+    const searchBtn   = document.getElementById("searchBtn");
+    const resetBtn    = document.getElementById("resetBtn");
+
+    // Modal
+    const openModalBtn   = document.getElementById("openModalBtn");
+    const modal          = document.getElementById("addPatientModal");
+    const closeModalBtn  = document.querySelector(".close-modal-btn");
+    const addPatientForm = document.getElementById("addPatientForm");
+    const successAlert   = document.getElementById("successAlert");
+
+    // Perfil
+    const profileIcon    = document.getElementById("profileIcon");
 
     // -------------------------
-    // Funciones de pestañas
+    // Función para cambiar de pestaña
     // -------------------------
     function cambiarPestaña(tipo) {
         if (tipo === "activos") {
@@ -54,6 +65,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         }
     }
 
+    // Eventos de pestañas
     btnActivos.addEventListener("click", () => cambiarPestaña("activos"));
     btnInactivos.addEventListener("click", () => cambiarPestaña("inactivos"));
 
@@ -71,7 +83,11 @@ document.addEventListener("DOMContentLoaded", async function () {
             );
             if (!response.ok) throw new Error("❌ Error al obtener pacientes activos.");
             const data = await response.json();
-            renderPacientes(data.pacientes, "#patients-list-activos");
+
+            // Renderizamos
+            renderPacientes(data.pacientes, "#patients-list-activos", "activos", search);
+
+            // Actualizamos paginación
             actualizarPaginacion(
                 data.total_pages,
                 page,
@@ -96,7 +112,11 @@ document.addEventListener("DOMContentLoaded", async function () {
             );
             if (!response.ok) throw new Error("❌ Error al obtener pacientes inactivos.");
             const data = await response.json();
-            renderPacientes(data.pacientes, "#patients-list-inactivos");
+
+            // Renderizamos
+            renderPacientes(data.pacientes, "#patients-list-inactivos", "inactivos", search);
+
+            // Actualizamos paginación
             actualizarPaginacion(
                 data.total_pages,
                 page,
@@ -111,19 +131,30 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
 
     // -------------------------
-    // Evento para buscar pacientes
+    // Buscador: evento de "Buscar"
     // -------------------------
     searchBtn.addEventListener("click", () => {
         const searchValue = searchInput.value.trim();
-        // Reiniciamos la página y cargamos ambos tipos
-        currentPageActivos = 1;
+        currentPageActivos   = 1;
         currentPageInactivos = 1;
         cargarPacientesActivos(1, searchValue);
         cargarPacientesInactivos(1, searchValue);
     });
 
     // -------------------------
-    // Función para cambiar estado de un paciente
+    // Botón "Reiniciar" búsqueda
+    // -------------------------
+    resetBtn.addEventListener("click", () => {
+        searchInput.value   = "";
+        currentPageActivos  = 1;
+        currentPageInactivos= 1;
+        // Cargar todo sin filtros
+        cargarPacientesActivos();
+        cargarPacientesInactivos();
+    });
+
+    // -------------------------
+    // Función para cambiar estado
     // -------------------------
     async function cambiarEstadoPaciente(idPaciente) {
         try {
@@ -133,8 +164,8 @@ document.addEventListener("DOMContentLoaded", async function () {
             });
             if (!responseEstado.ok) throw new Error("❌ Error al cambiar el estado del paciente.");
             await responseEstado.json();
-            // Al cambiar el estado, recargamos ambas listas
-            // Usamos el valor de búsqueda actual (por si se estaba filtrando)
+
+            // Recargamos la vista en base a la búsqueda actual
             const searchValue = searchInput.value.trim();
             cargarPacientesActivos(1, searchValue);
             cargarPacientesInactivos(1, searchValue);
@@ -145,18 +176,48 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
 
     // -------------------------
-    // Renderizar pacientes (activos o inactivos)
+    // Renderizar pacientes + mensajes de "no se encontró"
     // -------------------------
-    function renderPacientes(pacientes, selector) {
+    function renderPacientes(pacientes, selector, tipo, search) {
+        // tipo = "activos" o "inactivos"
         const patientsList = document.querySelector(selector);
         if (!patientsList) return;
+
+        // Limpiar
         patientsList.innerHTML = "";
 
+        // Si la búsqueda NO está vacía y no hay resultados
+        if (search && pacientes.length === 0) {
+            if (tipo === "activos") {
+                patientsList.innerHTML = `
+                    <div class="no-results">
+                        No se encontró coincidencia en pacientes activos.<br>
+                        Tal vez esté inactivo o no exista.
+                    </div>`;
+            } else {
+                patientsList.innerHTML = `
+                    <div class="no-results">
+                        No se encontró coincidencia en pacientes inactivos.<br>
+                        Tal vez esté activo o no exista.
+                    </div>`;
+            }
+            return;
+        }
+
+        // Si no hay búsqueda y tampoco hay pacientes
+        if (!search && pacientes.length === 0) {
+            patientsList.innerHTML = `
+                <div class="no-results">
+                    No hay pacientes ${tipo} registrados.
+                </div>`;
+            return;
+        }
+
+        // Caso normal: sí hay pacientes, renderizamos
         pacientes.forEach(paciente => {
             const patientCard = document.createElement("div");
             patientCard.className = "patient-card";
 
-            // Verificamos estado
             let estadoActivo = paciente.estado_paciente === "activo";
             let estadoBoton = `
                 <button class="toggle-btn ${estadoActivo ? 'active' : 'inactive'}" data-id="${paciente.id_paciente}">
@@ -172,7 +233,6 @@ document.addEventListener("DOMContentLoaded", async function () {
                 </div>
                 ${estadoBoton}
             `;
-
             patientsList.appendChild(patientCard);
         });
 
@@ -180,7 +240,6 @@ document.addEventListener("DOMContentLoaded", async function () {
         document.querySelectorAll(`${selector} .toggle-btn`).forEach(button => {
             button.addEventListener("click", async function () {
                 const idPaciente = this.getAttribute("data-id");
-                // Animación
                 this.classList.add("toggle-anim");
                 setTimeout(async () => {
                     await cambiarEstadoPaciente(idPaciente);
@@ -193,10 +252,10 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
 
     // -------------------------
-    // Función para la paginación
+    // Función de paginación
     // -------------------------
     function actualizarPaginacion(totalPages, currentPage, cargarFuncion, selector) {
-        let paginationContainer = document.querySelector(selector);
+        const paginationContainer = document.querySelector(selector);
         if (!paginationContainer) return;
 
         paginationContainer.innerHTML = ""; // Limpiar la paginación anterior
@@ -204,7 +263,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         if (totalPages > 1) {
             let maxVisiblePages = 10;
             let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
-            let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+            let endPage   = Math.min(totalPages, startPage + maxVisiblePages - 1);
 
             if (endPage - startPage < maxVisiblePages - 1) {
                 startPage = Math.max(1, endPage - maxVisiblePages + 1);
@@ -261,12 +320,6 @@ document.addEventListener("DOMContentLoaded", async function () {
     // -------------------------
     // Manejo del modal "Agregar paciente"
     // -------------------------
-    const openModalBtn    = document.getElementById("openModalBtn");
-    const modal           = document.getElementById("addPatientModal");
-    const closeModalBtn   = document.querySelector(".close-modal-btn");
-    const addPatientForm  = document.getElementById("addPatientForm");
-    const successAlert    = document.getElementById("successAlert");
-
     openModalBtn?.addEventListener("click", () => {
         if (modal) modal.style.display = "flex";
     });
@@ -283,8 +336,8 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     addPatientForm?.addEventListener("submit", async function (event) {
         event.preventDefault();
-        const formData   = new FormData(addPatientForm);
-        const patientData= Object.fromEntries(formData.entries());
+        const formData    = new FormData(addPatientForm);
+        const patientData = Object.fromEntries(formData.entries());
         try {
             const response = await fetch(`/pacientes?id_terapeuta=${idTerapeuta}`, {
                 method: "POST",
@@ -303,11 +356,11 @@ document.addEventListener("DOMContentLoaded", async function () {
             addPatientForm.reset();
 
             // Al agregar uno nuevo, recargamos la lista de pacientes activos
-            // (su estado inicial es "activo")
-            const searchValue = searchInput.value.trim(); 
+            // (por defecto se crea con estado "activo")
+            const searchValue = searchInput.value.trim();
             cargarPacientesActivos(1, searchValue);
 
-            // Cerrar modal y mostrar mensaje
+            // Cerrar modal y mostrar mensaje de éxito
             successAlert?.classList.add("show");
             setTimeout(() => successAlert?.classList.remove("show"), 3000);
             modal.style.display = "none";
@@ -319,7 +372,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     });
 
     // -------------------------
-    // Logout (si aplica)
+    // Logout (si tuvieras un btn logout)
     // -------------------------
     const logoutBtn = document.getElementById("logoutBtn");
     if (logoutBtn) {
@@ -330,7 +383,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
 
     // -------------------------
-    // Inicializar la vista
+    // Inicializar
     // -------------------------
     function iniciarPestañas() {
         cambiarPestaña("activos");
@@ -340,8 +393,6 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
     iniciarPestañas();
 
-    // Perfil (si aplica)
-    const profileIcon = document.getElementById("profileIcon");
     profileIcon?.addEventListener("click", () => {
         window.location.href = "/perfil";
     });
