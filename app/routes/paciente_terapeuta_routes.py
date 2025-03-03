@@ -8,36 +8,57 @@ from models.terapeutas import TerapeutaPaciente  # 🔹 Importamos la tabla rela
 
 router = APIRouter()
 
+from fastapi import APIRouter, Depends, HTTPException, Query
+from sqlalchemy.orm import Session
+from sqlalchemy import func, or_
+from database import get_db
+from models.paciente_terapeuta_principal import Paciente
+from models.terapeutas import TerapeutaPaciente
+
+router = APIRouter()
+
 @router.get("/pacientes/activos")
 def obtener_pacientes_activos(
     id_terapeuta: int,
     page: int = Query(1, alias="page", ge=1),
     per_page: int = Query(5, alias="per_page", ge=1, le=100),
+    search: str = Query("", alias="search"),  # <-- Parám extra para el buscador
     db: Session = Depends(get_db)
 ):
     offset = (page - 1) * per_page
-
-    pacientes = (
+    
+    # Construimos la consulta base
+    query = (
         db.query(Paciente)
         .join(TerapeutaPaciente, TerapeutaPaciente.id_paciente_tp_fk == Paciente.id_paciente)
-        .filter(TerapeutaPaciente.id_terapeuta_tp_fk == id_terapeuta)
-        .filter(Paciente.estado_paciente == "activo")  # 🔹 Filtrar solo los activos
+        .filter(
+            TerapeutaPaciente.id_terapeuta_tp_fk == id_terapeuta,
+            Paciente.estado_paciente == "activo"
+        )
+    )
+    
+    # Si hay cadena de búsqueda, filtramos por nombre y apellidos (o como gustes)
+    if search:
+        search_like = f"%{search}%"
+        query = query.filter(
+            or_(
+                Paciente.nombre.ilike(search_like),
+                Paciente.primer_apellido.ilike(search_like),
+                Paciente.segundo_apellido.ilike(search_like)
+            )
+        )
+    
+    total_pacientes = query.count()
+    total_pages = (total_pacientes // per_page) + (1 if total_pacientes % per_page else 0)
+    
+    pacientes = (
+        query
         .order_by(Paciente.id_paciente.asc())
         .offset(offset)
         .limit(per_page)
         .all()
     )
-
-    total_pacientes = (
-        db.query(func.count(Paciente.id_paciente))
-        .join(TerapeutaPaciente, TerapeutaPaciente.id_paciente_tp_fk == Paciente.id_paciente)
-        .filter(TerapeutaPaciente.id_terapeuta_tp_fk == id_terapeuta)
-        .filter(Paciente.estado_paciente == "activo")
-        .scalar()
-    )
-
-    total_pages = (total_pacientes // per_page) + (1 if total_pacientes % per_page > 0 else 0)
-
+    
     return {
         "page": page,
         "per_page": per_page,
@@ -45,37 +66,45 @@ def obtener_pacientes_activos(
         "total_pages": total_pages,
         "pacientes": pacientes
     }
-
 
 @router.get("/pacientes/inactivos")
 def obtener_pacientes_inactivos(
     id_terapeuta: int,
     page: int = Query(1, alias="page", ge=1),
     per_page: int = Query(5, alias="per_page", ge=1, le=100),
+    search: str = Query("", alias="search"),
     db: Session = Depends(get_db)
 ):
     offset = (page - 1) * per_page
 
-    pacientes = (
+    query = (
         db.query(Paciente)
         .join(TerapeutaPaciente, TerapeutaPaciente.id_paciente_tp_fk == Paciente.id_paciente)
-        .filter(TerapeutaPaciente.id_terapeuta_tp_fk == id_terapeuta)
-        .filter(Paciente.estado_paciente == "inactivo")  # 🔹 Filtrar solo los inactivos
+        .filter(
+            TerapeutaPaciente.id_terapeuta_tp_fk == id_terapeuta,
+            Paciente.estado_paciente == "inactivo"
+        )
+    )
+
+    if search:
+        search_like = f"%{search}%"
+        query = query.filter(
+            or_(
+                Paciente.nombre.ilike(search_like),
+                Paciente.primer_apellido.ilike(search_like),
+                Paciente.segundo_apellido.ilike(search_like)
+            )
+        )
+    total_pacientes = query.count()
+    total_pages = (total_pacientes // per_page) + (1 if total_pacientes % per_page else 0)
+
+    pacientes = (
+        query
         .order_by(Paciente.id_paciente.asc())
         .offset(offset)
         .limit(per_page)
         .all()
     )
-
-    total_pacientes = (
-        db.query(func.count(Paciente.id_paciente))
-        .join(TerapeutaPaciente, TerapeutaPaciente.id_paciente_tp_fk == Paciente.id_paciente)
-        .filter(TerapeutaPaciente.id_terapeuta_tp_fk == id_terapeuta)
-        .filter(Paciente.estado_paciente == "inactivo")
-        .scalar()
-    )
-
-    total_pages = (total_pacientes // per_page) + (1 if total_pacientes % per_page > 0 else 0)
 
     return {
         "page": page,
@@ -84,6 +113,7 @@ def obtener_pacientes_inactivos(
         "total_pages": total_pages,
         "pacientes": pacientes
     }
+
 
 
 
