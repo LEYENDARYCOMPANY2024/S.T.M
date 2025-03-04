@@ -166,3 +166,46 @@ def cambiar_estado_paciente(
         return resultado
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
+    
+@router.get("/pacientes/buscar")
+def buscar_paciente_por_codigo(codigo: str, db: Session = Depends(get_db)):
+    paciente = db.query(Paciente).filter(Paciente.codigo == codigo).first()
+    if not paciente:
+        raise HTTPException(status_code=404, detail="Paciente no encontrado.")
+    return paciente  # ✅ Devolver directamente el paciente si existe
+
+@router.post("/pacientes/asignar")
+def asignar_paciente_a_terapeuta(id_paciente: int, id_terapeuta: int, db: Session = Depends(get_db)):
+    """
+    Asigna un paciente existente a un terapeuta si está inactivo.
+    Si está activo con otro terapeuta, no se puede reasignar hasta que se desactive.
+    """
+
+    print(f"🔍 Verificando asignación para id_paciente={id_paciente}, id_terapeuta={id_terapeuta}")
+
+    paciente = db.query(Paciente).filter(Paciente.id_paciente == id_paciente).first()
+    if not paciente:
+        print("❌ Paciente no encontrado")
+        raise HTTPException(status_code=404, detail="Paciente no encontrado.")
+
+    print(f"✅ Paciente encontrado: {paciente.nombre}, Estado: {paciente.estado_paciente}")
+
+    # ✅ Si el paciente está activo con otro terapeuta, no permitir reasignación
+    if paciente.estado_paciente == "activo":
+        print("🚫 El paciente ya está activo con otro terapeuta.")
+        raise HTTPException(status_code=400, detail="Este paciente ya está activo con otro terapeuta y no puede ser reasignado.")
+
+    # ✅ Eliminar cualquier relación anterior si el paciente estaba inactivo
+    db.query(TerapeutaPaciente).filter(TerapeutaPaciente.id_paciente_tp_fk == id_paciente).delete()
+
+    # ✅ Crear la nueva relación con el nuevo terapeuta
+    nueva_relacion = TerapeutaPaciente(
+        id_terapeuta_tp_fk=id_terapeuta,
+        id_paciente_tp_fk=id_paciente
+    )
+    db.add(nueva_relacion)
+    db.commit()
+
+    print("✅ Paciente asignado correctamente")
+    return {"message": "Paciente asignado correctamente a un nuevo terapeuta."}
+
