@@ -47,3 +47,5 @@ class TerapeutaPaciente(Base):
     id_terapeuta_paciente = Column(Integer, primary_key=True, autoincrement=True)
     id_terapeuta_tp_fk = Column(Integer, ForeignKey("terapeutas.id_terapeuta"), nullable=False)
     id_paciente_tp_fk = Column(Integer, ForeignKey("pacientes.id_paciente"), nullable=False)
+    
+    historial_progreso = relationship("HistorialProgreso", back_populates="terapeuta_paciente")

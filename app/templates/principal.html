@@ -51,6 +51,14 @@
             <div class="modal-content">
                 <button class="close-modal-btn">&times;</button>
                 <h2>Agregar paciente</h2>
+
+                <!-- Campo para buscar por código -->
+                <label for="codigoPaciente">¿El paciente ya tiene un código?</label>
+                <input type="text" id="codigoPaciente" name="codigo" placeholder="Introduce el código si ya está registrado">
+
+                <button type="button"  id= "searchPacienteBtn" class="search-btn">Buscar Paciente</button>
+
+                <!-- Formulario de registro -->
                 <form id="addPatientForm">
                     <input type="text" name="nombre" placeholder="Nombre" required>
                     <input type="text" name="primer_apellido" placeholder="Primer Apellido" required>
@@ -67,6 +75,7 @@
                 </form>                          
             </div>
         </div>
+
 
         <!-- 🔹 Alerta de éxito al agregar paciente -->
         <div class="alert" id="successAlert">
