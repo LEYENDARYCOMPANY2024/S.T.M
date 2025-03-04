@@ -391,39 +391,78 @@ document.addEventListener("DOMContentLoaded", async function () {
         event.preventDefault();
         const formData = new FormData(addPatientForm);
         const patientData = Object.fromEntries(formData.entries());
+        const codigoPaciente = document.getElementById("codigoPaciente").value.trim();
     
-        try {
-            const response = await fetch(`/pacientes?id_terapeuta=${idTerapeuta}`, {
-                method: "POST",
-                headers: { 
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`
-                },
-                body: JSON.stringify(patientData)
-            });
+        // ✅ Eliminar campos innecesarios antes de enviar
+        delete patientData.nombre_usuario_p;
+        delete patientData.contrasena_p;
+        delete patientData.correo;
     
-            if (!response.ok) {
-                throw new Error("❌ Error al agregar paciente.");
+        if (codigoPaciente) {
+            // ✅ Caso 1: Se ingresó un código → Buscar y asignar paciente
+            console.log("🔍 Buscando paciente con código:", codigoPaciente);
+    
+            try {
+                const response = await fetch(`/pacientes/buscar?codigo=${codigoPaciente}`, {
+                    method: "GET",
+                    headers: { "Authorization": `Bearer ${token}` }
+                });
+    
+                if (!response.ok) throw new Error("Paciente no encontrado.");
+                const data = await response.json();
+                console.log("📥 Paciente encontrado:", data);
+    
+                // ✅ Asignar paciente al terapeuta en lugar de registrarlo
+                await fetch(`/pacientes/asignar?id_paciente=${data.id_paciente}&id_terapeuta=${idTerapeuta}`, {
+                    method: "POST",
+                    headers: { "Authorization": `Bearer ${token}` }
+                });
+    
+                mostrarMensaje("Paciente asignado con éxito.", "success");
+                modal.style.display = "none";
+    
+            } catch (error) {
+                console.error("❌ Error en la búsqueda:", error);
+                mostrarMensaje("❌ " + error.message, "error");
             }
     
-            console.log("✅ Paciente agregado con éxito");
-            addPatientForm.reset();
+        } else {
+            // ✅ Caso 2: No se ingresó código → Registrar nuevo paciente
+            console.log("📤 Registrando nuevo paciente:", patientData);
     
-            // Recarga la lista de pacientes activos
-            const searchValue = searchInput.value.trim();
-            cargarPacientesActivos(1, searchValue);
+            try {
+                const response = await fetch(`/pacientes?id_terapeuta=${idTerapeuta}`, {
+                    method: "POST",
+                    headers: { 
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`
+                    },
+                    body: JSON.stringify(patientData)
+                });
     
-            // Cerrar modal y mostrar mensaje
-            mostrarMensaje("Paciente agregado con éxito.", "success");
-            modal.style.display = "none";
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.detail || "❌ Error al agregar paciente.");
+                }
     
-        } catch (error) {
-            console.error(error);
-            mostrarMensaje("❌ Error al agregar paciente.", "error");
+                console.log("✅ Paciente registrado con éxito");
+                addPatientForm.reset();
+    
+                // Recargar lista de pacientes activos
+                const searchValue = searchInput.value.trim();
+                cargarPacientesActivos(1, searchValue);
+    
+                // Cerrar modal y mostrar mensaje de éxito
+                mostrarMensaje("Paciente registrado con éxito.", "success");
+                modal.style.display = "none";
+    
+            } catch (error) {
+                console.error("❌ Error en la solicitud:", error);
+                mostrarMensaje("❌ " + error.message, "error");
+            }
         }
-    });
+    });    
     
-
 
     function mostrarMensaje(mensaje, tipo = "success") {
         const alertBox = document.createElement("div");
