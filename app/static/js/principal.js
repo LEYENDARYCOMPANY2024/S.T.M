@@ -1,4 +1,68 @@
 document.addEventListener("DOMContentLoaded", async function () {
+
+    function mostrarConfirmacion(mensaje) {
+        return new Promise((resolve) => {
+            // Crear el fondo oscuro del modal
+            const overlay = document.createElement("div");
+            overlay.classList.add("modal-overlay");
+    
+            // Crear el modal con estilo
+            const confirmBox = document.createElement("div");
+            confirmBox.classList.add("modal-content", "confirm-box");
+            confirmBox.innerHTML = `
+                <h2>Confirmación</h2>
+                <p>${mensaje}</p>
+                <div class="confirm-buttons">
+                    <button id="confirmYes" class="btn-confirm">Sí</button>
+                    <button id="confirmNo" class="btn-cancel">No</button>
+                </div>
+            `;
+    
+            overlay.appendChild(confirmBox);
+            document.body.appendChild(overlay);
+    
+            document.getElementById("confirmYes").addEventListener("click", () => {
+                resolve(true);
+                overlay.remove();
+            });
+    
+            document.getElementById("confirmNo").addEventListener("click", () => {
+                resolve(false);
+                overlay.remove();
+            });
+        });
+    }
+
+
+
+    function mostrarMensajeEnFormulario(mensaje, tipo = "success") {
+        const formContainer = document.querySelector("#addPatientModal .modal-content");
+    
+        if (!formContainer) return;
+    
+        const alertBox = document.createElement("div");
+        alertBox.classList.add("alert", tipo === "success" ? "success" : "error");
+        alertBox.innerHTML = `
+            <span class="alert-icon">${tipo === "success" ? "✅" : "❌"}</span> 
+            ${mensaje}
+        `;
+    
+        formContainer.insertBefore(alertBox, formContainer.firstChild);
+    
+        setTimeout(() => {
+            alertBox.classList.add("show");
+        }, 100);
+    
+        setTimeout(() => {
+            alertBox.classList.remove("show");
+            setTimeout(() => alertBox.remove(), 300);
+        }, 3000);
+    }
+    
+        
+
+
+
     const token = localStorage.getItem("session_token");
     if (!token) {
         window.location.href = "/login";
@@ -25,9 +89,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     let currentPageInactivos = 1;
     let patientsPerPage = 5;
 
-    // -------------------------
     // Referencias del DOM
-    // -------------------------
     const btnActivos       = document.getElementById("btn-activos");
     const btnInactivos     = document.getElementById("btn-inactivos");
     const sectionActivos   = document.getElementById("section-activos");
@@ -38,7 +100,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     const searchBtn   = document.getElementById("searchBtn");
     const resetBtn    = document.getElementById("resetBtn");
 
-    // Modal
+    // Modal "Agregar paciente"
     const openModalBtn   = document.getElementById("openModalBtn");
     const modal          = document.getElementById("addPatientModal");
     const closeModalBtn  = document.querySelector(".close-modal-btn");
@@ -48,9 +110,6 @@ document.addEventListener("DOMContentLoaded", async function () {
     // Perfil
     const profileIcon    = document.getElementById("profileIcon");
 
-    // -------------------------
-    // Función para cambiar de pestaña
-    // -------------------------
     function cambiarPestaña(tipo) {
         if (tipo === "activos") {
             btnActivos.classList.add("active");
@@ -65,35 +124,19 @@ document.addEventListener("DOMContentLoaded", async function () {
         }
     }
 
-    // Eventos de pestañas
     btnActivos.addEventListener("click", () => cambiarPestaña("activos"));
     btnInactivos.addEventListener("click", () => cambiarPestaña("inactivos"));
 
-    // -------------------------
-    // Funciones para cargar pacientes
-    // -------------------------
     async function cargarPacientesActivos(page = currentPageActivos, search = "") {
         try {
             const response = await fetch(
                 `/pacientes/activos?id_terapeuta=${idTerapeuta}&page=${page}&per_page=${patientsPerPage}&search=${search}`,
-                {
-                    method: "GET",
-                    headers: { "Authorization": `Bearer ${token}` }
-                }
+                { method: "GET", headers: { "Authorization": `Bearer ${token}` } }
             );
             if (!response.ok) throw new Error("❌ Error al obtener pacientes activos.");
             const data = await response.json();
-
-            // Renderizamos
             renderPacientes(data.pacientes, "#patients-list-activos", "activos", search);
-
-            // Actualizamos paginación
-            actualizarPaginacion(
-                data.total_pages,
-                page,
-                (newPage) => cargarPacientesActivos(newPage, search),
-                "#pagination-activos"
-            );
+            actualizarPaginacion(data.total_pages, page, (newPage) => cargarPacientesActivos(newPage, search), "#pagination-activos");
             currentPageActivos = page;
         } catch (error) {
             console.error(error);
@@ -105,24 +148,12 @@ document.addEventListener("DOMContentLoaded", async function () {
         try {
             const response = await fetch(
                 `/pacientes/inactivos?id_terapeuta=${idTerapeuta}&page=${page}&per_page=${patientsPerPage}&search=${search}`,
-                {
-                    method: "GET",
-                    headers: { "Authorization": `Bearer ${token}` }
-                }
+                { method: "GET", headers: { "Authorization": `Bearer ${token}` } }
             );
             if (!response.ok) throw new Error("❌ Error al obtener pacientes inactivos.");
             const data = await response.json();
-
-            // Renderizamos
             renderPacientes(data.pacientes, "#patients-list-inactivos", "inactivos", search);
-
-            // Actualizamos paginación
-            actualizarPaginacion(
-                data.total_pages,
-                page,
-                (newPage) => cargarPacientesInactivos(newPage, search),
-                "#pagination-inactivos"
-            );
+            actualizarPaginacion(data.total_pages, page, (newPage) => cargarPacientesInactivos(newPage, search), "#pagination-inactivos");
             currentPageInactivos = page;
         } catch (error) {
             console.error(error);
@@ -130,9 +161,6 @@ document.addEventListener("DOMContentLoaded", async function () {
         }
     }
 
-    // -------------------------
-    // Buscador: evento de "Buscar"
-    // -------------------------
     searchBtn.addEventListener("click", () => {
         const searchValue = searchInput.value.trim();
         currentPageActivos   = 1;
@@ -141,90 +169,93 @@ document.addEventListener("DOMContentLoaded", async function () {
         cargarPacientesInactivos(1, searchValue);
     });
 
-    // -------------------------
-    // Botón "Reiniciar" búsqueda
-    // -------------------------
     resetBtn.addEventListener("click", () => {
-        searchInput.value   = "";
-        currentPageActivos  = 1;
-        currentPageInactivos= 1;
-        // Cargar todo sin filtros
+        searchInput.value = "";
+        currentPageActivos = 1;
+        currentPageInactivos = 1;
         cargarPacientesActivos();
         cargarPacientesInactivos();
     });
 
-    // -------------------------
-    // Función para cambiar estado
-    // -------------------------
-    async function cambiarEstadoPaciente(idPaciente) {
+    // Función para cambiar el estado (inactivar/activar)
+    async function cambiarEstadoPaciente(button, idPaciente, estadoActual) {
         try {
-            const responseEstado = await fetch(`/pacientes/${idPaciente}/estado`, {
+            let action = "";
+            let bodyData = { action: "", motivo: null, create_new_record: false };
+    
+            // ✅ Mostrar modal de confirmación en lugar de `window.confirm()`
+            const confirmacion = await mostrarConfirmacion(
+                estadoActual === "activo"
+                    ? "¿Estás seguro de desactivar al paciente?"
+                    : "¿Estás seguro de activar al paciente?"
+            );
+    
+            if (!confirmacion) return; // ⛔ No hace nada si el usuario cancela
+    
+            action = estadoActual === "activo" ? "inactivate" : "reactivate";
+            bodyData.action = action;
+    
+            if (action === "reactivate") {
+                const motivoReactivacion = prompt("Motivo de reactivación (puede ser breve):");
+                if (motivoReactivacion && motivoReactivacion.trim() !== "") {
+                    bodyData.motivo = motivoReactivacion.trim();
+                }
+            }
+    
+            const response = await fetch(`/pacientes/${idPaciente}/estado?id_terapeuta=${idTerapeuta}`, {
                 method: "PUT",
-                headers: { "Authorization": `Bearer ${token}` }
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
+                body: JSON.stringify(bodyData)
             });
-            if (!responseEstado.ok) throw new Error("❌ Error al cambiar el estado del paciente.");
-            await responseEstado.json();
-
-            // Recargamos la vista en base a la búsqueda actual
-            const searchValue = searchInput.value.trim();
-            cargarPacientesActivos(1, searchValue);
-            cargarPacientesInactivos(1, searchValue);
+    
+            if (!response.ok) throw new Error("❌ Error al cambiar el estado del paciente.");
+            await response.json();
+    
+            button.classList.add("toggle-anim");
+            setTimeout(() => {
+                button.classList.toggle("active");
+                button.classList.toggle("inactive");
+                button.setAttribute("data-estado", action === "inactivate" ? "inactivo" : "activo");
+                button.classList.remove("toggle-anim");
+            }, 500);
+    
+            mostrarMensaje("Estado del paciente actualizado correctamente.", "success");
         } catch (error) {
-            console.error(error);
-            alert(error.message);
+            mostrarMensaje(error.message, "error");
         }
     }
+    
+    
+    
+    
 
-    // -------------------------
-    // Renderizar pacientes + mensajes de "no se encontró"
-    // -------------------------
     function renderPacientes(pacientes, selector, tipo, search) {
-        // tipo = "activos" o "inactivos"
         const patientsList = document.querySelector(selector);
         if (!patientsList) return;
-
-        // Limpiar
+        
         patientsList.innerHTML = "";
-
-        // Si la búsqueda NO está vacía y no hay resultados
-        if (search && pacientes.length === 0) {
-            if (tipo === "activos") {
-                patientsList.innerHTML = `
-                    <div class="no-results">
-                        No se encontró coincidencia en pacientes activos.<br>
-                        Tal vez esté inactivo o no exista.
-                    </div>`;
-            } else {
-                patientsList.innerHTML = `
-                    <div class="no-results">
-                        No se encontró coincidencia en pacientes inactivos.<br>
-                        Tal vez esté activo o no exista.
-                    </div>`;
-            }
+    
+        if (pacientes.length === 0) {
+            patientsList.innerHTML = `<div class="no-results">No hay pacientes ${tipo} registrados aún.</div>`;
             return;
         }
-
-        // Si no hay búsqueda y tampoco hay pacientes
-        if (!search && pacientes.length === 0) {
-            patientsList.innerHTML = `
-                <div class="no-results">
-                    No hay pacientes ${tipo} registrados.
-                </div>`;
-            return;
-        }
-
-        // Caso normal: sí hay pacientes, renderizamos
+    
         pacientes.forEach(paciente => {
             const patientCard = document.createElement("div");
             patientCard.className = "patient-card";
-
+    
             let estadoActivo = paciente.estado_paciente === "activo";
             let estadoBoton = `
-                <button class="toggle-btn ${estadoActivo ? 'active' : 'inactive'}" data-id="${paciente.id_paciente}">
+                <button class="toggle-btn ${estadoActivo ? 'active' : 'inactive'}" 
+                    data-id="${paciente.id_paciente}" 
+                    data-estado="${paciente.estado_paciente}">
                     <span class="toggle-slider"></span>
                 </button>
             `;
-
+    
             patientCard.innerHTML = `
                 <i class="fas fa-user-circle user-icon"></i>
                 <div class="patient-info">
@@ -235,30 +266,23 @@ document.addEventListener("DOMContentLoaded", async function () {
             `;
             patientsList.appendChild(patientCard);
         });
-
-        // Evento para cambiar estado
+    
+        // Evento para cambiar estado SOLO si el usuario confirma la acción
         document.querySelectorAll(`${selector} .toggle-btn`).forEach(button => {
             button.addEventListener("click", async function () {
                 const idPaciente = this.getAttribute("data-id");
-                this.classList.add("toggle-anim");
-                setTimeout(async () => {
-                    await cambiarEstadoPaciente(idPaciente);
-                    this.classList.toggle("active");
-                    this.classList.toggle("inactive");
-                    this.classList.remove("toggle-anim");
-                }, 500);
+                const estadoActual = this.getAttribute("data-estado");
+                await cambiarEstadoPaciente(this, idPaciente, estadoActual);  // 🔹 Pasamos `this` (el botón)
             });
         });
     }
+    
+    
 
-    // -------------------------
-    // Función de paginación
-    // -------------------------
     function actualizarPaginacion(totalPages, currentPage, cargarFuncion, selector) {
         const paginationContainer = document.querySelector(selector);
         if (!paginationContainer) return;
-
-        paginationContainer.innerHTML = ""; // Limpiar la paginación anterior
+        paginationContainer.innerHTML = "";
 
         if (totalPages > 1) {
             let maxVisiblePages = 10;
@@ -269,7 +293,6 @@ document.addEventListener("DOMContentLoaded", async function () {
                 startPage = Math.max(1, endPage - maxVisiblePages + 1);
             }
 
-            // Botón "Primero"
             if (currentPage > 1) {
                 let firstPageBtn = document.createElement("button");
                 firstPageBtn.textContent = "«";
@@ -278,7 +301,6 @@ document.addEventListener("DOMContentLoaded", async function () {
                 paginationContainer.appendChild(firstPageBtn);
             }
 
-            // Puntos suspensivos (inicio)
             if (startPage > 1) {
                 let dots = document.createElement("span");
                 dots.textContent = "...";
@@ -286,7 +308,6 @@ document.addEventListener("DOMContentLoaded", async function () {
                 paginationContainer.appendChild(dots);
             }
 
-            // Números de página
             for (let i = startPage; i <= endPage; i++) {
                 const button = document.createElement("button");
                 button.textContent = i;
@@ -298,7 +319,6 @@ document.addEventListener("DOMContentLoaded", async function () {
                 paginationContainer.appendChild(button);
             }
 
-            // Puntos suspensivos (fin)
             if (endPage < totalPages) {
                 let dots = document.createElement("span");
                 dots.textContent = "...";
@@ -306,7 +326,6 @@ document.addEventListener("DOMContentLoaded", async function () {
                 paginationContainer.appendChild(dots);
             }
 
-            // Botón "Último"
             if (currentPage < totalPages) {
                 let lastPageBtn = document.createElement("button");
                 lastPageBtn.textContent = "»";
@@ -317,9 +336,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         }
     }
 
-    // -------------------------
-    // Manejo del modal "Agregar paciente"
-    // -------------------------
+    // Modal "Agregar Paciente"
     openModalBtn?.addEventListener("click", () => {
         if (modal) modal.style.display = "flex";
     });
@@ -334,10 +351,47 @@ document.addEventListener("DOMContentLoaded", async function () {
         }
     });
 
+
+    const codigoPacienteInput = document.getElementById("codigoPaciente");
+    const searchPacienteBtn = document.getElementById("searchPacienteBtn");
+
+    searchPacienteBtn.addEventListener("click", async function () {
+        const codigo = codigoPacienteInput.value.trim();
+        if (!codigo) {
+            mostrarMensajeEnFormulario("Introduce un código de paciente.", "error");
+            return;
+        }
+    
+        try {
+            const response = await fetch(`/pacientes/buscar?codigo=${codigo}`, {
+                method: "GET",
+                headers: { "Authorization": `Bearer ${token}` }
+            });
+    
+            if (!response.ok) throw new Error("Paciente no encontrado.");
+            const data = await response.json();
+            mostrarMensajeEnFormulario(`Paciente encontrado: ${data.nombre} ${data.primer_apellido}. Será asignado a este terapeuta.`, "success");
+    
+            await fetch(`/pacientes/asignar?id_paciente=${data.id_paciente}&id_terapeuta=${idTerapeuta}`, {
+                method: "POST",
+                headers: { "Authorization": `Bearer ${token}` }
+            });
+    
+            modal.style.display = "none";
+        } catch (error) {
+            mostrarMensajeEnFormulario(error.message, "error");
+        }
+    });
+    
+    
+
+
+
     addPatientForm?.addEventListener("submit", async function (event) {
         event.preventDefault();
-        const formData    = new FormData(addPatientForm);
+        const formData = new FormData(addPatientForm);
         const patientData = Object.fromEntries(formData.entries());
+    
         try {
             const response = await fetch(`/pacientes?id_terapeuta=${idTerapeuta}`, {
                 method: "POST",
@@ -347,47 +401,54 @@ document.addEventListener("DOMContentLoaded", async function () {
                 },
                 body: JSON.stringify(patientData)
             });
-
+    
             if (!response.ok) {
                 throw new Error("❌ Error al agregar paciente.");
             }
-
+    
             console.log("✅ Paciente agregado con éxito");
             addPatientForm.reset();
-
-            // Al agregar uno nuevo, recargamos la lista de pacientes activos
-            // (por defecto se crea con estado "activo")
+    
+            // Recarga la lista de pacientes activos
             const searchValue = searchInput.value.trim();
             cargarPacientesActivos(1, searchValue);
-
-            // Cerrar modal y mostrar mensaje de éxito
-            successAlert?.classList.add("show");
-            setTimeout(() => successAlert?.classList.remove("show"), 3000);
+    
+            // Cerrar modal y mostrar mensaje
+            mostrarMensaje("Paciente agregado con éxito.", "success");
             modal.style.display = "none";
-
+    
         } catch (error) {
             console.error(error);
-            alert("❌ Error al agregar paciente.");
+            mostrarMensaje("❌ Error al agregar paciente.", "error");
         }
     });
+    
 
-    // -------------------------
-    // Logout (si tuvieras un btn logout)
-    // -------------------------
-    const logoutBtn = document.getElementById("logoutBtn");
-    if (logoutBtn) {
-        logoutBtn.addEventListener("click", () => {
-            localStorage.removeItem("session_token");
-            window.location.href = "/login";
-        });
+
+    function mostrarMensaje(mensaje, tipo = "success") {
+        const alertBox = document.createElement("div");
+        alertBox.classList.add("alert", tipo === "success" ? "success" : "error");
+        alertBox.innerHTML = `
+            <span class="alert-icon">${tipo === "success" ? "✅" : "❌"}</span> 
+            ${mensaje}
+        `;
+        document.body.appendChild(alertBox);
+    
+        setTimeout(() => {
+            alertBox.classList.add("show");
+        }, 100);
+    
+        setTimeout(() => {
+            alertBox.classList.remove("show");
+            setTimeout(() => alertBox.remove(), 300);
+        }, 3000);
     }
+    
 
-    // -------------------------
-    // Inicializar
-    // -------------------------
+
+    // Inicialización
     function iniciarPestañas() {
         cambiarPestaña("activos");
-        // Sin filtro inicial
         cargarPacientesActivos();
         cargarPacientesInactivos();
     }
@@ -396,4 +457,13 @@ document.addEventListener("DOMContentLoaded", async function () {
     profileIcon?.addEventListener("click", () => {
         window.location.href = "/perfil";
     });
+
+    // Opcional: si tienes un botón de logout
+    const logoutBtn = document.getElementById("logoutBtn");
+    if (logoutBtn) {
+        logoutBtn.addEventListener("click", () => {
+            localStorage.removeItem("session_token");
+            window.location.href = "/login";
+        });
+    }
 });
