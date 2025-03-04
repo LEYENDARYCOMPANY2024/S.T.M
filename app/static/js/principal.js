@@ -183,22 +183,32 @@ document.addEventListener("DOMContentLoaded", async function () {
             let action = "";
             let bodyData = { action: "", motivo: null, create_new_record: false };
     
-            // ✅ Mostrar modal de confirmación en lugar de `window.confirm()`
             const confirmacion = await mostrarConfirmacion(
                 estadoActual === "activo"
                     ? "¿Estás seguro de desactivar al paciente?"
                     : "¿Estás seguro de activar al paciente?"
             );
     
-            if (!confirmacion) return; // ⛔ No hace nada si el usuario cancela
+            if (!confirmacion) return;
     
             action = estadoActual === "activo" ? "inactivate" : "reactivate";
             bodyData.action = action;
     
             if (action === "reactivate") {
-                const motivoReactivacion = prompt("Motivo de reactivación (puede ser breve):");
-                if (motivoReactivacion && motivoReactivacion.trim() !== "") {
-                    bodyData.motivo = motivoReactivacion.trim();
+                let motivoReactivacion = "";
+    
+                while (!motivoReactivacion.trim()) {
+                    motivoReactivacion = prompt("Motivo de reactivación (obligatorio):");
+                    if (!motivoReactivacion) {
+                        mostrarMensaje("Debes proporcionar un motivo para la reactivación.", "error");
+                    }
+                }
+    
+                bodyData.motivo = motivoReactivacion;
+    
+                const deseaNuevoPeriodo = await mostrarConfirmacion("¿Deseas crear un nuevo periodo en el historial de progreso?");
+                if (deseaNuevoPeriodo) {
+                    bodyData.create_new_record = true;
                 }
             }
     
@@ -223,10 +233,12 @@ document.addEventListener("DOMContentLoaded", async function () {
             }, 500);
     
             mostrarMensaje("Estado del paciente actualizado correctamente.", "success");
+    
         } catch (error) {
             mostrarMensaje(error.message, "error");
         }
     }
+    
     
     
     
@@ -362,29 +374,52 @@ document.addEventListener("DOMContentLoaded", async function () {
             return;
         }
     
+        console.log("🔍 Buscando paciente con código:", codigo);
+    
         try {
             const response = await fetch(`/pacientes/buscar?codigo=${codigo}`, {
                 method: "GET",
                 headers: { "Authorization": `Bearer ${token}` }
             });
     
-            if (!response.ok) throw new Error("Paciente no encontrado.");
-            const data = await response.json();
-            mostrarMensajeEnFormulario(`Paciente encontrado: ${data.nombre} ${data.primer_apellido}. Será asignado a este terapeuta.`, "success");
+            if (!response.ok) {
+                throw new Error("Paciente no encontrado.");
+            }
     
-            await fetch(`/pacientes/asignar?id_paciente=${data.id_paciente}&id_terapeuta=${idTerapeuta}`, {
+            const data = await response.json();
+            console.log("📥 Paciente encontrado:", data);
+    
+            // ✅ Verificar si el paciente ya está activo con otro terapeuta
+            if (data.estado_paciente === "activo") {
+                mostrarMensajeEnFormulario("Este paciente ya está activo con otro terapeuta y no puede ser reasignado.", "error");
+                return;
+            }
+    
+            console.log("📤 Enviando solicitud para asignar paciente:");
+            console.log("id_paciente:", data.id_paciente);
+            console.log("id_terapeuta:", idTerapeuta);
+    
+            const asignarResponse = await fetch(`/pacientes/asignar?id_paciente=${data.id_paciente}&id_terapeuta=${idTerapeuta}`, {
                 method: "POST",
-                headers: { "Authorization": `Bearer ${token}` }
+                headers: { 
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                }
             });
     
+            if (!asignarResponse.ok) {
+                const errorMessage = await asignarResponse.json();
+                throw new Error(errorMessage.detail || "Error al asignar paciente.");
+            }
+    
+            mostrarMensaje("Paciente asignado con éxito.", "success");
             modal.style.display = "none";
+    
         } catch (error) {
+            console.error("❌ Error en la búsqueda:", error);
             mostrarMensajeEnFormulario(error.message, "error");
         }
-    });
-    
-    
-
+    });       
 
 
     addPatientForm?.addEventListener("submit", async function (event) {
