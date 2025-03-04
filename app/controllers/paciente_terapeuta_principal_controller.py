@@ -36,8 +36,8 @@ def create_or_assign_paciente(db: Session, paciente_data: dict, id_terapeuta: in
         db.commit()
         return {"message": "Paciente asignado a nuevo terapeuta.", "codigo": paciente_existente.codigo}
 
-    # Si no existe, lo creamos
-    required_fields = ["nombre", "primer_apellido", "edad", "genero", "nombre_usuario_p", "contrasena_p", "correo"]
+    # 🔹 SOLO CAMPOS QUE ESTÁN EN EL FORMULARIO
+    required_fields = ["nombre", "primer_apellido", "edad", "genero"]
     for field in required_fields:
         if not paciente_data.get(field):
             raise ValueError(f"Falta el campo obligatorio: {field}")
@@ -45,7 +45,16 @@ def create_or_assign_paciente(db: Session, paciente_data: dict, id_terapeuta: in
     paciente_data["estado_paciente"] = "activo"
     paciente_data["codigo"] = generar_codigo_paciente()
 
-    nuevo_paciente = Paciente(**paciente_data)
+    nuevo_paciente = Paciente(
+        nombre=paciente_data["nombre"],
+        primer_apellido=paciente_data["primer_apellido"],
+        segundo_apellido=paciente_data.get("segundo_apellido"),  # Opcional
+        edad=paciente_data["edad"],
+        codigo=paciente_data["codigo"],
+        genero=paciente_data["genero"],
+        estado_paciente="activo",
+    )
+
     db.add(nuevo_paciente)
     db.commit()
     db.refresh(nuevo_paciente)
@@ -66,10 +75,8 @@ def create_or_assign_paciente(db: Session, paciente_data: dict, id_terapeuta: in
     db.add(historial)
     db.commit()
 
-    # Aquí puedes agregar lógica para enviar un correo con el código al paciente
-    # send_email(paciente_data["correo"], f"Tu código de paciente: {paciente_data['codigo']}")
-
     return {"message": "Paciente registrado exitosamente.", "codigo": nuevo_paciente.codigo}
+
 
 def toggle_estado_paciente(
     db: Session,

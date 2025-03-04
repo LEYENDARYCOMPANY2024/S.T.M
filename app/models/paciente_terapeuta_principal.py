@@ -28,8 +28,8 @@ class Paciente(Base):
     estado_civil = Column(String, nullable=True)
     escolaridad = Column(String, nullable=True)
     ocupacion = Column(Enum(OcupacionEnum, name="ocupacion_enum"), nullable=True)
-    nombre_usuario_p = Column(String(100), unique=True, nullable=False)
-    contrasena_p = Column(String, nullable=False)
+    nombre_usuario_p = Column(String(100), unique=True, nullable=True)
+    contrasena_p = Column(String, nullable=True)
     estado_paciente = Column(String, nullable=False)
 
     # 🔹 Relación con `Terapeuta` a través de `TerapeutaPaciente`
