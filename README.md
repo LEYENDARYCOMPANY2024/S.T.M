@@ -32,10 +32,7 @@ python -m venv smm
 ### Activar
 ```shell
 source smm/bin/activate
-```
-
-### Desactivar
-
+```   
 ```shell
 deactivate
 ```
