@@ -259,3 +259,35 @@ select:focus {
         grid-template-columns: 1fr;
     }
 }
+
+
+
+/* Estilos para la alerta de éxito */
+.alert {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 15px 30px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #71b7e6, #9b59b6);
+    color: white;
+    font-size: 18px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s, visibility 0.3s;
+    z-index: 1000;
+}
+
+.alert.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.alert-icon {
+    margin-right: 10px;
+    font-size: 24px;
+}

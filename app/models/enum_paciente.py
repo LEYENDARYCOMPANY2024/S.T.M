@@ -18,4 +18,22 @@ class EstadoCivilEnum(str, Enum):
     separado = "separado"
 
     
-    
+class EscolaridadEnum(str, Enum):
+    primaria = "primaria"
+    secundaria = "secundaria"
+    preparatoria = "preparatoria"
+    licenciatura = "licenciatura"
+    maestria = "maestria"
+    doctorado = "doctorado"
+    otro = "otro"
+
+class OcupacionEnum(str, Enum):
+    empleado = "empleado"
+    freelance = "freelance"
+    autonomo = "autonomo"
+    empleador = "empleador"
+    desempleado = "desempleado"
+    estudiante = "estudiante"
+    jubilado = "jubilado"
+    pensionado = "pensionado"
+    otro = "otro"
