@@ -65,6 +65,8 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     // ──────────────────────────────────────────
     //  Cargar historial clínico en el formulario (JSON excepto tabla Paciente)
+    // ──────────────────────────────────────────
+    // ──────────────────────────────────────────
     async function cargarHistorial() {
         try {
             const response = await fetch(`/historial/${idPaciente}`);
@@ -77,15 +79,21 @@ document.addEventListener("DOMContentLoaded", async function () {
 
             // Restaurar todos los campos (radio, texto, textarea, select) excepto Datos del Paciente
             Object.keys(historial).forEach(key => {
-                const elemento = document.getElementById(key);
-                if (!elemento) return;
-
-                if (elemento.type === "radio") {
-                    // historial[key] = "espasmosSi" (por ejemplo), marcamos ese radio como checked
-                    const radio = document.getElementById(historial[key]);
-                    if (radio) radio.checked = true;
+                // Obtenemos el valor guardado, por ejemplo, 'htaNo'
+                const valorGuardado = historial[key];
+                if (valorGuardado && valorGuardado.includes('Si') || valorGuardado.includes('No')) {
+                    // Si el valor incluye 'Si' o 'No', probablemente sea un radio
+                    const radios = document.getElementsByName(key);
+                    radios.forEach(radio => {
+                        if (radio.id === valorGuardado) {
+                            radio.checked = true;
+                        }
+                    });
                 } else {
-                    elemento.value = historial[key];
+                    const elemento = document.getElementById(key);
+                    if (elemento) {
+                        elemento.value = valorGuardado;
+                    }
                 }
             });
 
@@ -97,6 +105,8 @@ document.addEventListener("DOMContentLoaded", async function () {
             console.error("❌ Error al cargar historial clínico:", error);
         }
     }
+
+
 
     // ──────────────────────────────────────────
     //  Guardar datos del paciente en la tabla pacientes
