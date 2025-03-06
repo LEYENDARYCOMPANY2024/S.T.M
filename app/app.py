@@ -7,6 +7,7 @@ from routes.registro import router as registro_router
 from routes.inicio_sesion import router as patient_router  # ✅ Rutas de pacientes
 from routes.terapeuta_perfil import router as perfil_router  # ✅ Importamos el router de perfil
 from routes.paciente_terapeuta_routes import router as paciente_terapeuta_router
+from routes.historial_clinico_routes import router as historial_router  # ✅ Nueva ruta para historial clínico
 
 
 
@@ -21,6 +22,7 @@ app.include_router(registro_router)
 app.include_router(patient_router)  # ✅ Rutas para pacientes
 app.include_router(perfil_router)   # ✅ Rutas para perfil de terapeuta
 app.include_router(paciente_terapeuta_router)
+app.include_router(historial_router)  # ✅ Agregamos la nueva ruta del historial clínico
 
 # 📌 Montamos archivos estáticos
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -37,3 +39,9 @@ def serve_principal():
 @app.get("/perfil")
 def serve_principal():
     return FileResponse("templates/perfil.html")  # Asegúrate de que la ruta es correcta
+
+
+# ✅ Nueva ruta para servir el HTML de historial clínico
+@app.get("/historial_clinico")
+def serve_historial():
+    return FileResponse("templates/historial.html")  # Asegúrate de que este archivo existe
