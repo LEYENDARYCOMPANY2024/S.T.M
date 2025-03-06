@@ -52,13 +52,16 @@ def update_paciente(id_paciente: int, paciente_update: PacienteUpdate, db: Sessi
         raise HTTPException(status_code=404, detail="Paciente no encontrado")
 
     try:
-        # 🔹 Asegurar que el estado civil es uno de los valores permitidos en el ENUM
-        estado_civil_permitidos = [e.value for e in EstadoCivilEnum]
+        # ✅ Convertir `""` en `None` para evitar errores en ENUMs
+        paciente.escolaridad = paciente_update.escolaridad if paciente_update.escolaridad else None
+        paciente.ocupacion = paciente_update.ocupacion if paciente_update.ocupacion else None
 
+        # 🔹 Validar que `estado_civil` sea correcto antes de guardarlo
+        estado_civil_permitidos = [e.value for e in EstadoCivilEnum]
         if paciente_update.estado_civil not in estado_civil_permitidos:
             raise HTTPException(status_code=400, detail=f"Estado civil '{paciente_update.estado_civil}' no es válido. Opciones permitidas: {estado_civil_permitidos}")
 
-        paciente.estado_civil = paciente_update.estado_civil  # ✅ Guardar directamente el valor correcto del ENUM
+        paciente.estado_civil = paciente_update.estado_civil  # ✅ Guardar directamente el ENUM correcto
 
         # 🔹 Actualizar los demás datos
         paciente.nombre = paciente_update.nombre
@@ -66,8 +69,6 @@ def update_paciente(id_paciente: int, paciente_update: PacienteUpdate, db: Sessi
         paciente.segundo_apellido = paciente_update.segundo_apellido
         paciente.edad = paciente_update.edad
         paciente.genero = paciente_update.genero
-        paciente.escolaridad = paciente_update.escolaridad
-        paciente.ocupacion = paciente_update.ocupacion
 
         db.commit()
         db.refresh(paciente)
@@ -77,5 +78,6 @@ def update_paciente(id_paciente: int, paciente_update: PacienteUpdate, db: Sessi
     except Exception as e:
         print(f"❌ Error en el servidor: {str(e)}")  
         raise HTTPException(status_code=500, detail="Error interno del servidor")
+
 
 
