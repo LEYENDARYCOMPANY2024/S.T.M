@@ -34,3 +34,6 @@ class Paciente(Base):
 
     # 🔹 Relación con `Terapeuta` a través de `TerapeutaPaciente`
     terapeutas = relationship("Terapeuta", secondary="terapeuta_paciente", back_populates="pacientes")  # ✅ Agregado
+    
+    # 🔹 Relación inversa con HistorialClinico
+    historial_clinico = relationship("HistorialClinico", back_populates="paciente", uselist=False)
