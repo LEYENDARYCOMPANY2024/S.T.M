@@ -26,19 +26,12 @@ document.addEventListener("DOMContentLoaded", async function () {
         return;
     }
 
-    // ✅ Función para habilitar/deshabilitar la sección de mujeres
     function actualizarSeccionMujeres() {
         const genero = document.getElementById("sexo").value;
         const seccionMujeres = document.querySelector(".women-section");
-
-        if (genero === "femenino") {
-            seccionMujeres.style.display = "block";
-        } else {
-            seccionMujeres.style.display = "none";
-        }
+        seccionMujeres.style.display = (genero === "femenino") ? "block" : "none";
     }
 
-    // ✅ Función para cargar los datos del paciente
     async function cargarDatosPaciente() {
         try {
             const response = await fetch(`/historial/paciente/${idPaciente}`);
@@ -63,7 +56,6 @@ document.addEventListener("DOMContentLoaded", async function () {
         }
     }
 
-    // ✅ Función para cargar el historial clínico
     async function cargarHistorial() {
         try {
             const response = await fetch(`/historial/${idPaciente}`);
@@ -85,9 +77,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         }
     }
 
-
-     // ✅ Función para guardar los datos del paciente en la tabla `pacientes`
-     async function guardarDatosPaciente() {
+    async function guardarDatosPaciente() {
         const payloadPaciente = {
             nombre: document.getElementById("nombre").value,
             primer_apellido: document.getElementById("primer_apellido").value,
@@ -117,85 +107,40 @@ document.addEventListener("DOMContentLoaded", async function () {
         }
     }
 
-
-
-
-    // ✅ Función para bloquear campos de texto si se selecciona "No"
     function configurarCamposCondicionales() {
-        const condiciones = [
-            "diabetes",
-            "alergia",
-            "hta",
-            "cancer",
-            "transfusiones",
-            "reumaticas",
-            "fracturas",
-            "embarazo",
-            "tabaquismo",
-            "alcoholismo",
-            "drogas",
-            "actividadFisica",
-            "automedica"
-        ];
+        document.querySelectorAll(".inline-field").forEach(contenedor => {
+            const radioSi = contenedor.querySelector("input[type='radio'][id$='Si']");
+            const radioNo = contenedor.querySelector("input[type='radio'][id$='No']");
+            const campoTexto = contenedor.querySelector("input[type='text']");
 
-        condiciones.forEach(condicion => {
-            const radioSi = document.getElementById(`${condicion}Si`);
-            const radioNo = document.getElementById(`${condicion}No`);
-            if (!radioSi || !radioNo) return;
-
-            const contenedor = radioSi.closest(".inline-field");
-            const campoTexto = contenedor ? contenedor.querySelector("input[type='text']") : null;
-            if (!campoTexto) return;
+            if (!radioSi || !radioNo || !campoTexto) return;
 
             function actualizarCampoTexto() {
-                if (radioSi.checked) {
-                    campoTexto.disabled = false;
-                    campoTexto.placeholder = "Especifique";
-                } else if (radioNo.checked) {
-                    campoTexto.disabled = true;
-                    campoTexto.value = "";
-                    campoTexto.placeholder = "No aplica";
-                }
+                campoTexto.disabled = !radioSi.checked;
+                campoTexto.value = radioNo.checked ? "No aplica" : campoTexto.value;
             }
 
             radioSi.addEventListener("change", actualizarCampoTexto);
             radioNo.addEventListener("change", actualizarCampoTexto);
             actualizarCampoTexto();
         });
-
-        // 🔹 Agregar lógica para Espasmos o Contractura Muscular
-        const espasmosSi = document.getElementById("espasmosSi");
-        const espasmosNo = document.getElementById("espasmosNo");
-        const sitioEspasmos = document.getElementById("sitioEspasmos");
-
-        if (espasmosSi && espasmosNo && sitioEspasmos) {
-            function actualizarEspasmos() {
-                if (espasmosSi.checked) {
-                    sitioEspasmos.disabled = false;
-                    sitioEspasmos.placeholder = "Indique sitio y características";
-                } else if (espasmosNo.checked) {
-                    sitioEspasmos.disabled = true;
-                    sitioEspasmos.value = "";
-                    sitioEspasmos.placeholder = "No aplica";
-                }
-            }
-
-            espasmosSi.addEventListener("change", actualizarEspasmos);
-            espasmosNo.addEventListener("change", actualizarEspasmos);
-            actualizarEspasmos();
-        }
     }
 
-
-
-    // ✅ Función para guardar el historial clínico
     async function guardarHistorial() {
         const datosHistorial = {};
+        const excluirCampos = ["nombre", "primer_apellido", "segundo_apellido", "sexo", "edad", "estadoCivil", "ocupacion", "escolaridad"];
+
         document.querySelectorAll("input, textarea, select").forEach(input => {
-            if (input.id && input.type !== "radio") {
+            if (input.id && input.type !== "radio" && !excluirCampos.includes(input.id)) {
                 datosHistorial[input.id] = input.value;
-            } else if (input.type === "radio" && input.checked) {
-                datosHistorial[input.name] = input.id;
+            } else if (input.type === "radio" && input.checked && !excluirCampos.includes(input.name)) {
+                datosHistorial[input.name] = input.id.includes("Si") ? "Sí" : "No";
+            }
+        });
+
+        document.querySelectorAll(".inline-field input[type='text']").forEach(input => {
+            if (input.disabled) {
+                datosHistorial[input.id] = "No aplica";
             }
         });
 
@@ -222,9 +167,6 @@ document.addEventListener("DOMContentLoaded", async function () {
         }
     }
 
-    
-
-    // ✅ Event listeners para guardar datos
     document.getElementById("guardarPaciente").addEventListener("click", function (event) {
         event.preventDefault();
         guardarDatosPaciente();
@@ -235,7 +177,6 @@ document.addEventListener("DOMContentLoaded", async function () {
         guardarHistorial();
     });
 
-    // ✅ Cálculo automático del IMC
     document.getElementById("peso").addEventListener("input", calcularIMC);
     document.getElementById("estatura").addEventListener("input", calcularIMC);
 
@@ -244,15 +185,12 @@ document.addEventListener("DOMContentLoaded", async function () {
         const estatura = parseFloat(document.getElementById("estatura").value);
         
         if (peso > 0 && estatura > 0) {
-            const estaturaMetros = estatura / 100;
-            const imc = (peso / (estaturaMetros * estaturaMetros)).toFixed(1);
-            document.getElementById("imc").value = imc;
+            document.getElementById("imc").value = (peso / ((estatura / 100) ** 2)).toFixed(1);
         }
     }
 
     document.getElementById("sexo").addEventListener("change", actualizarSeccionMujeres);
 
-    // ✅ Cargar datos al iniciar la página
     cargarDatosPaciente();
     cargarHistorial();
     configurarCamposCondicionales();
