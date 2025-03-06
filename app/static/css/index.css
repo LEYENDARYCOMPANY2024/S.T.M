@@ -6,12 +6,12 @@
 }
 
 :root {
-    --primary-color: #8e44ad;      /* Morado principal (del login) */
-    --primary-dark: #732d91;       /* Morado oscuro para hover */
-    --secondary-color: #71b7e6;    /* Azul claro del gradiente */
+    --primary-color:  #1565;      /* Morado principal (del login) */
+    --primary-dark: #1565C0 ;       /* Morado oscuro para hover */
+    --secondary-color: #1565C0 ;    /* Azul claro del gradiente */
     --text-color: #fff;            /* Color de texto principal */
     --text-light: rgba(255, 255, 255, 0.8);  /* Color de texto secundario */
-    --bg-color: linear-gradient(135deg, #71b7e6, #9b59b6);  /* Fondo principal */
+    --bg-color: linear-gradient(135deg, #1565C0 , #1565C0 );  /* Fondo principal */
     --bg-alt: rgba(255, 255, 255, 0.15);     /* Fondo alternativo */
     --shadow: 0 25px 50px rgba(0, 0, 0, 0.5); /* Sombra estándar */
     --border-radius: 20px;         /* Radio de bordes */
