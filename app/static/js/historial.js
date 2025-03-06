@@ -1,290 +1,118 @@
-// ──────────────────────────────────────────
-// Cálculo del IMC
-document.getElementById('peso').addEventListener('input', calcularIMC);
-document.getElementById('estatura').addEventListener('input', calcularIMC);
-
-function calcularIMC() {
-    const peso = parseFloat(document.getElementById('peso').value);
-    const estatura = parseFloat(document.getElementById('estatura').value);
-    
-    if (peso > 0 && estatura > 0) {
-        const estaturaMetros = estatura / 100;
-        const imc = (peso / (estaturaMetros * estaturaMetros)).toFixed(1);
-        document.getElementById('imc').value = imc;
-    }
-}
-
-// ──────────────────────────────────────────
-// Configuración de campos condicionales (por ejemplo, diabetes, alergia, etc.)
-function configurarCamposCondicionales() {
-    const condiciones = [
-      'diabetes',
-      'alergia',
-      'hta',
-      'cancer',
-      'transfusiones',
-      'reumaticas',
-      'fracturas'
-    ];
-    
-    condiciones.forEach(condicion => {
-      const radioSi = document.getElementById(`${condicion}Si`);
-      const radioNo = document.getElementById(`${condicion}No`);
-      const contenedor = radioSi.closest('.inline-field');
-      const campoTexto = contenedor.querySelector('input[type="text"]');
-      
-      function actualizarCampoTexto() {
-        if (radioSi.checked) {
-          campoTexto.disabled = false;
-          campoTexto.placeholder = "Especifique";
-        } else if (radioNo.checked) {
-          campoTexto.disabled = true;
-          campoTexto.value = "";
-          campoTexto.placeholder = "No aplica";
-        }
-      }
-      
-      radioSi.addEventListener('change', actualizarCampoTexto);
-      radioNo.addEventListener('change', actualizarCampoTexto);
-      campoTexto.disabled = true;
-    });
-}
-
-document.addEventListener('DOMContentLoaded', function() {
-    configurarCamposCondicionales();
-    
-    // Validación de formulario para que los campos "Sí" tengan texto
-    const formulario = document.querySelector('form');
-    if (formulario) {
-      formulario.addEventListener('submit', function(event) {
-        const condiciones = [
-          'diabetes',
-          'alergia',
-          'hta',
-          'cancer',
-          'transfusiones',
-          'reumaticas',
-          'fracturas'
-        ];
-        
-        let formularioValido = true;
-        condiciones.forEach(condicion => {
-          const radioSi = document.getElementById(`${condicion}Si`);
-          const contenedor = radioSi.closest('.inline-field');
-          const campoTexto = contenedor.querySelector('input[type="text"]');
-          
-          if (radioSi.checked && campoTexto.value.trim() === '') {
-            alert(`Por favor especifique detalles para ${condicion}.`);
-            formularioValido = false;
-          }
-        });
-        
-        if (!formularioValido) {
-          event.preventDefault();
-        }
-      });
-    }
-});
-
-// ──────────────────────────────────────────
-// Configurar el campo de espasmos
-document.addEventListener('DOMContentLoaded', function() {
-    const radioSi = document.getElementById('espasmosSi');
-    const radioNo = document.getElementById('espasmosNo');
-    const campoTexto = document.getElementById('sitioEspasmos');
-    
-    function actualizarCampoTexto() {
-      if (radioSi.checked) {
-        campoTexto.disabled = false;
-        campoTexto.placeholder = "Indique sitio y características";
-      } else if (radioNo.checked) {
-        campoTexto.disabled = true;
-        campoTexto.value = "";
-        campoTexto.placeholder = "No aplica";
-      }
-    }
-    
-    radioSi.addEventListener('change', actualizarCampoTexto);
-    radioNo.addEventListener('change', actualizarCampoTexto);
-    
-    if (radioSi.checked) {
-      campoTexto.disabled = false;
-    } else if (radioNo.checked) {
-      campoTexto.disabled = true;
-      campoTexto.value = "";
-    } else {
-      campoTexto.disabled = true;
-    }
-});
-
-// ──────────────────────────────────────────
-// Configurar campos de Hábitos de Salud
-document.addEventListener('DOMContentLoaded', function() {
-    const habitos = [
-      'tabaquismo',
-      'alcoholismo',
-      'drogas',
-      'actividadFisica',
-      'automedica'
-    ];
-    
-    habitos.forEach(habito => {
-      const radioSi = document.getElementById(`${habito}Si`);
-      const radioNo = document.getElementById(`${habito}No`);
-      if (!radioSi || !radioNo) return;
-      
-      const contenedor = radioSi.closest('.inline-field');
-      const campoTexto = contenedor.querySelector('input[type="text"]');
-      if (!campoTexto) return;
-      
-      function actualizarCampoTexto() {
-        if (radioSi.checked) {
-          campoTexto.disabled = false;
-          if (habito === 'tabaquismo') {
-            campoTexto.placeholder = "Cantidad/frecuencia (cigarrillos por día)";
-          } else if (habito === 'alcoholismo') {
-            campoTexto.placeholder = "Tipo y frecuencia de consumo";
-          } else if (habito === 'drogas') {
-            campoTexto.placeholder = "Tipo y frecuencia de consumo";
-          } else if (habito === 'actividadFisica') {
-            campoTexto.placeholder = "Tipo de actividad y frecuencia";
-          } else if (habito === 'automedica') {
-            campoTexto.placeholder = "Medicamentos que consume";
-          } else {
-            campoTexto.placeholder = "Especifique";
-          }
-        } else if (radioNo.checked) {
-          campoTexto.disabled = true;
-          campoTexto.value = "";
-          campoTexto.placeholder = "No aplica";
-        }
-      }
-      
-      radioSi.addEventListener('change', actualizarCampoTexto);
-      radioNo.addEventListener('change', actualizarCampoTexto);
-      
-      if (radioSi.checked) {
-        campoTexto.disabled = false;
-      } else if (radioNo.checked) {
-        campoTexto.disabled = true;
-        campoTexto.value = "";
-      } else {
-        campoTexto.disabled = true;
-      }
-    });
-});
-
-// ──────────────────────────────────────────
-// Configurar campo de Información Específica para Mujeres
-document.addEventListener('DOMContentLoaded', function() {
-    const radioSi = document.getElementById('embarazoSi');
-    const radioNo = document.getElementById('embarazoNo');
-    if (!radioSi || !radioNo) return;
-    const contenedor = radioSi.closest('.inline-field');
-    const campoTexto = contenedor.querySelector('input[type="text"]');
-    if (!campoTexto) return;
-    
-    function actualizarCampoEmbarazo() {
-      if (radioSi.checked) {
-        campoTexto.disabled = false;
-        campoTexto.placeholder = "Semanas de gestación";
-        campoTexto.classList.add('campo-importante');
-      } else if (radioNo.checked) {
-        campoTexto.disabled = true;
-        campoTexto.value = "";
-        campoTexto.placeholder = "No aplica";
-        campoTexto.classList.remove('campo-importante');
-      }
-    }
-    
-    radioSi.addEventListener('change', actualizarCampoEmbarazo);
-    radioNo.addEventListener('change', actualizarCampoEmbarazo);
-    
-    if (radioSi.checked) {
-      campoTexto.disabled = false;
-      campoTexto.placeholder = "Semanas de gestación";
-      campoTexto.classList.add('campo-importante');
-    } else if (radioNo.checked) {
-      campoTexto.disabled = true;
-      campoTexto.value = "";
-      campoTexto.placeholder = "No aplica";
-    } else {
-      campoTexto.disabled = true;
-    }
-    
-    const sexoFemenino = document.getElementById('sexoFemenino');
-    const sexoMasculino = document.getElementById('sexoMasculino');
-    const seccionMujeres = document.querySelector('.women-section');
-    if (sexoFemenino && sexoMasculino && seccionMujeres) {
-      function actualizarVisibilidadSeccion() {
-        if (sexoFemenino.checked) {
-          seccionMujeres.style.display = 'block';
-        } else if (sexoMasculino.checked) {
-          seccionMujeres.style.display = 'none';
-          if (radioNo) radioNo.checked = true;
-          if (campoTexto) {
-            campoTexto.disabled = true;
-            campoTexto.value = "";
-          }
-        }
-      }
-      
-      sexoFemenino.addEventListener('change', actualizarVisibilidadSeccion);
-      sexoMasculino.addEventListener('change', actualizarVisibilidadSeccion);
-      
-      actualizarVisibilidadSeccion();
-    }
-});
-
-// ──────────────────────────────────────────
-// Funcionalidades del Historial Clínico
 document.addEventListener("DOMContentLoaded", async function () {
-    // Obtener el id del paciente de localStorage
-    const idPaciente = localStorage.getItem("id_paciente");
-    if (!idPaciente) {
-        alert("No hay paciente seleccionado.");
-        window.location.href = "/principal";
-        return;
+  const idPaciente = localStorage.getItem("id_paciente");
+  if (!idPaciente) {
+      alert("No hay paciente seleccionado.");
+      window.location.href = "/principal";
+      return;
+  }
+
+  // ──────────────────────────────────────────
+  // 🔹 Función para obtener y cargar los datos del paciente
+  async function cargarDatosPaciente() {
+    try {
+        const response = await fetch(`/historial/paciente/${idPaciente}`);
+        if (response.ok) {
+            const pacienteData = await response.json();
+
+            document.getElementById("nombre").value = pacienteData.nombre || "";
+            document.getElementById("primer_apellido").value = pacienteData.primer_apellido || "";
+            document.getElementById("segundo_apellido").value = pacienteData.segundo_apellido || "";
+            document.getElementById("edad").value = pacienteData.edad || "";
+            document.getElementById("escolaridad").value = pacienteData.escolaridad || "";
+            
+            document.getElementById("sexo").value = pacienteData.genero || "";
+
+            // 🔹 Asegurar que el estado civil se seleccione correctamente
+            const estadoCivilSelect = document.getElementById("estadoCivil");
+            if (pacienteData.estado_civil) {
+                estadoCivilSelect.value = pacienteData.estado_civil;
+            }
+
+            document.getElementById("ocupacion").value = pacienteData.ocupacion || "";
+
+        } else {
+            console.warn("ℹ️ No se encontraron datos del paciente.");
+        }
+    } catch (error) {
+        console.error("❌ Error al cargar datos del paciente:", error);
     }
-    
-    // Función para cargar el historial clínico del paciente
-    async function cargarHistorial() {
+}
+
+
+
+  // ──────────────────────────────────────────
+  // 🔹 Función para obtener y cargar el historial clínico
+  async function cargarHistorial() {
       try {
           const response = await fetch(`/historial/${idPaciente}`);
           if (response.ok) {
               const data = await response.json();
               const historial = data.datos_historial_clinico || {};
 
-              // Llenar los campos del formulario con la información recibida
-              if (document.getElementById("nombre"))
-                  document.getElementById("nombre").value = historial.nombre || "";
-              if (document.getElementById("edad"))
-                  document.getElementById("edad").value = historial.edad || "";
-              if (document.getElementById("ocupacion"))
-                  document.getElementById("ocupacion").value = historial.ocupacion || "";
+              document.getElementById("peso").value = historial.peso || "";
+              document.getElementById("estatura").value = historial.estatura || "";
+              document.getElementById("imc").value = historial.imc || "";
           } else {
-              console.warn("ℹ️ No se encontró historial para este paciente. El formulario quedará vacío.");
+              console.warn("ℹ️ No se encontró historial para este paciente.");
           }
       } catch (error) {
           console.error("❌ Error al cargar historial clínico:", error);
       }
   }
-  
-  
-  
-    
-    cargarHistorial();
-    
-    // Función para guardar o actualizar el historial clínico
-    async function guardarHistorial() {
+
+  // ──────────────────────────────────────────
+  // 🔹 Función para guardar los datos del paciente en la tabla `pacientes`
+  async function guardarDatosPaciente() {
+    const payloadPaciente = {
+        nombre: document.getElementById("nombre").value,
+        primer_apellido: document.getElementById("primer_apellido").value,
+        segundo_apellido: document.getElementById("segundo_apellido").value,
+        edad: parseInt(document.getElementById("edad").value),
+        genero: document.getElementById("sexo").value,
+        estado_civil: document.getElementById("estadoCivil").value,  // 🔹 Enviar el valor exacto del select
+        escolaridad: document.getElementById("escolaridad").value,
+        ocupacion: document.getElementById("ocupacion").value
+    };
+
+    try {
+        const res = await fetch(`/historial/paciente/${idPaciente}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(payloadPaciente)
+        });
+
+        if (!res.ok) {
+            let errorMessage = "Error desconocido";
+            try {
+                const errorData = await res.json();
+                errorMessage = errorData.detail;
+            } catch (e) {
+                errorMessage = "Error en el servidor (No se pudo interpretar la respuesta)";
+            }
+            throw new Error(errorMessage);
+        }
+
+        alert("✅ Datos del paciente guardados con éxito.");
+
+    } catch (error) {
+        console.error("❌ Error al guardar los datos del paciente:", error);
+        alert(`❌ ${error.message}`);
+    }
+}
+
+
+  // ──────────────────────────────────────────
+  // 🔹 Función para guardar el historial clínico en JSON dentro de `historial_clinico`
+  async function guardarHistorial() {
       const datosHistorial = {
-          nombre: document.getElementById("nombre") ? document.getElementById("nombre").value : "",
-          edad: document.getElementById("edad") ? document.getElementById("edad").value : "",
-          ocupacion: document.getElementById("ocupacion") ? document.getElementById("ocupacion").value : ""
-          // Agregar más campos según sea necesario
+          peso: document.getElementById("peso").value,
+          estatura: document.getElementById("estatura").value,
+          imc: document.getElementById("imc").value
       };
 
-      const payload = {
+      const payloadHistorial = {
           id_paciente_hc_fk: parseInt(idPaciente),
           datos_historial_clinico: datosHistorial
       };
@@ -295,25 +123,49 @@ document.addEventListener("DOMContentLoaded", async function () {
               headers: {
                   "Content-Type": "application/json"
               },
-              body: JSON.stringify(payload)
+              body: JSON.stringify(payloadHistorial)
           });
+
           if (res.ok) {
-              alert("Historial guardado con éxito.");
+              alert("Historial clínico guardado con éxito.");
           } else {
-              alert("Error al guardar el historial.");
+              alert("Error al guardar el historial clínico.");
           }
       } catch (error) {
           console.error("❌ Error al guardar historial clínico:", error);
       }
   }
 
-  // Agregar event listener al botón "Guardar Historial"
-  const guardarBtn = document.getElementById("guardarHistorial");
-  if (guardarBtn) {
-      guardarBtn.addEventListener("click", function (event) {
-          event.preventDefault();
-          guardarHistorial();
-      });
+  // ──────────────────────────────────────────
+  // 🔹 Cargar datos al iniciar la página
+  cargarDatosPaciente();
+  cargarHistorial();
+
+  // ──────────────────────────────────────────
+  // 🔹 Event listeners para guardar datos
+  document.getElementById("guardarPaciente").addEventListener("click", function (event) {
+      event.preventDefault();
+      guardarDatosPaciente();
+  });
+
+  document.getElementById("guardarHistorial").addEventListener("click", function (event) {
+      event.preventDefault();
+      guardarHistorial();
+  });
+
+  // ──────────────────────────────────────────
+  // 🔹 Cálculo automático del IMC
+  document.getElementById('peso').addEventListener('input', calcularIMC);
+  document.getElementById('estatura').addEventListener('input', calcularIMC);
+
+  function calcularIMC() {
+      const peso = parseFloat(document.getElementById('peso').value);
+      const estatura = parseFloat(document.getElementById('estatura').value);
+      
+      if (peso > 0 && estatura > 0) {
+          const estaturaMetros = estatura / 100;
+          const imc = (peso / (estaturaMetros * estaturaMetros)).toFixed(1);
+          document.getElementById('imc').value = imc;
+      }
   }
-  
 });

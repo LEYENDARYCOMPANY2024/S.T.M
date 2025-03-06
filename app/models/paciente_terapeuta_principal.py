@@ -1,6 +1,7 @@
 from sqlalchemy import Column, Integer, String, Enum, ForeignKey
 from sqlalchemy.orm import relationship
 from database import Base
+from .enum_paciente import EstadoCivilEnum
 import enum
 
 # 🔹 Definir correctamente el ENUM en Python
@@ -25,7 +26,7 @@ class Paciente(Base):
     edad = Column(Integer, nullable=False)
     codigo = Column(String(50), nullable=False, unique=True)
     genero = Column(String, nullable=False)
-    estado_civil = Column(String, nullable=True)
+    estado_civil = Column(Enum(EstadoCivilEnum, nullable=True, name="estado_civil_enum"), nullable=True)
     escolaridad = Column(String, nullable=True)
     ocupacion = Column(Enum(OcupacionEnum, name="ocupacion_enum"), nullable=True)
     nombre_usuario_p = Column(String(100), unique=True, nullable=True)
