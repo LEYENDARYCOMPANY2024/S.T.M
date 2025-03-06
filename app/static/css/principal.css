@@ -785,9 +785,6 @@ body {
     background: #c82333;
 }
 
-
-
-
 #searchPacienteBtn {
     width: 30%;
     height: 2.2rem;  /* 🔹 Altura reducida */
@@ -812,4 +809,19 @@ body {
     transform: translateY(-2px);
 }
 
+.reset-btn {
+    background-color: transparent; /* Rojo llamativo */
+    color: black; /* Texto en blanco */
+    border: none; /* Sin borde */
+    padding: 10px 20px; /* Espaciado interno */
+    font-size: 16px; /* Tamaño del texto */
+    font-weight: bold; /* Texto en negrita */
+    border-radius: 5px; /* Bordes redondeados */
+    cursor: pointer; /* Cambia el cursor al pasar por encima */
+    transition: background-color 0.3s ease;
+}
+
+.reset-btn:hover {
+    background-color: transparent; /* Color más oscuro al pasar el mouse */
+}
 
