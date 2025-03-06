@@ -301,7 +301,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     function renderPacientes(pacientes, selector, tipo, search) {
         const patientsList = document.querySelector(selector);
         if (!patientsList) return;
-        
+    
         patientsList.innerHTML = "";
     
         if (pacientes.length === 0) {
@@ -312,10 +312,14 @@ document.addEventListener("DOMContentLoaded", async function () {
         pacientes.forEach(paciente => {
             const patientCard = document.createElement("div");
             patientCard.className = "patient-card";
+            patientCard.setAttribute("data-id", paciente.id_paciente);
+    
+            // 🔹 Hacer que toda la tarjeta redirija al historial
+            patientCard.addEventListener("click", () => seleccionarPaciente(paciente.id_paciente));
     
             let estadoActivo = paciente.estado_paciente === "activo";
             let estadoBoton = `
-                <button class="toggle-btn ${estadoActivo ? 'active' : 'inactive'}" 
+                <button class="toggle-btn ${estadoActivo ? 'active' : 'inactive'}"
                     data-id="${paciente.id_paciente}" 
                     data-estado="${paciente.estado_paciente}">
                     <span class="toggle-slider"></span>
@@ -328,19 +332,74 @@ document.addEventListener("DOMContentLoaded", async function () {
                     <span><strong>${paciente.nombre} ${paciente.primer_apellido} ${paciente.segundo_apellido || ""}</strong></span>
                     <span class="patient-code">Código: ${paciente.codigo}</span>
                 </div>
-                ${estadoBoton}
+                <div class="toggle-container">
+                    ${estadoBoton} <!-- 🔹 Botón de activación/desactivación -->
+                </div>
             `;
+    
             patientsList.appendChild(patientCard);
         });
     
+        // 🔹 Mantener funcionalidad del botón de estado
         document.querySelectorAll(`${selector} .toggle-btn`).forEach(button => {
-            button.addEventListener("click", async function () {
+            button.addEventListener("click", async function (event) {
+                event.stopPropagation(); // 🔹 Evita que se active la redirección al historial
                 const idPaciente = this.getAttribute("data-id");
                 const estadoActual = this.getAttribute("data-estado");
                 await cambiarEstadoPaciente(this, idPaciente, estadoActual);
             });
         });
     }
+    
+    // 🔹 Función para seleccionar un paciente y cargar su historial clínico
+    async function seleccionarPaciente(id_paciente) {
+        try {
+            // Guardar el ID del paciente en localStorage
+            localStorage.setItem("id_paciente", id_paciente);
+
+            // 🔹 Redirigir a la página de historial clínico
+            window.location.href = "/historial_clinico";
+            
+            if (!response.ok) {
+                console.warn("ℹ️ No se encontró historial para este paciente.");
+                limpiarFormulario(); // Dejar formulario vacío si no hay historial
+                return;
+            }
+
+            const historialData = await response.json();
+            console.log("📋 Historial clínico del paciente:", historialData);
+
+            // Cargar los datos en el formulario
+            cargarHistorialEnFormulario(historialData.datos_historial_clinico);
+
+        } catch (error) {
+            console.error("❌ Error al obtener historial clínico:", error);
+        }
+    }
+
+    // 🔹 Función para limpiar el formulario si no hay historial
+    function limpiarFormulario() {
+        if (document.getElementById("nombre"))
+            document.getElementById("nombre").value = "";
+        if (document.getElementById("edad"))
+            document.getElementById("edad").value = "";
+        if (document.getElementById("ocupacion"))
+            document.getElementById("ocupacion").value = "";
+    }
+
+    // 🔹 Función para cargar datos en el formulario de historial clínico
+    function cargarHistorialEnFormulario(datos) {
+        if (document.getElementById("nombre"))
+            document.getElementById("nombre").value = datos.nombre || "";
+        if (document.getElementById("edad"))
+            document.getElementById("edad").value = datos.edad || "";
+        if (document.getElementById("ocupacion"))
+            document.getElementById("ocupacion").value = datos.ocupacion || "";
+        // Puedes agregar más campos aquí según los datos que recibas del backend
+    }
+
+    
+    
     
     function actualizarPaginacion(totalPages, currentPage, cargarFuncion, selector) {
         const paginationContainer = document.querySelector(selector);

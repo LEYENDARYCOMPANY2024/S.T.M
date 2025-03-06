@@ -1,22 +1,22 @@
-  // Script para calcular el IMC
-  document.getElementById('peso').addEventListener('input', calcularIMC);
-  document.getElementById('estatura').addEventListener('input', calcularIMC);
-  
-  function calcularIMC() {
-      const peso = parseFloat(document.getElementById('peso').value);
-      const estatura = parseFloat(document.getElementById('estatura').value);
-      
-      if (peso > 0 && estatura > 0) {
-          // Convertir estatura de cm a metros
-          const estaturaMetros = estatura / 100;
-          const imc = (peso / (estaturaMetros * estaturaMetros)).toFixed(1);
-          document.getElementById('imc').value = imc;
-      }
-  }
- 
-// Función para configurar todos los campos condicionales
+// ──────────────────────────────────────────
+// Cálculo del IMC
+document.getElementById('peso').addEventListener('input', calcularIMC);
+document.getElementById('estatura').addEventListener('input', calcularIMC);
+
+function calcularIMC() {
+    const peso = parseFloat(document.getElementById('peso').value);
+    const estatura = parseFloat(document.getElementById('estatura').value);
+    
+    if (peso > 0 && estatura > 0) {
+        const estaturaMetros = estatura / 100;
+        const imc = (peso / (estaturaMetros * estaturaMetros)).toFixed(1);
+        document.getElementById('imc').value = imc;
+    }
+}
+
+// ──────────────────────────────────────────
+// Configuración de campos condicionales (por ejemplo, diabetes, alergia, etc.)
 function configurarCamposCondicionales() {
-    // Lista de todas las condiciones médicas que tienen opción Sí/No
     const condiciones = [
       'diabetes',
       'alergia',
@@ -27,52 +27,36 @@ function configurarCamposCondicionales() {
       'fracturas'
     ];
     
-    // Para cada condición, configuramos el comportamiento
     condiciones.forEach(condicion => {
-      // Obtenemos referencias a los elementos
       const radioSi = document.getElementById(`${condicion}Si`);
       const radioNo = document.getElementById(`${condicion}No`);
-      
-      // El campo de texto será el input que está en el mismo contenedor
-      // Se encuentra el div padre y luego el input de texto dentro
       const contenedor = radioSi.closest('.inline-field');
       const campoTexto = contenedor.querySelector('input[type="text"]');
       
-      // Función para actualizar el estado del campo de texto
       function actualizarCampoTexto() {
-        // Si "Sí" está seleccionado, habilitamos el campo de texto
         if (radioSi.checked) {
           campoTexto.disabled = false;
           campoTexto.placeholder = "Especifique";
-        } 
-        // Si "No" está seleccionado, deshabilitamos y limpiamos el campo
-        else if (radioNo.checked) {
+        } else if (radioNo.checked) {
           campoTexto.disabled = true;
           campoTexto.value = "";
           campoTexto.placeholder = "No aplica";
         }
       }
       
-      // Configuramos los event listeners para los radio buttons
       radioSi.addEventListener('change', actualizarCampoTexto);
       radioNo.addEventListener('change', actualizarCampoTexto);
-      
-      // Inicializamos el estado (por defecto los campos estarán deshabilitados)
-      // hasta que el usuario seleccione una opción
       campoTexto.disabled = true;
     });
-  }
+}
 
-  
-// Ejecutar la configuración cuando el DOM esté completamente cargado
 document.addEventListener('DOMContentLoaded', function() {
     configurarCamposCondicionales();
     
-    // También podemos añadir una validación al formulario
+    // Validación de formulario para que los campos "Sí" tengan texto
     const formulario = document.querySelector('form');
     if (formulario) {
       formulario.addEventListener('submit', function(event) {
-        // Verificar que todos los campos con "Sí" seleccionado tengan texto
         const condiciones = [
           'diabetes',
           'alergia',
@@ -84,13 +68,11 @@ document.addEventListener('DOMContentLoaded', function() {
         ];
         
         let formularioValido = true;
-        
         condiciones.forEach(condicion => {
           const radioSi = document.getElementById(`${condicion}Si`);
           const contenedor = radioSi.closest('.inline-field');
           const campoTexto = contenedor.querySelector('input[type="text"]');
           
-          // Si se seleccionó "Sí" pero no se especificó detalles
           if (radioSi.checked && campoTexto.value.trim() === '') {
             alert(`Por favor especifique detalles para ${condicion}.`);
             formularioValido = false;
@@ -98,56 +80,46 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         
         if (!formularioValido) {
-          event.preventDefault(); // Evitar que se envíe el formulario
+          event.preventDefault();
         }
       });
     }
-  });
-  
+});
 
-// Función para configurar el campo de Espasmos
+// ──────────────────────────────────────────
+// Configurar el campo de espasmos
 document.addEventListener('DOMContentLoaded', function() {
-    // Obtener referencias a los elementos
     const radioSi = document.getElementById('espasmosSi');
     const radioNo = document.getElementById('espasmosNo');
     const campoTexto = document.getElementById('sitioEspasmos');
     
-    // Función para actualizar el estado del campo de texto
     function actualizarCampoTexto() {
-      // Si "Sí" está seleccionado, habilitamos el campo de texto
       if (radioSi.checked) {
         campoTexto.disabled = false;
         campoTexto.placeholder = "Indique sitio y características";
-      } 
-      // Si "No" está seleccionado, deshabilitamos y limpiamos el campo
-      else if (radioNo.checked) {
+      } else if (radioNo.checked) {
         campoTexto.disabled = true;
         campoTexto.value = "";
         campoTexto.placeholder = "No aplica";
       }
     }
     
-    // Configuramos los event listeners para los radio buttons
     radioSi.addEventListener('change', actualizarCampoTexto);
     radioNo.addEventListener('change', actualizarCampoTexto);
     
-    // Estado inicial - Verificamos si ya hay algo seleccionado
     if (radioSi.checked) {
       campoTexto.disabled = false;
     } else if (radioNo.checked) {
       campoTexto.disabled = true;
       campoTexto.value = "";
     } else {
-      // Si ninguno está seleccionado inicialmente, deshabilitamos el campo
       campoTexto.disabled = true;
     }
-  });
-  
+});
 
-  
-// Función para configurar los campos de Hábitos de Salud
+// ──────────────────────────────────────────
+// Configurar campos de Hábitos de Salud
 document.addEventListener('DOMContentLoaded', function() {
-    // Lista de hábitos que tienen opción Sí/No
     const habitos = [
       'tabaquismo',
       'alcoholismo',
@@ -156,28 +128,18 @@ document.addEventListener('DOMContentLoaded', function() {
       'automedica'
     ];
     
-    // Para cada hábito, configuramos el comportamiento
     habitos.forEach(habito => {
-      // Obtenemos referencias a los elementos
       const radioSi = document.getElementById(`${habito}Si`);
       const radioNo = document.getElementById(`${habito}No`);
-      
-      // Verificar que existan los elementos
       if (!radioSi || !radioNo) return;
       
-      // El campo de texto será el input que está en el mismo contenedor
       const contenedor = radioSi.closest('.inline-field');
       const campoTexto = contenedor.querySelector('input[type="text"]');
-      
       if (!campoTexto) return;
       
-      // Función para actualizar el estado del campo de texto
       function actualizarCampoTexto() {
-        // Si "Sí" está seleccionado, habilitamos el campo de texto
         if (radioSi.checked) {
           campoTexto.disabled = false;
-          
-          // Placeholders personalizados según el tipo de hábito
           if (habito === 'tabaquismo') {
             campoTexto.placeholder = "Cantidad/frecuencia (cigarrillos por día)";
           } else if (habito === 'alcoholismo') {
@@ -191,75 +153,53 @@ document.addEventListener('DOMContentLoaded', function() {
           } else {
             campoTexto.placeholder = "Especifique";
           }
-        } 
-        // Si "No" está seleccionado, deshabilitamos y limpiamos el campo
-        else if (radioNo.checked) {
+        } else if (radioNo.checked) {
           campoTexto.disabled = true;
           campoTexto.value = "";
           campoTexto.placeholder = "No aplica";
         }
       }
       
-    // Configuramos los event listeners para los radio buttons
-    radioSi.addEventListener('change', actualizarCampoTexto);
-    radioNo.addEventListener('change', actualizarCampoTexto);
-    
-    // Inicializamos el estado basado en la selección actual
-    if (radioSi.checked) {
-      campoTexto.disabled = false;
-    } else if (radioNo.checked) {
-      campoTexto.disabled = true;
-      campoTexto.value = "";
-    } else {
-      // Por defecto, si ninguno está seleccionado
-      campoTexto.disabled = true;
-    }
-  });
+      radioSi.addEventListener('change', actualizarCampoTexto);
+      radioNo.addEventListener('change', actualizarCampoTexto);
+      
+      if (radioSi.checked) {
+        campoTexto.disabled = false;
+      } else if (radioNo.checked) {
+        campoTexto.disabled = true;
+        campoTexto.value = "";
+      } else {
+        campoTexto.disabled = true;
+      }
+    });
 });
 
-
-
-// Función para configurar el campo de embarazo en la sección de mujeres
+// ──────────────────────────────────────────
+// Configurar campo de Información Específica para Mujeres
 document.addEventListener('DOMContentLoaded', function() {
-    // Obtener referencias a los elementos
     const radioSi = document.getElementById('embarazoSi');
     const radioNo = document.getElementById('embarazoNo');
-    
-    // Verificar que existan los elementos
     if (!radioSi || !radioNo) return;
-    
-    // El campo de texto será el input que está en el mismo contenedor
     const contenedor = radioSi.closest('.inline-field');
     const campoTexto = contenedor.querySelector('input[type="text"]');
-    
     if (!campoTexto) return;
     
-    // Función para actualizar el estado del campo de texto
     function actualizarCampoEmbarazo() {
-      // Si "Sí" está seleccionado, habilitamos el campo de texto
       if (radioSi.checked) {
         campoTexto.disabled = false;
         campoTexto.placeholder = "Semanas de gestación";
-        
-        // Opcional: cambiar el estilo para destacar este campo importante
         campoTexto.classList.add('campo-importante');
-      } 
-      // Si "No" está seleccionado, deshabilitamos y limpiamos el campo
-      else if (radioNo.checked) {
+      } else if (radioNo.checked) {
         campoTexto.disabled = true;
         campoTexto.value = "";
         campoTexto.placeholder = "No aplica";
-        
-        // Remover cualquier estilo adicional
         campoTexto.classList.remove('campo-importante');
       }
     }
     
-    // Configuramos los event listeners para los radio buttons
     radioSi.addEventListener('change', actualizarCampoEmbarazo);
     radioNo.addEventListener('change', actualizarCampoEmbarazo);
     
-    // Inicializamos el estado basado en la selección actual
     if (radioSi.checked) {
       campoTexto.disabled = false;
       campoTexto.placeholder = "Semanas de gestación";
@@ -269,35 +209,111 @@ document.addEventListener('DOMContentLoaded', function() {
       campoTexto.value = "";
       campoTexto.placeholder = "No aplica";
     } else {
-      // Por defecto, si ninguno está seleccionado
       campoTexto.disabled = true;
     }
-  
-
-  // Esto es opcional, solo si tienes un selector de sexo en tu formulario
-  const sexoFemenino = document.getElementById('sexoFemenino'); // Ajusta este ID según tu formulario
-  const sexoMasculino = document.getElementById('sexoMasculino'); // Ajusta este ID según tu formulario
-  const seccionMujeres = document.querySelector('.women-section');
-  
-  if (sexoFemenino && sexoMasculino && seccionMujeres) {
-    function actualizarVisibilidadSeccion() {
-      if (sexoFemenino.checked) {
-        seccionMujeres.style.display = 'block';
-      } else if (sexoMasculino.checked) {
-        seccionMujeres.style.display = 'none';
-        // Opcional: Resetear los valores
-        if (radioNo) radioNo.checked = true;
-        if (campoTexto) {
-          campoTexto.disabled = true;
-          campoTexto.value = "";
+    
+    const sexoFemenino = document.getElementById('sexoFemenino');
+    const sexoMasculino = document.getElementById('sexoMasculino');
+    const seccionMujeres = document.querySelector('.women-section');
+    if (sexoFemenino && sexoMasculino && seccionMujeres) {
+      function actualizarVisibilidadSeccion() {
+        if (sexoFemenino.checked) {
+          seccionMujeres.style.display = 'block';
+        } else if (sexoMasculino.checked) {
+          seccionMujeres.style.display = 'none';
+          if (radioNo) radioNo.checked = true;
+          if (campoTexto) {
+            campoTexto.disabled = true;
+            campoTexto.value = "";
+          }
         }
       }
+      
+      sexoFemenino.addEventListener('change', actualizarVisibilidadSeccion);
+      sexoMasculino.addEventListener('change', actualizarVisibilidadSeccion);
+      
+      actualizarVisibilidadSeccion();
+    }
+});
+
+// ──────────────────────────────────────────
+// Funcionalidades del Historial Clínico
+document.addEventListener("DOMContentLoaded", async function () {
+    // Obtener el id del paciente de localStorage
+    const idPaciente = localStorage.getItem("id_paciente");
+    if (!idPaciente) {
+        alert("No hay paciente seleccionado.");
+        window.location.href = "/principal";
+        return;
     }
     
-    sexoFemenino.addEventListener('change', actualizarVisibilidadSeccion);
-    sexoMasculino.addEventListener('change', actualizarVisibilidadSeccion);
-    
-    // Inicializar visibilidad
-    actualizarVisibilidadSeccion();
+    // Función para cargar el historial clínico del paciente
+    async function cargarHistorial() {
+      try {
+          const response = await fetch(`/historial/${idPaciente}`);
+          if (response.ok) {
+              const data = await response.json();
+              const historial = data.datos_historial_clinico || {};
+
+              // Llenar los campos del formulario con la información recibida
+              if (document.getElementById("nombre"))
+                  document.getElementById("nombre").value = historial.nombre || "";
+              if (document.getElementById("edad"))
+                  document.getElementById("edad").value = historial.edad || "";
+              if (document.getElementById("ocupacion"))
+                  document.getElementById("ocupacion").value = historial.ocupacion || "";
+          } else {
+              console.warn("ℹ️ No se encontró historial para este paciente. El formulario quedará vacío.");
+          }
+      } catch (error) {
+          console.error("❌ Error al cargar historial clínico:", error);
+      }
   }
-});  
+  
+  
+  
+    
+    cargarHistorial();
+    
+    // Función para guardar o actualizar el historial clínico
+    async function guardarHistorial() {
+      const datosHistorial = {
+          nombre: document.getElementById("nombre") ? document.getElementById("nombre").value : "",
+          edad: document.getElementById("edad") ? document.getElementById("edad").value : "",
+          ocupacion: document.getElementById("ocupacion") ? document.getElementById("ocupacion").value : ""
+          // Agregar más campos según sea necesario
+      };
+
+      const payload = {
+          id_paciente_hc_fk: parseInt(idPaciente),
+          datos_historial_clinico: datosHistorial
+      };
+
+      try {
+          const res = await fetch(`/historial/`, {
+              method: "POST",
+              headers: {
+                  "Content-Type": "application/json"
+              },
+              body: JSON.stringify(payload)
+          });
+          if (res.ok) {
+              alert("Historial guardado con éxito.");
+          } else {
+              alert("Error al guardar el historial.");
+          }
+      } catch (error) {
+          console.error("❌ Error al guardar historial clínico:", error);
+      }
+  }
+
+  // Agregar event listener al botón "Guardar Historial"
+  const guardarBtn = document.getElementById("guardarHistorial");
+  if (guardarBtn) {
+      guardarBtn.addEventListener("click", function (event) {
+          event.preventDefault();
+          guardarHistorial();
+      });
+  }
+  
+});
