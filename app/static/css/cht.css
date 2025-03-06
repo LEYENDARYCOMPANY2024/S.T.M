@@ -6,12 +6,12 @@
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #71b7e6, #9b59b6);
+    background: #1565C0 ;
     color: #e0e0e0;
 }
 
 .top-bar {
-    background: linear-gradient(135deg, #71b7e6, #9b59b6);
+    background: #1565C0 ;
     padding: 10px;
     display: flex;
     justify-content: space-between;
@@ -32,7 +32,7 @@ body {
 }
 
 .navigation {
-    background: #6fe0e6;
+    background: #1565;
     padding: 10px 0;
     padding: 10px 0;
     display: flex;
@@ -42,7 +42,7 @@ body {
 }
 
 .navigation a {
-    color: #260035;
+    color: white;
     text-decoration: none;
     padding: 12px 24px;
     font-size: 18px;
@@ -131,7 +131,7 @@ body {
 
 /* Chat Header */
 .chat-header {
-    background: linear-gradient(135deg, #71b7e6, #9b59b6);
+    background: #1565;
     padding: 15px;
     text-align: center;
     color: white;
@@ -149,13 +149,13 @@ body {
 .chat-header .user-status {
     width: 10px;
     height: 10px;
-    background-color: #4CAF50;
+    background-color: #1565;
     border-radius: 50%;
     position: absolute;
     right: 15px;
     top: 50%;
     transform: translateY(-50%);
-    box-shadow: 0 0 5px #4CAF50;
+    box-shadow: 0 0 5px #1565;
 }
 
 .chat-header .back-button {
@@ -268,14 +268,14 @@ body {
 }
 
 .message.received {
-    background: #6fe0e6;
+    background: #1565;
     color: #16002a;
     align-self: flex-start;
     border-bottom-left-radius: 2px;
 }
 
 .message.sent {
-    background: #9b59b6;
+    background: rgba(4, 93, 116, 0.333);
     color: white;
     align-self: flex-end;
     border-bottom-right-radius: 2px;
@@ -488,7 +488,7 @@ body {
 }
 
 .send-button {
-    background: linear-gradient(135deg, #71b7e6, #9b59b6);
+    background: linear-gradient(135deg, #71b7e6, #1565);
     border: none;
     padding: 10px;
     margin-left: 10px;
@@ -504,7 +504,7 @@ body {
 
 .send-button:hover {
     transform: scale(1.1);
-    background: linear-gradient(135deg, #9b59b6, #71b7e6);
+    background: linear-gradient(135deg, #1565, #71b7e6);
     box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
 }
 
