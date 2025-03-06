@@ -6,12 +6,61 @@
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #71b7e6, #9b59b6);
+    background: #1565C0 ;
     color: #e0e0e0;
 }
 
+        /* Contenedor del loader */
+        .loader-container {
+            text-align: center;
+            margin-top: 50px;
+            opacity: 0;
+            animation: fadeIn 1s forwards;
+        }
+
+        /* Loader circular */
+        .loader {
+            width: 50px;
+            height: 50px;
+            border: 5px solid white;
+            border-top-color: #1565;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            box-shadow: 0 0 10px rgba(52, 152, 219, 0.8);
+        }
+
+        /* Texto de carga */
+        .loader-text {
+            margin-top: 10px;
+            font-size: 18px;
+            color: #333;
+        }
+
+        /* Animaciones */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        /* Clase para el efecto de pulso */
+        .pulse {
+            animation: pulse 1.5s infinite;
+        }
+
+        
 .top-bar {
-    background: linear-gradient(135deg, #71b7e6, #9b59b6);
+    background: #1565C0 ;
     padding: 10px;
     display: flex;
     justify-content: space-between;
@@ -32,7 +81,7 @@ body {
 }
 
 .navigation {
-    background: #6fe0e6;
+    background: #00326c ;
     padding: 10px 0;
     padding: 10px 0;
     display: flex;
@@ -42,7 +91,7 @@ body {
 }
 
 .navigation a {
-    color: #260035;
+    color: #ffffff;
     text-decoration: none;
     padding: 12px 24px;
     font-size: 18px;
@@ -107,7 +156,7 @@ body {
 
 
 .top-bar {
-    background: linear-gradient(to right, #87CEEB, #9370DB);
+    background: #1565C0 ;
     padding: 15px;
     display: flex;
     justify-content: space-between;
@@ -131,8 +180,8 @@ body {
 }
 
 .session-button {
-    background:  #95a1d9;
-    color: black;
+    background:  #00326c;
+    color: white;
     padding: 40px;
     border-radius: 10px;
     display: flex;
@@ -151,14 +200,14 @@ body {
 .session-button .icon {
     width: 24px;
     height: 24px;
-    border: 2px solid black;
+    border: 2px solid white;
     border-radius: 50%;
     position: relative;
 }
 
 .session-button .icon::after {
     content: '→';
-    color: black;
+    color: white;
     position: absolute;
     top: 50%;
     left: 50%;
@@ -166,12 +215,14 @@ body {
 }
 
 .add-session {
-    background:  #95a1d9;
-    color: black;
+    background:  #00326c;
+    color: white;
     padding: 30px;
     border-radius: 10px;
     width: 500px;
     box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+
 }
 
 .add-session h2 {
@@ -181,28 +232,31 @@ body {
 }
 
 .input-field {
-    background-color: white;
-    color: black;
+    background-color: transparent;
+    color: white;
     padding: 12px;
     margin-bottom: 15px;
     width: 100%;
     border: none;
     border-radius: 5px;
     font-size: 0.9rem;
+    border: 2px solid black; 
+
 }
 
 .calendar {
-    background: white;
+    background: transparent;
     padding: 20px;
     border-radius: 15px;
     margin: 20px 0;
     box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+    border: 2px solid black; 
 }
 
 .month {
     font-size: 22px;
     margin-bottom: 15px;
-    color: black;
+    color: white;
 }
 
 .controls {
@@ -214,8 +268,8 @@ body {
 
 .calendar button {
     padding: 8px 12px;
-    background: #71b7e6;
-    color: black;
+    background: #00326c;
+    color: white;
     border: none;
     border-radius: 50%;
     cursor: pointer;
@@ -224,7 +278,7 @@ body {
 }
 
 .calendar button:hover {
-    background: #ae00ff;
+    background: #1565C0 ;
 }
 
 .days {
@@ -241,27 +295,27 @@ body {
 }
 
 .day {
-    background: #71b7e6;
+    background: #00326c;
     transition: 0.3s;
     cursor: pointer;
 }
 
 .day:hover {
-    background: #ae00ff;
-    color: black;
+    background: #1565C0 ;
+    color: white;
 }
 
 .header {
-    background: #ae00ff;
-    color: black;
+    background: #00326c;
+    color: white;
     padding: 3px;
     border-radius: 10px;
     margin: 4px;
 }
 
 .create-button {
-    background-color: #7a00cc;
-    color: black;
+    background-color: #1565C0 ;
+    color: white;
     padding: 10px 25px;
     border: none;
     border-radius: 20px;
@@ -279,7 +333,7 @@ body {
 }
 
 .btn {
-    background-color: #95a1d9;
+    background-color: #1565C0 ;
     border: none;
     padding: 8px;
     border-radius: 5px;
@@ -290,7 +344,7 @@ body {
   }
   
   .btn:hover {
-    background: #95a1d9;
+    background: #1565C0 ;
   }
   
   .btn svg {
