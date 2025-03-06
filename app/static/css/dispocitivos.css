@@ -6,12 +6,12 @@
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #71b7e6, #9b59b6);
+    background: #1565C0 ;
     color: #e0e0e0;
 }
 
 .top-bar {
-    background: linear-gradient(135deg, #71b7e6, #9b59b6);
+    background: #1565C0 ;
     padding: 10px;
     display: flex;
     justify-content: space-between;
@@ -32,7 +32,7 @@ body {
 }
 
 .navigation {
-    background: #6fe0e6;
+    background: #1565;
     padding: 10px 0;
     padding: 10px 0;
     display: flex;
@@ -42,7 +42,7 @@ body {
 }
 
 .navigation a {
-    color: #260035;
+    color: white;
     text-decoration: none;
     padding: 12px 24px;
     font-size: 18px;
@@ -108,15 +108,15 @@ body {
 .container {
     width: 95%;
     max-width: 1400px;
-    margin: 0 auto;
-    background-color: #989ad5;
+    margin: 20px auto 0 auto; /* Agrega 20px en la parte superior */
+    background-color: #1565;
     border-radius: 10px;
     overflow: hidden;
     padding: 20px;
     transition: transform 0.3s ease-in-out;
     box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
-    
 }
+
 
 .container:hover {
     transform: scale(1.02);
@@ -146,7 +146,7 @@ body {
 .table th, .table td {
     padding: 18px 25px;
     text-align: left;
-    border-bottom: 2px solid #989ad5;
+    border-bottom: 2px solid #1565;
     color: white;
     border: 2px solid black; 
 }
@@ -160,11 +160,11 @@ body {
 
 
 .table tr:nth-child(even) {
-    background-color: #989ad5;
+    background-color: #1565;
 }
 
 .table tr:hover {
-    background-color: #989ad5;
+    background-color: #1565;
     transition: 0.3s ease-in-out;
 }
 
@@ -234,7 +234,7 @@ input:checked + .slider:before {
 }
 
 .form-container {
-    background-color: #989ad5;
+    background-color: #1565;
     padding: 35px;
     display: none;
     max-width: 1000px;
@@ -283,7 +283,7 @@ input:checked + .slider:before {
 }
 
 .form-group input:focus, .form-group select:focus {
-    border-color: #989ad5;
+    border-color: #1565;
     outline: none;
     border: 2px solid black; 
 }
