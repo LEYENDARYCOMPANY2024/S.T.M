@@ -7,7 +7,7 @@
 
 body {
     min-height: 100vh;
-    background: linear-gradient(135deg, #71b7e6, #9b59b6);
+    background: #1565C0 ;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -16,7 +16,7 @@ body {
 .header {
     width: 100%;
     padding: 1rem;
-    background: linear-gradient(135deg, #71b7e6, #9b59b6);
+    background: #1565 ;
     backdrop-filter: blur(10px);
     box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
 }
@@ -131,7 +131,7 @@ body {
     bottom: 5px;
     right: 5px;
     color: white;
-    background: #8e44ad;
+    background: #1565;
     border: none;
     border-radius: 50%;
     width: 30px;
@@ -144,7 +144,7 @@ body {
 }
 
 .upload-photo-btn:hover {
-    background: #732d91;
+    background: #1565;
     transform: scale(1.07);
 }
 
@@ -161,7 +161,7 @@ body {
 }
 
 .username input:hover, .username input:focus {
-    background: rgba(106, 27, 154, 0.6);
+    background: #1565;
     box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
     outline: none;
 }
@@ -172,7 +172,7 @@ body {
 
 .info-field input {
     width: 100%;
-    background: rgba(142, 36, 170, 0.4);
+    background: #1565;
     padding: 14px;
     margin-bottom: 1rem;
     border-radius: 10px;
@@ -180,16 +180,17 @@ body {
     color: white;
     font-size: 1rem;
     transition: background 0.3s, box-shadow 0.3s;
+    border: 2px solid black; 
 }
 
 .info-field input:hover, .info-field input:focus {
-    background: rgba(142, 36, 170, 0.6);
+    background: #1565;
     box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
     outline: none;
 }
 
 .address-field {
-    background: rgba(171, 71, 188, 0.4);
+    background: #1565;
     padding: 14px;
     margin-bottom: 1rem;
     border-radius: 10px;
@@ -198,7 +199,7 @@ body {
 
 .address-field input {
     width: 100%;
-    background: rgba(171, 71, 188, 0.4);
+    background: #1565;
     padding: 10px;
     margin: 5px 0;
     border-radius: 8px;
@@ -206,15 +207,17 @@ body {
     color: white;
     font-size: 1rem;
     transition: background 0.3s;
+    border: 2px solid black; 
 }
 
 .address-field input:hover, .address-field input:focus {
-    background: rgba(171, 71, 188, 0.6);
+    background: #1565;
     outline: none;
+    border: 2px solid black; 
 }
 
 .professional-id {
-    background: rgba(186, 104, 200, 0.4);
+    background: #1565;
     padding: 14px;
     border-radius: 10px;
     transition: background 0.3s, box-shadow 0.3s;
@@ -231,23 +234,23 @@ body {
 
 .professional-id input {
     flex-grow: 1;
-    background: rgba(186, 104, 200, 0.4);
+    background: #1565;
     padding: 10px;
     border-radius: 8px;
     border: none;
     color: white;
     font-size: 1rem;
-    transition: background 0.3s;
+    transition: background 0.3s; 
 }
 
 .professional-id input:hover, .professional-id input:focus {
-    background: rgba(186, 104, 200, 0.6);
+    background: #1565;
     outline: none;
 }
 
 .add-button {
     color: white;
-    background: #8e44ad;
+    background: #1565;
     border: none;
     border-radius: 5px;
     width: 30px;
@@ -260,7 +263,7 @@ body {
 }
 
 .add-button:hover {
-    background: #732d91;
+    background: #1565;
     transform: scale(1.07);
 }
 
@@ -269,7 +272,7 @@ body {
     height: 150px;
     margin-top: 10px;
     display: none;
-    background: rgba(186, 104, 200, 0.2);
+    background: #1565;
     border-radius: 8px;
     overflow: hidden;
 }
@@ -303,12 +306,12 @@ body {
 }
 
 .save-btn {
-    background: linear-gradient(135deg, #7367F0, #CE9FFC);
+    background: #1565;
     color: white;
 }
 
 .save-btn:hover {
-    background: linear-gradient(135deg, #6257e0, #be8fec);
+    background: #1565;
     transform: translateY(-3px);
     box-shadow: 0 7px 14px rgba(0, 0, 0, 0.2);
 }
@@ -373,7 +376,7 @@ label {
     transform: translateX(-50%);
     padding: 15px 30px;
     border-radius: 10px;
-    background: linear-gradient(135deg, #71b7e6, #9b59b6);
+    background: #1565;
     color: white;
     font-size: 18px;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
@@ -413,14 +416,14 @@ label {
 .upload-btn {
     margin-top: 10px;
     padding: 8px 12px;
-    background: #007bff;
+    background: #1565C0 ;
     color: white;
     border: none;
     border-radius: 5px;
     cursor: pointer;
 }
 .upload-btn:hover {
-    background: #0056b3;
+    background: #1565C0 ;
 }
 input[type="file"] {
     display: none;
