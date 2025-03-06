@@ -180,3 +180,28 @@ document.addEventListener("DOMContentLoaded", async function () {
         window.location.replace("/");
     };
 });
+
+
+
+const fileInput = document.getElementById('file-input');
+        const profilePhoto = document.getElementById('profile-photo');
+
+        // Cargar imagen guardada en localStorage (si existe)
+        document.addEventListener("DOMContentLoaded", () => {
+            const savedImage = localStorage.getItem("profile-image");
+            if (savedImage) {
+                profilePhoto.src = savedImage;
+            }
+        });
+
+        fileInput.addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    profilePhoto.src = e.target.result;
+                    localStorage.setItem("profile-image", e.target.result); // Guardar imagen en localStorage
+                };
+                reader.readAsDataURL(file);
+            }
+        });

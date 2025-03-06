@@ -16,8 +16,9 @@ body {
 .header {
     width: 100%;
     padding: 1rem;
-    background: rgba(102, 0, 153, 0.8);
+    background: linear-gradient(135deg, #71b7e6, #9b59b6);
     backdrop-filter: blur(10px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
 }
 
 .back-button {
@@ -91,6 +92,39 @@ body {
     height: 100%;
     object-fit: cover;
 }
+
+.upload-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: -100rem auto 1rem auto; /* Desplaza hacia arriba */
+}
+
+.upload-photo-btn {
+    background: rgba(88, 24, 69, 0.3);
+    border: none;
+    border-radius: 50%;
+    padding: 1rem;
+    cursor: pointer;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.upload-photo-btn:hover {
+    transform: translateY(-10px); /* Mueve el botón un poco más al elevarlo */
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+}
+
+.upload-photo-btn svg {
+    width: 24px;
+    height: 24px;
+    fill: white;
+}
+
+#photo-upload {
+    display: none;
+}
+
 
 .upload-photo-btn {
     position: absolute;
@@ -359,4 +393,35 @@ label {
 .alert-icon {
     margin-right: 10px;
     font-size: 24px;
+}
+
+.profile-content {
+    text-align: center;
+    padding: 20px;
+}
+.profile-image-section {
+    position: relative;
+    display: inline-block;
+}
+.profile-image img {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #ccc;
+}
+.upload-btn {
+    margin-top: 10px;
+    padding: 8px 12px;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.upload-btn:hover {
+    background: #0056b3;
+}
+input[type="file"] {
+    display: none;
 }
