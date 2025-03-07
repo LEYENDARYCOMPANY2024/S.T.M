@@ -52,7 +52,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             document.getElementById("edad").value = pacienteData.edad || "";
             document.getElementById("escolaridad").value = pacienteData.escolaridad || "";
             document.getElementById("sexo").value = pacienteData.genero || "";
-            document.getElementById("estadoCivil").value = pacienteData.estado_civil || "";
+            document.getElementById("estadoCivil").value = pacienteData.estado_civil || "soltero";
             document.getElementById("ocupacion").value = pacienteData.ocupacion || "";
 
             // Mostrar u ocultar sección de mujeres
