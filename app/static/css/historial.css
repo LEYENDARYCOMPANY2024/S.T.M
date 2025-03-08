@@ -6,12 +6,12 @@
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: #1565C0 ;
-    color: #ffffff;
+    background: linear-gradient(135deg, #71b7e6, #9b59b6);
+    color: #000;
 }
 
 .top-bar {
-    background: #1565C0 ;
+    background: linear-gradient(135deg, #71b7e6, #9b59b6);
     padding: 10px;
     display: flex;
     justify-content: space-between;
@@ -32,7 +32,7 @@ body {
 }
 
 .navigation {
-    background: #1565;
+    background: #6fe0e6;
     padding: 10px 0;
     padding: 10px 0;
     display: flex;
@@ -42,7 +42,7 @@ body {
 }
 
 .navigation a {
-    color: white;
+    color: #260035;
     text-decoration: none;
     padding: 12px 24px;
     font-size: 18px;
@@ -59,7 +59,7 @@ body {
     left: 50%;
     width: 0;
     height: 2px;
-    background: white;
+    background: #000;
     transition: width 0.3s ease, left 0.3s ease;
 }
 
@@ -95,10 +95,10 @@ body {
 }
 
 :root {
-    --primary-color: white;
-    --secondary-color: white;
-    --border-color:  white;
-    --hover-color: white;
+    --primary-color: #000;
+    --secondary-color: #000;
+    --border-color: #000;
+    --hover-color: #0000;
 }
 
 * {
@@ -110,7 +110,7 @@ body {
 .container {
     max-width: 1200px;
     margin: 0 auto;
-    background:  #1565;
+    background:  #959fd8;
     border-radius: 10px;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0);
     padding: 20px;
@@ -270,7 +270,7 @@ select:focus {
     transform: translateX(-50%);
     padding: 15px 30px;
     border-radius: 10px;
-    background: #1565;
+    background: linear-gradient(135deg, #71b7e6, #9b59b6);
     color: white;
     font-size: 18px;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
