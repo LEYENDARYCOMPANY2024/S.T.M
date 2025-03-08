@@ -59,7 +59,7 @@ function renderSesiones(sesiones) {
         const sessionDiv = document.createElement("button"); // Convertir en botón
         sessionDiv.classList.add("session-button");
         sessionDiv.innerHTML = `
-            <span>Sesión ${index + 1 + (currentPage - 1) * sessionsPerPage}: ${sesion.descripcion_sesion} - ${sesion.fecha_inicio} a las ${sesion.hora_inicio}</span>
+            <span>Sesión ${index + 1 + (currentPage - 1) * sessionsPerPage}: ${sesion.fecha_inicio} a las ${sesion.hora_inicio}</span>
         `;
 
         // 📌 Evento de clic (por ahora no redirige)

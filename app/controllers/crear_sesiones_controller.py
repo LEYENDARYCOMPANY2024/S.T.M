@@ -28,8 +28,20 @@ def create_sesion(db: Session, id_paciente: int, descripcion: str, fecha, hora: 
 
     
 
-# 📌 Obtener sesiones con paginación
+# 📌 Obtener sesiones con formato de hora más claro
 def get_sesiones(db: Session, page: int, per_page: int):
     offset = (page - 1) * per_page
     sesiones = db.query(Sesion).offset(offset).limit(per_page).all()
-    return {"sesiones": sesiones, "page": page, "per_page": per_page}
+
+    # ✅ Convertir la hora a formato "HH:MM"
+    sesiones_formateadas = []
+    for sesion in sesiones:
+        sesiones_formateadas.append({
+            "id_sesion": sesion.id_sesion,
+            "descripcion_sesion": sesion.descripcion_sesion,
+            "fecha_inicio": sesion.fecha_inicio.strftime("%Y-%m-%d"),
+            "hora_inicio": sesion.hora_inicio.strftime("%H:%M")  # ✅ Solo "HH:MM"
+        })
+
+    return {"sesiones": sesiones_formateadas, "page": page, "per_page": per_page}
+
