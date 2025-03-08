@@ -198,7 +198,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         };
 
         try {
-            const res = await fetch(`/historial/`, {
+            const res = await fetch(/historial/, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payloadHistorial)
