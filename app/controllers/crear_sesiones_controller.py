@@ -1,12 +1,16 @@
 from sqlalchemy.orm import Session
 from models.crear_sesiones_models import Sesion, PacienteSesion
+from datetime import datetime  # ⬅️ Importamos `datetime`
 
 # 📌 Crear sesión
-def create_sesion(db: Session, id_paciente: int, descripcion: str, fecha, hora):
+def create_sesion(db: Session, id_paciente: int, descripcion: str, fecha, hora: str):
+    # ✅ Convertimos `fecha` y `hora` en un solo `datetime`
+    fecha_hora = datetime.combine(fecha, hora)  # `hora` ya es `datetime.time`
+
     new_sesion = Sesion(
         descripcion_sesion=descripcion,
         fecha_inicio=fecha,
-        hora_inicio=hora
+        hora_inicio=fecha_hora  # ✅ Ahora es `datetime`
     )
     db.add(new_sesion)
     db.commit()
@@ -19,7 +23,10 @@ def create_sesion(db: Session, id_paciente: int, descripcion: str, fecha, hora):
     db.add(paciente_sesion)
     db.commit()
 
-    return {"message": "Sesión creada y vinculada al paciente", "id_sesion": new_sesion.id_sesion}
+    return {"message": "Sesión creada exitosamente", "id_sesion": new_sesion.id_sesion}
+
+
+    
 
 # 📌 Obtener sesiones con paginación
 def get_sesiones(db: Session, page: int, per_page: int):
