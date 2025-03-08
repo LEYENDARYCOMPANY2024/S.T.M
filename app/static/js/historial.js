@@ -52,7 +52,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             document.getElementById("edad").value = pacienteData.edad || "";
             document.getElementById("escolaridad").value = pacienteData.escolaridad || "";
             document.getElementById("sexo").value = pacienteData.genero || "";
-            document.getElementById("estadoCivil").value = pacienteData.estado_civil || "";
+            document.getElementById("estadoCivil").value = pacienteData.estado_civil || "soltero";
             document.getElementById("ocupacion").value = pacienteData.ocupacion || "";
 
             // Mostrar u ocultar sección de mujeres
@@ -79,25 +79,22 @@ document.addEventListener("DOMContentLoaded", async function () {
 
             // Restaurar todos los campos (radio, texto, textarea, select) excepto Datos del Paciente
             Object.keys(historial).forEach(key => {
-                // Obtenemos el valor guardado, por ejemplo, 'htaNo'
                 const valorGuardado = historial[key];
-                if (valorGuardado && valorGuardado.includes('Si') || valorGuardado.includes('No')) {
-                    // Si el valor incluye 'Si' o 'No', probablemente sea un radio
-                    const radios = document.getElementsByName(key);
-                    radios.forEach(radio => {
-                        if (radio.id === valorGuardado) {
-                            radio.checked = true;
-                        }
-                    });
-                } else {
-                    const elemento = document.getElementById(key);
-                    if (elemento) {
-                        elemento.value = valorGuardado;
-                    }
+                const elemento = document.getElementById(key);
+
+                if (elemento) {
+                    // Elementos normales (texto, textarea, select)
+                    elemento.value = valorGuardado;
+                } else if (valorGuardado && (valorGuardado.includes('Si') || valorGuardado.includes('No') || valorGuardado.includes('inicial') || valorGuardado.includes('final'))) {
+                    // Radios con patrón Sí/No o casos especiales (inicial/final)
+                    const radio = document.getElementById(valorGuardado);
+                    if (radio) radio.checked = true;
                 }
             });
 
-            // Actualiza la configuración de campos dependientes
+
+            // Actualiza la configuración de ca
+            // mpos dependientes
             configurarCamposCondicionales();
 
         } catch (error) {
@@ -201,7 +198,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         };
 
         try {
-            const res = await fetch(`/historial/`, {
+            const res = await fetch(/historial/, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payloadHistorial)
