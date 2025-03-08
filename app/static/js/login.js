@@ -1,14 +1,33 @@
-document.addEventListener("DOMContentLoaded", function () {
-    const token = localStorage.getItem("session_token");
+$(document).ready(function () {
+    // Verificar si jQuery se cargó correctamente
+    if (typeof jQuery === "undefined") {
+        console.error("jQuery no se ha cargado correctamente.");
+        return;
+    }
+    console.log("jQuery cargado correctamente.");
 
+    // Toggle de visibilidad de la contraseña
+    $("#togglePassword").click(function () {
+        const passwordField = $("#contrasena");
+        if (passwordField.attr("type") === "password") {
+            passwordField.attr("type", "text");
+            $(this).removeClass("fa-eye").addClass("fa-eye-slash");
+        } else {
+            passwordField.attr("type", "password");
+            $(this).removeClass("fa-eye-slash").addClass("fa-eye");
+        }
+    });
+
+    // Verificar si hay un token en localStorage
+    const token = localStorage.getItem("session_token");
     if (token) {
-        console.log("📌 Token detectado en localStorage:", token); // 🔹 Verificar el token guardado
+        console.log("📌 Token detectado en localStorage:", token);
         window.location.replace("/principal");
         return;
     }
-    
 
-    document.getElementById("loginForm").addEventListener("submit", async function (event) {
+    // Manejo del formulario de inicio de sesión
+    $("#loginForm").submit(async function (event) {
         event.preventDefault();
 
         const formData = new FormData(this);
@@ -28,14 +47,10 @@ document.addEventListener("DOMContentLoaded", function () {
             }
 
             const data = await response.json();
-
-            // 📌 Guardar el token y el usuario en `localStorage`
             localStorage.setItem("session_token", data.token);
             localStorage.setItem("nombre_usuario", data.terapeuta.nombre_usuario);
 
-            console.log("📌 Token guardado correctamente:", data.token); // 🔹 Mostrar token guardado
-
-            // 📌 Redirigir inmediatamente a la página principal
+            console.log("📌 Token guardado correctamente:", data.token);
             window.location.replace("/principal");
         } catch (error) {
             alert(error.message);

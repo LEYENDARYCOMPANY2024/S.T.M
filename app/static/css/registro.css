@@ -9,7 +9,7 @@ body {
     justify-content: center;
     align-items: center;
     height: 100vh;
-    background: #1565C0 ;
+    background: #08232b;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
@@ -32,12 +32,13 @@ body {
     margin-bottom: 25px;
     color: white;
     font-size: 32px;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+    text-shadow: 1px 1px 2px rgb(255, 255, 255);
 }
 
 .input-container {
     position: relative;
     margin: 25px 0;
+    color: white;
 }
 
 .input-container input {
@@ -53,8 +54,7 @@ body {
 }
 
 .input-container input:focus {
-    background: rgba(255, 255, 255, 0.5);
-    box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+    box-shadow: 0 0 15px rgb(0, 0, 0);
 }
 
 .input-container .icon {
@@ -65,11 +65,20 @@ body {
     color: #fff;
     font-size: 20px;
 }
+.input-container input {
+    color: black; /* Cambia el color del texto a negro */
+    background: rgba(255, 255, 255, 0.9); /* Fondo más blanco */
+}
+
+.input-container input::placeholder {
+    color: gray; /* Color del placeholder */
+}
+
 
 .register-container button {
     width: 100%;
     padding: 14px;
-    background: #1565;
+    background: #c0c6f0;
     border: none;
     border-radius: 10px;
     color: white;
@@ -80,17 +89,17 @@ body {
 }
 
 .register-container button:hover {
-    background: #1565;
+    background: #c0c6f0;
     transform: scale(1.07);
 }
 
 .login-link {
     margin-top: 20px;
-    color: white;
+    color: #c0c6f0;
 }
 
 .login-link a {
-    color: #f0e68c;
+    color: #c0c6f0;
     text-decoration: none;
     font-weight: bold;
 }
@@ -102,12 +111,12 @@ body {
 /* Estilos para la alerta de éxito */
 .alert {
     position: fixed;
-    top: 20px; /* Antes era 50px, ahora la subimos más */
+    top: 20px; /* Changed from 20px to 10px to move it higher */
     left: 50%;
     transform: translateX(-50%);
     padding: 15px 30px;
     border-radius: 10px;
-    background: #1565;
+    background: #08232b;
     color: white;
     font-size: 18px;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
@@ -115,13 +124,12 @@ body {
     align-items: center;
     opacity: 0;
     visibility: hidden;
-    transition: opacity 0.3s, visibility 0.3s, top 0.3s ease-in-out; /* Agregamos transición para que suba suavemente */
+    transition: opacity 0.3s, visibility 0.3s;
 }
 
 .alert.show {
     opacity: 1;
     visibility: visible;
-    top: -90px; /* Cuando se muestra, sube un poco más */
 }
 
 .alert-icon {
