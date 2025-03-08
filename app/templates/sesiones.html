@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/static/css/sesiones.css">
 </head>
+
 <body>
     <div class="top-bar">
         <div class="menu-icon">☰</div>
@@ -17,7 +18,7 @@
           
     </div>
     <nav class="navigation">
-        <a href="#" class="d-flex align-items-center">
+        <a href="/historial_clinico" class="d-flex align-items-center">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-clock-history me-2" viewBox="0 0 16 16">
               <path d="M8.515 1.019A7 7 0 0 0 8 1V0a8 8 0 0 1 .589.022zm2.004.45a7 7 0 0 0-.985-.299l.219-.976q.576.129 1.126.342zm1.37.71a7 7 0 0 0-.439-.27l.493-.87a8 8 0 0 1 .979.654l-.615.789a7 7 0 0 0-.418-.302zm1.834 1.79a7 7 0 0 0-.653-.796l.724-.69q.406.429.747.91zm.744 1.352a7 7 0 0 0-.214-.468l.893-.45a8 8 0 0 1 .45 1.088l-.95.313a7 7 0 0 0-.179-.483m.53 2.507a7 7 0 0 0-.1-1.025l.985-.17q.1.58.116 1.17zm-.131 1.538q.05-.254.081-.51l.993.123a8 8 0 0 1-.23 1.155l-.964-.267q.069-.247.12-.501m-.952 2.379q.276-.436.486-.908l.914.405q-.24.54-.555 1.038zm-.964 1.205q.183-.183.35-.378l.758.653a8 8 0 0 1-.401.432z"/>
               <path d="M8 1a7 7 0 1 0 4.95 11.95l.707.707A8.001 8.001 0 1 1 8 0z"/>
@@ -55,45 +56,44 @@
     </nav>
 </body>
 
-    <div class="container">
-        <!-- Panel de Sesión 1 -->
-        <div class="session-button">
-            <span>Sesión 1</span>
-            <button class="btn" onclick="window.location.href='sesions2.html'">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-right" viewBox="0 0 16 16">
-                <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8"/>
-              </svg>
-            </button>
-            
-            
-        </div>
+<div class="container">
+  <h2>Sesiones</h2>
 
-        <div class="add-session">
-            <h2>Agregar sesión</h2>
-            <input type="text" class="input-field" placeholder="descripción de sesión">
-            <input type="date" class="input-field" placeholder="fecha">
-            <body>
-                <div class="calendar">
-                    <div class="controls">
-                        <button onclick="changeMonth(-1)">&#9665;</button>
-                        <div class="month" id="month-year"></div>
-                        <button onclick="changeMonth(1)">&#9655;</button>
-                    </div>
-                    <div class="days" id="calendar-container">
-                        <div class="header">Lun</div>
-                        <div class="header">Mar</div>
-                        <div class="header">Mié</div>
-                        <div class="header">Jue</div>
-                        <div class="header">Vie</div>
-                        <div class="header">Sáb</div>
-                        <div class="header">Dom</div>
-                    </div>
-                    <div class="days" id="calendar-days"></div>
-                </div>
-            <input type="time" class="input-field" placeholder="hora inicio">
-            <button class="create-button">Crear sesión</button>
-        </div>
+  <!-- 📌 Contenedor para las sesiones -->
+  <div id="sessions-container"></div>
+
+  <!-- 📌 Controles de paginación -->
+  <div id="pagination"></div>
+
+  <!-- 📌 Formulario para agregar sesión -->
+  <div class="add-session">
+      <h2>Agregar sesión</h2>
+      <input type="text" id="session-desc" class="input-field" placeholder="Descripción">
+      <input type="date" id="session-date" class="input-field">
+
+      <div class="calendar">
+          <div class="controls">
+              <button onclick="changeMonth(-1)">&#9665;</button>
+              <div class="month" id="month-year"></div>
+              <button onclick="changeMonth(1)">&#9655;</button>
+          </div>
+
+          <div class="days" id="calendar-container">
+            <div class="header">Lun</div><div class="header">Mar</div>
+            <div class="header">Mié</div><div class="header">Jue</div>
+            <div class="header">Vie</div><div class="header">Sáb</div>
+            <div class="header">Dom</div>
+          </div>
+          
+          <div class="days" id="calendar-days"></div>
+      </div>
+
+      <input type="time" id="session-time" class="input-field">
+
+      <button class="create-button" onclick="crearSesion()">Crear sesión</button>
+  </div>
+</div>
     </main>
-    <script src="/static/js/sesionesjs"></script>
+    <script src="/static/js/sesiones.js"></script>
 </body>
 </html>
