@@ -22,10 +22,18 @@ function mostrarMensaje(mensaje, tipo = "success") {
     }, 3000);
 }
 
+// 📌 Obtener ID del paciente desde localStorage
+const idPaciente = localStorage.getItem("id_paciente");
+if (!idPaciente) {
+    mostrarMensaje("No hay paciente seleccionado.", "error");
+    window.location.href = "/principal";
+    throw new Error("No hay paciente seleccionado.");
+}
+
 // 📌 Función para obtener sesiones con paginación
 async function fetchSesiones(page) {
     try {
-        const response = await fetch(`/sesiones/?page=${page}&per_page=${sessionsPerPage}`);
+        const response = await fetch(`/sesiones/?id_paciente=${idPaciente}&page=${page}&per_page=${sessionsPerPage}`);
         if (!response.ok) throw new Error("No se pudieron obtener las sesiones");
 
         const data = await response.json();
@@ -64,14 +72,13 @@ function renderSesiones(sesiones) {
     });
 }
 
-
 // 📌 Actualizar los controles de paginación
 function updatePagination(totalPages, currentPage) {
     const paginationContainer = document.getElementById("pagination");
     paginationContainer.innerHTML = "";
 
     if (totalPages > 1) {
-        let maxVisiblePages = 5; // Número máximo de páginas visibles antes de mostrar "..."
+        let maxVisiblePages = 5;
         let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
         let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
 
@@ -121,13 +128,10 @@ function updatePagination(totalPages, currentPage) {
         }
     }
 }
-
-// 📌 Crear sesión
 async function crearSesion() {
     const desc = document.getElementById("session-desc").value;
     const date = document.getElementById("session-date").value;
     const time = document.getElementById("session-time").value;
-    const id_paciente = 1;  // ⚠️ Cambiar según el paciente actual
 
     if (!desc || !date || !time) {
         mostrarMensaje("Por favor, completa todos los campos.", "error");
@@ -135,26 +139,29 @@ async function crearSesion() {
     }
 
     try {
-        const response = await fetch("/sesiones/", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ id_paciente, descripcion: desc, fecha: date, hora: time })
-        });
+        const response = await fetch(
+            `/sesiones/?id_paciente=${idPaciente}&descripcion=${encodeURIComponent(desc)}&fecha=${date}&hora=${time}`,
+            {
+                method: "POST",
+                headers: { "Content-Type": "application/json" }
+            }
+        );
 
         if (!response.ok) throw new Error("Error al crear la sesión");
 
         mostrarMensaje("Sesión creada exitosamente", "success");
-        fetchSesiones(currentPage); // Recargar sesiones después de agregar
+        fetchSesiones(currentPage); // Recargar sesiones
     } catch (error) {
         mostrarMensaje("Error al crear sesión", "error");
         console.error(error);
     }
 }
 
+
+
 // 📌 Alternar visibilidad del calendario
 function toggleCalendar() {
-    const calendar = document.getElementById("calendar-container");
-    calendar.classList.toggle("hidden");
+    document.getElementById("calendar-container").classList.toggle("hidden");
 }
 
 // 📌 Renderizar el calendario
@@ -189,11 +196,9 @@ function renderCalendar() {
         let dayCell = document.createElement("div");
         dayCell.classList.add("day");
         dayCell.textContent = i;
-
-        // 📌 Cuando el usuario hace clic en un día, se selecciona
         dayCell.addEventListener("click", () => {
             document.getElementById("session-date").value = `${year}-${(month + 1).toString().padStart(2, '0')}-${i.toString().padStart(2, '0')}`;
-            toggleCalendar(); // Cerrar el calendario después de elegir
+            toggleCalendar();
         });
 
         calendarDays.appendChild(dayCell);

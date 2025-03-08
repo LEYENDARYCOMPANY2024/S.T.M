@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, Text, Date, Time, ForeignKey
+from sqlalchemy import Column, Integer, Text, Date, Time, ForeignKey, JSON
 from sqlalchemy.orm import relationship
 from database import Base
 
@@ -8,6 +8,7 @@ class Sesion(Base):
     descripcion_sesion = Column(Text, nullable=False)
     fecha_inicio = Column(Date, nullable=False)
     hora_inicio = Column(Time, nullable=False)
+    video_mediapipe_t = Column(JSON, nullable=False, default={})  # ✅ JSON vacío por defecto
 
     pacientes = relationship("PacienteSesion", back_populates="sesion")
 
