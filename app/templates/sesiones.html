@@ -67,32 +67,39 @@
 
   <!-- 📌 Formulario para agregar sesión -->
   <div class="add-session">
-      <h2>Agregar sesión</h2>
-      <input type="text" id="session-desc" class="input-field" placeholder="Descripción">
-      <input type="date" id="session-date" class="input-field">
+    <h2>Agregar sesión</h2>
+    <input type="text" id="session-desc" class="input-field" placeholder="Descripción">
+    <input type="date" id="session-date" class="input-field">
 
-      <div class="calendar">
-          <div class="controls">
-              <button onclick="changeMonth(-1)">&#9665;</button>
-              <div class="month" id="month-year"></div>
-              <button onclick="changeMonth(1)">&#9655;</button>
-          </div>
+    <!-- 📌 Icono de calendario para abrir el modal -->
+    <div class="calendar-icon" onclick="toggleCalendar()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-calendar-event" viewBox="0 0 16 16">
+            <path d="M4 .5a.5.5 0 0 1 .5.5V2h7V1a.5.5 0 0 1 1 0V2h1a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h1V1a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/>
+            <path d="M3 9.5a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1h-2a.5.5 0 0 1-.5-.5m3 0a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1h-2a.5.5 0 0 1-.5-.5m3 0a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1h-2a.5.5 0 0 1-.5-.5"/>
+        </svg>
+    </div>
 
-          <div class="days" id="calendar-container">
-            <div class="header">Lun</div><div class="header">Mar</div>
-            <div class="header">Mié</div><div class="header">Jue</div>
-            <div class="header">Vie</div><div class="header">Sáb</div>
-            <div class="header">Dom</div>
-          </div>
-          
-          <div class="days" id="calendar-days"></div>
-      </div>
+    <!-- 📌 Calendario oculto que se muestra cuando se hace clic en el icono -->
+    <div class="calendar-container hidden" id="calendar-container">
+        <div class="calendar">
+            <div class="controls">
+                <button onclick="changeMonth(-1)">&#9665;</button>
+                <div class="month" id="month-year"></div>
+                <button onclick="changeMonth(1)">&#9655;</button>
+            </div>
+            <div class="days" id="calendar-grid">
+                <div class="header">Lun</div><div class="header">Mar</div>
+                <div class="header">Mié</div><div class="header">Jue</div>
+                <div class="header">Vie</div><div class="header">Sáb</div>
+                <div class="header">Dom</div>
+            </div>
+            <div class="days" id="calendar-days"></div>
+        </div>
+    </div>
 
-      <input type="time" id="session-time" class="input-field">
-
-      <button class="create-button" onclick="crearSesion()">Crear sesión</button>
+    <input type="time" id="session-time" class="input-field">
+    <button class="create-button" onclick="crearSesion()">Crear sesión</button>
   </div>
-</div>
     </main>
     <script src="/static/js/sesiones.js"></script>
 </body>

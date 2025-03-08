@@ -151,7 +151,13 @@ async function crearSesion() {
     }
 }
 
-// 📌 Renderizar el calendario dentro de la sección correcta
+// 📌 Alternar visibilidad del calendario
+function toggleCalendar() {
+    const calendar = document.getElementById("calendar-container");
+    calendar.classList.toggle("hidden");
+}
+
+// 📌 Renderizar el calendario
 function renderCalendar() {
     const monthYear = document.getElementById("month-year");
     const calendarDays = document.getElementById("calendar-days");
@@ -183,6 +189,13 @@ function renderCalendar() {
         let dayCell = document.createElement("div");
         dayCell.classList.add("day");
         dayCell.textContent = i;
+
+        // 📌 Cuando el usuario hace clic en un día, se selecciona
+        dayCell.addEventListener("click", () => {
+            document.getElementById("session-date").value = `${year}-${(month + 1).toString().padStart(2, '0')}-${i.toString().padStart(2, '0')}`;
+            toggleCalendar(); // Cerrar el calendario después de elegir
+        });
+
         calendarDays.appendChild(dayCell);
     }
 }
