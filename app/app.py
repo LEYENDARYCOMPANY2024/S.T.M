@@ -51,6 +51,6 @@ def serve_historial():
 def serve_sesiones():
     return FileResponse("templates/sesiones.html") 
 
-@app.get("/niveles")
+@app.get("/niveles_ejercicios")
 def serve_niveles():
     return FileResponse("templates/ejercicios.html")
