@@ -6,7 +6,7 @@
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: #1565C0 ;
+    background: #08232b ;
     color: #e0e0e0;
 }
 
@@ -26,7 +26,7 @@ body {
             border-top-color: #1565;
             border-radius: 50%;
             animation: spin 1s linear infinite;
-            box-shadow: 0 0 10px rgba(52, 152, 219, 0.8);
+            box-shadow: #08232b;
         }
 
         /* Texto de carga */
@@ -60,7 +60,7 @@ body {
 
         
 .top-bar {
-    background: #1565C0 ;
+    background: #08232b ;
     padding: 10px;
     display: flex;
     justify-content: space-between;
@@ -81,7 +81,7 @@ body {
 }
 
 .navigation {
-    background: #00326c ;
+    background: #c0c6f0 ;
     padding: 10px 0;
     padding: 10px 0;
     display: flex;
@@ -156,7 +156,7 @@ body {
 
 
 .top-bar {
-    background: #1565C0 ;
+    background: #08232b ;
     padding: 15px;
     display: flex;
     justify-content: space-between;
@@ -180,7 +180,7 @@ body {
 }
 
 .session-button {
-    background:  #00326c;
+    background:  #c0c6f0;
     color: white;
     padding: 40px;
     border-radius: 10px;
@@ -215,8 +215,8 @@ body {
 }
 
 .add-session {
-    background:  #00326c;
-    color: white;
+    background:  #c0c6f0;
+    color: black;
     padding: 30px;
     border-radius: 10px;
     width: 500px;
@@ -268,7 +268,7 @@ body {
 
 .calendar button {
     padding: 8px 12px;
-    background: #00326c;
+    background: #08232b;
     color: white;
     border: none;
     border-radius: 50%;
@@ -278,7 +278,7 @@ body {
 }
 
 .calendar button:hover {
-    background: #1565C0 ;
+    background: white ;
 }
 
 .days {
@@ -295,18 +295,18 @@ body {
 }
 
 .day {
-    background: #00326c;
+    background: white;
     transition: 0.3s;
     cursor: pointer;
 }
 
 .day:hover {
-    background: #1565C0 ;
+    background: #08232b ;
     color: white;
 }
 
 .header {
-    background: #00326c;
+    background: #08232b;
     color: white;
     padding: 3px;
     border-radius: 10px;
@@ -314,7 +314,7 @@ body {
 }
 
 .create-button {
-    background-color: #1565C0 ;
+    background-color: #08232b ;
     color: white;
     padding: 10px 25px;
     border: none;
@@ -333,7 +333,7 @@ body {
 }
 
 .btn {
-    background-color: #1565C0 ;
+    background-color: #08232b ;
     border: none;
     padding: 8px;
     border-radius: 5px;
@@ -344,7 +344,7 @@ body {
   }
   
   .btn:hover {
-    background: #1565C0 ;
+    background: #08232b ;
   }
   
   .btn svg {
