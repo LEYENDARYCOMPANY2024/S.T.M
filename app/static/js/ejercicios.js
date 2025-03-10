@@ -3,13 +3,18 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 async function cargarNiveles() {
-    const idPaciente = localStorage.getItem("id_paciente");
-
     try {
-        const response = await fetch(`/api/niveles`);  // ✅ Ahora es la URL correcta
-        const niveles = await response.json();
-        const menuContainer = document.getElementById("levels-menu");
+        const response = await fetch(`/api/niveles`);
+        if (!response.ok) {
+            throw new Error(`Error en la API: ${response.status}`);
+        }
 
+        const niveles = await response.json();
+        if (!Array.isArray(niveles)) {
+            throw new Error("La API no devolvió una lista de niveles válida.");
+        }
+
+        const menuContainer = document.getElementById("levels-menu");
         menuContainer.innerHTML = ""; // Limpiar contenido previo
 
         niveles.forEach(async (nivel) => {
@@ -35,13 +40,17 @@ async function cargarNiveles() {
                     <p>${nivel.descripcion}</p>
                     <h4>Ejercicios:</h4>
                     <ul class="exercise-list">
-                        ${ejercicios.map(ej => `
-                            <li>
-                                <strong>${ej.nom_ejercicio}</strong>
-                                <p>${ej.instrucciones}</p>
-                                <iframe width="300" height="200" src="${ej.video_url}" frameborder="0" allowfullscreen></iframe>
-                            </li>
-                        `).join("")}
+                        ${ejercicios.map(ej => {
+                            const videoId = obtenerYouTubeID(ej.video_url);
+                            return `
+                                <li>
+                                    <strong>${ej.nom_ejercicio}</strong>
+                                    <p>${ej.instrucciones}</p>
+                                    ${videoId ? `<iframe width="300" height="200" src="https://www.youtube.com/embed/${videoId}" frameborder="0" allowfullscreen></iframe>` 
+                                              : `<p style="color:red;">No se puede mostrar el video</p>`}
+                                </li>
+                            `;
+                        }).join("")}
                     </ul>
                 </div>
             `;
@@ -53,18 +62,29 @@ async function cargarNiveles() {
     }
 }
 
+// 📌 Función para obtener el ID del video de YouTube desde la URL
+function obtenerYouTubeID(url) {
+    const regExp = /(?:youtube\.com\/(?:[^\/]+\/[^\/]+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/;
+    const match = url.match(regExp);
+    return match ? match[1] : null;
+}
 
-// Función para obtener ejercicios de un nivel desde la API
+
+
+
 async function obtenerEjercicios(id_nivel) {
     try {
-        const response = await fetch(`/niveles/${id_nivel}/ejercicios`);
-        if (!response.ok) return [];
+        const response = await fetch(`/api/niveles/${id_nivel}/ejercicios`);  // ✅ Ahora es la URL correcta
+        if (!response.ok) {
+            throw new Error(`Error en la API: ${response.status}`);
+        }
         return await response.json();
     } catch (error) {
         console.error(`Error al obtener ejercicios del nivel ${id_nivel}:`, error);
         return [];
     }
 }
+
 
 // Función para alternar el estado de bloqueo/desbloqueo de un nivel
 async function toggleLock(button, id_nivel) {
