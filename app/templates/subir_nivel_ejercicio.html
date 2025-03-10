@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Subir Niveles y Ejercicios</title>
+</head>
+<body>
+    <h3>Crear Nivel y Ejercicio</h3>
+    <form action="/subir" method="post">
+        <label>Nombre del Nivel:</label><br>
+        <input type="text" name="nombre_nivel" required><br><br>
+
+        <label>Descripción del Nivel:</label><br>
+        <textarea name="descripcion_nivel" required></textarea><br><br>
+
+        <label>Orden del Nivel:</label><br>
+        <input type="number" name="orden_nivel" required><br><br>
+
+        <label>Nombre del Ejercicio:</label><br>
+        <input type="text" name="nombre_ejercicio" required><br><br>
+
+        <label>Instrucciones del Ejercicio:</label><br>
+        <textarea name="instrucciones" required></textarea><br><br>
+
+        <label>URL del Video (YouTube):</label><br>
+        <input type="url" name="video_url" required><br><br>
+
+        <button type="submit">Enviar</button>
+    </form>
+</body>
+</html>
