@@ -6,12 +6,12 @@
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: #1565C0 ;
+    background: #08232b ;
     color: #e0e0e0;
 }
 
 .top-bar {
-    background: #1565C0 ;
+    background: #08232b ;
     padding: 10px;
     display: flex;
     justify-content: space-between;
@@ -32,7 +32,7 @@ body {
 }
 
 .navigation {
-    background: #1565;
+    background: #c0c6f0;
     padding: 10px 0;
     padding: 10px 0;
     display: flex;
@@ -808,3 +808,62 @@ body {
         opacity: 0;
     }
 }
+/* Add more breakpoints */
+@media (max-width: 992px) {
+    /* Styles for tablets and smaller desktops */
+    .chat-container {
+      max-width: 90%;
+    }
+    .navigation {
+      gap: 120px;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    /* Styles for large phones and small tablets */
+    .navigation {
+      gap: 60px;
+    }
+    .message {
+      max-width: 80%;
+    }
+  }
+  .navigation {
+    gap: clamp(20px, 5vw, 270px);
+  }
+  :root {
+    --primary-color: #1565;
+    --accent-color: #71b7e6;
+    --bg-dark: #08232b;
+    --text-light: #e0e0e0;
+    --message-sent: rgba(4, 93, 116, 0.333);
+    --message-received: #1565;
+  }
+  
+  /* Then use these variables throughout your CSS */
+  body {
+    background: var(--bg-dark);
+    color: var(--text-light);
+  }
+
+  /* Use hardware acceleration for animations */
+.message, .send-button, .emoji-button {
+    transform: translateZ(0);
+    will-change: transform;
+  }
+  
+  /* Optimize box-shadows */
+  .chat-container {
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Increase touch target sizes */
+.attachment-button, .emoji-button, .send-button {
+    min-width: 44px;
+    min-height: 44px;
+  }
+  
+  /* Improve contrast */
+  .message.sent {
+    background: rgba(4, 93, 116, 0.8); /* Increased opacity for better contrast */
+  }
