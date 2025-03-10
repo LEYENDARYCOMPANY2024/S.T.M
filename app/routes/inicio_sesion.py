@@ -1,13 +1,9 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from controllers.iniciar_sesion import autenticar_terapeuta
+from models.terapeutas import LoginRequest
 
 router = APIRouter()
-
-# 📌 Modelo para recibir `JSON` en lugar de `FormData`
-class LoginRequest(BaseModel):
-    nombre_usuario: str
-    contrasena: str
 
 @router.post("/login")
 async def login_action(request: LoginRequest):

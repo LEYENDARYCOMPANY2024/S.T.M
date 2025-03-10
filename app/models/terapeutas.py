@@ -49,3 +49,9 @@ class TerapeutaPaciente(Base):
     id_paciente_tp_fk = Column(Integer, ForeignKey("pacientes.id_paciente"), nullable=False)
     
     historial_progreso = relationship("HistorialProgreso", back_populates="terapeuta_paciente")
+
+
+# 📌 Modelo para recibir `JSON` en lugar de `FormData`
+class LoginRequest(BaseModel):
+    nombre_usuario: str
+    contrasena: str
