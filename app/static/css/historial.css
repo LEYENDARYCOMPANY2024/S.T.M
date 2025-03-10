@@ -6,12 +6,12 @@
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #71b7e6, #9b59b6);
+    background: #08232b;
     color: #000;
 }
 
 .top-bar {
-    background: linear-gradient(135deg, #71b7e6, #9b59b6);
+    background: #08232b;
     padding: 10px;
     display: flex;
     justify-content: space-between;
@@ -32,7 +32,7 @@ body {
 }
 
 .navigation {
-    background: #6fe0e6;
+    background: #c0c6f0;
     padding: 10px 0;
     padding: 10px 0;
     display: flex;
@@ -110,7 +110,7 @@ body {
 .container {
     max-width: 1200px;
     margin: 0 auto;
-    background:  #959fd8;
+    background:  #c0c6f0;
     border-radius: 10px;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0);
     padding: 20px;
@@ -270,7 +270,7 @@ select:focus {
     transform: translateX(-50%);
     padding: 15px 30px;
     border-radius: 10px;
-    background: linear-gradient(135deg, #71b7e6, #9b59b6);
+    background: #08232b;
     color: white;
     font-size: 18px;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
@@ -290,4 +290,49 @@ select:focus {
 .alert-icon {
     margin-right: 10px;
     font-size: 24px;
+}
+
+
+#guardarPaciente {
+    background-color: #08232b; /* Verde */
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+
+#guardarPaciente:hover {
+    background-color: #08232b;
+    transform: scale(1.05);
+}
+
+#guardarPaciente:active {
+    background-color: #08232b;
+    transform: scale(0.98);
+}
+#guardarHistorial {
+    background-color: #08232b; /* Azul */
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+#guardarHistorial:hover {
+    background-color: #08232b;
+    transform: scale(1.05);
+}
+
+#guardarHistorial:active {
+    background-color: #08232b;
+    transform: scale(0.98);
 }
