@@ -101,8 +101,10 @@ pip install psycopg2-binary
 ## Crear el archivo .env (necesario para la conexión a la abse de datos)
 
 ```
-SUPABASE_URL="URL_DE_TU_BD"
-SUPABASE_KEY="KEY_DE_TU_BD"
+DATABASE_URL=postgresql://<DB_USER>:<DB_PASSWORD>@<DB_HOST>:<DB_PORT>/<DB_NAME>
+SUPABASE_URL=https://<SUPABASE_PROJECT>.supabase.co
+SUPABASE_KEY=<SUPABASE_ANON_KEY>
+SECRET_KEY=<YOUR_SECRET_KEY>
 ```
 ## Archivo de la carpeta test app_prueba_bd.py
 
@@ -158,7 +160,7 @@ git commit -m "Ignorar archivo <archivo ignorado>"
 git push origin <tu_rama>
 ```
 
-# si tiene cambios desatados ocupa este comando y 
+# si tiene cambios desatados ocupa este comando:
 
 ```shell
 git reset --hard
@@ -169,7 +171,7 @@ git reset --hard
 `Presiona Ctrl + Shift + R (Windows/Linux) o Cmd + Shift + R (Mac).`
 
 ## eliminar pycache y archivo temporales de python
-8
+
 ```shell
 find . -name "__pycache__" -type d -exec rm -r {} +
 find . -name "*.pyc" -delete
