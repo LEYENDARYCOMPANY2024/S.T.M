@@ -4,15 +4,29 @@
     box-sizing: border-box;
 }
 
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: #08232b;
-    color: #000;
+:root {
+    --primary-color: #000;
+    --secondary-color: #000;
+    --border-color: #000;
+    --hover-color: #0000;
+    --background-dark: #08232b;
+    --background-light: #c0c6f0;
+    --accent-purple: #260035;
+    --accent-pink: #d4619f;
+    --shadow-color: rgba(0, 0, 0, 0.5);
 }
 
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: var(--background-dark);
+    color: #000;
+    line-height: 1.6;
+}
+
+/* Top Navigation Bar */
 .top-bar {
-    background: #08232b;
-    padding: 10px;
+    background: var(--background-dark);
+    padding: 10px 5%;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -21,7 +35,7 @@ body {
 
 .menu-icon, .user-icon {
     color: #000;
-    font-size: 24px;
+    font-size: clamp(18px, 4vw, 24px);
     cursor: pointer;
     padding: 5px;
     transition: transform 0.3s ease;
@@ -31,21 +45,22 @@ body {
     transform: scale(1.1);
 }
 
+/* Main Navigation */
 .navigation {
-    background: #c0c6f0;
-    padding: 10px 0;
+    background: var(--background-light);
     padding: 10px 0;
     display: flex;
     justify-content: center;
-    gap: 30px;
+    gap: clamp(20px, 5vw, 100px);
     border-bottom: 1px solid #444;
+    flex-wrap: wrap;
 }
 
 .navigation a {
-    color: #260035;
+    color: var(--accent-purple);
     text-decoration: none;
-    padding: 12px 24px;
-    font-size: 18px;
+    padding: 12px clamp(10px, 3vw, 24px);
+    font-size: clamp(14px, 3vw, 18px);
     border-radius: 5px;
     transition: all 0.3s ease;
     position: relative;
@@ -59,7 +74,7 @@ body {
     left: 50%;
     width: 0;
     height: 2px;
-    background: #000;
+    background: var(--accent-purple);
     transition: width 0.3s ease, left 0.3s ease;
 }
 
@@ -76,45 +91,34 @@ body {
     transform: scale(0.98);
 }
 
-/* Responsive design */
-@media (max-width: 600px) {
-    .navigation {
-        flex-direction: column;
-        gap: 15px;
-        padding: 20px;
-    }
-    
-    .navigation a {
-        width: 100%;
-        text-align: center;
-    }
+/* Bootstrap classes for alignment */
+.d-flex {
+    display: flex;
 }
 
-.navigation {
-    gap: 270px;
+.align-items-center {
+    align-items: center;
 }
 
+.me-2 {
+    margin-right: 0.5rem;
+}
+
+/* CSS Variables */
 :root {
-    --primary-color: #000;
-    --secondary-color: #000;
-    --border-color: #000;
-    --hover-color: #0000;
+    --background-light: #c0c6f0;
+    --accent-purple: white;
 }
 
-* {
-    box-sizing: border-box;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
-
+/* Container and Layout */
 .container {
     max-width: 1200px;
-    margin: 0 auto;
-    background:  #c0c6f0;
+    width: 90%;
+    margin: 20px auto;
+    background: var(--background-light);
     border-radius: 10px;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0);
-    padding: 20px;
-    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 25px 50px var(--shadow-color);
+    padding: clamp(15px, 3vw, 30px);
 }
 
 h1 {
@@ -123,6 +127,7 @@ h1 {
     margin-bottom: 30px;
     padding-bottom: 10px;
     border-bottom: 2px solid var(--secondary-color);
+    font-size: clamp(20px, 5vw, 28px);
 }
 
 h2 {
@@ -131,6 +136,7 @@ h2 {
     padding: 8px 15px;
     border-radius: 5px;
     margin: 20px 0 15px 0;
+    font-size: clamp(16px, 4vw, 22px);
 }
 
 h3 {
@@ -138,36 +144,37 @@ h3 {
     border-left: 4px solid var(--primary-color);
     padding-left: 10px;
     margin: 15px 0 10px 0;
+    font-size: clamp(14px, 3.5vw, 18px);
 }
 
 .section {
     margin-bottom: 20px;
-    padding: 15px;
+    padding: clamp(10px, 3vw, 20px);
     border: 1px solid var(--border-color);
     border-radius: 5px;
     background-color: transparent;
     transition: background-color 0.3s;
-    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
 }
-
-
 
 .full-width {
     grid-column: 1 / -1;
 }
 
+/* Grid Layouts */
 .grid-layout {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: clamp(10px, 2vw, 20px);
 }
 
 .fields {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 15px;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: clamp(8px, 2vw, 15px);
 }
 
+/* Form Elements */
 label {
     display: block;
     margin-bottom: 5px;
@@ -190,6 +197,8 @@ select {
 input[type="checkbox"] {
     margin-right: 5px;
     transform: scale(1.2);
+    min-width: 16px;
+    min-height: 16px;
 }
 
 input[type="text"]:focus,
@@ -199,34 +208,38 @@ textarea:focus,
 select:focus {
     outline: none;
     border-color: var(--primary-color);
-    box-shadow: 0 0 5px #959fd8(44, 106, 161, 0.3);
+    box-shadow: 0 0 5px rgba(44, 106, 161, 0.3);
 }
 
 .checkbox-group {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     margin-bottom: 5px;
+    gap: 10px;
 }
 
 .checkbox-label {
     margin-right: 15px;
     display: flex;
     align-items: center;
+    min-height: 24px;
 }
 
+/* Special Sections */
 .women-section {
     background-color: transparent;
-    border-left: 4px solid #d4619f;
+    border-left: 4px solid var(--accent-pink);
 }
 
 .women-section h2 {
     background-color: transparent;
-    color: #d4619f;
+    color: var(--accent-pink);
 }
 
 .women-section h3 {
-    border-left-color: #d4619f;
-    color: #d4619f;
+    border-left-color: var(--accent-pink);
+    color: var(--accent-pink);
 }
 
 .inline-field {
@@ -242,6 +255,7 @@ select:focus {
     min-width: 150px;
 }
 
+/* Footer */
 .footer {
     margin-top: 30px;
     text-align: center;
@@ -250,19 +264,7 @@ select:focus {
     font-size: 14px;
 }
 
-@media (max-width: 768px) {
-    .grid-layout {
-        grid-template-columns: 1fr;
-    }
-    
-    .fields {
-        grid-template-columns: 1fr;
-    }
-}
-
-
-
-/* Estilos para la alerta de éxito */
+/* Alert */
 .alert {
     position: fixed;
     top: 20px;
@@ -270,9 +272,9 @@ select:focus {
     transform: translateX(-50%);
     padding: 15px 30px;
     border-radius: 10px;
-    background: #08232b;
+    background: var(--background-dark);
     color: white;
-    font-size: 18px;
+    font-size: clamp(14px, 3vw, 18px);
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
     display: flex;
     align-items: center;
@@ -280,6 +282,8 @@ select:focus {
     visibility: hidden;
     transition: opacity 0.3s, visibility 0.3s;
     z-index: 1000;
+    width: clamp(220px, 90%, 400px);
+    justify-content: center;
 }
 
 .alert.show {
@@ -289,50 +293,117 @@ select:focus {
 
 .alert-icon {
     margin-right: 10px;
-    font-size: 24px;
+    font-size: clamp(18px, 4vw, 24px);
 }
 
-
-#guardarPaciente {
-    background-color: #08232b; /* Verde */
+/* Buttons */
+#guardarPaciente, 
+#guardarHistorial {
+    background-color: var(--background-dark);
     color: white;
     border: none;
-    padding: 12px 20px;
-    font-size: 16px;
+    padding: clamp(8px, 2vw, 12px) clamp(12px, 3vw, 24px);
+    font-size: clamp(14px, 3vw, 16px);
     font-weight: bold;
     border-radius: 8px;
     cursor: pointer;
     transition: background 0.3s ease, transform 0.2s ease;
-}
-
-#guardarPaciente:hover {
-    background-color: #08232b;
-    transform: scale(1.05);
-}
-
-#guardarPaciente:active {
-    background-color: #08232b;
-    transform: scale(0.98);
-}
-#guardarHistorial {
-    background-color: #08232b; /* Azul */
-    color: white;
-    border: none;
-    padding: 12px 24px;
-    font-size: 16px;
-    font-weight: bold;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s ease;
     box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
+    display: block;
+    margin: 15px auto;
+    min-width: 150px;
 }
 
+#guardarPaciente:hover,
 #guardarHistorial:hover {
-    background-color: #08232b;
+    background-color: #0a3240;
     transform: scale(1.05);
 }
 
+#guardarPaciente:active,
 #guardarHistorial:active {
-    background-color: #08232b;
     transform: scale(0.98);
+}
+
+/* Responsive Breakpoints */
+@media (max-width: 992px) {
+    .grid-layout {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    .grid-layout,
+    .fields {
+        grid-template-columns: 1fr;
+    }
+    
+    .container {
+        width: 95%;
+        padding: 15px;
+    }
+    
+    .section {
+        padding: 10px;
+    }
+}
+
+@media (max-width: 600px) {
+    .navigation {
+        flex-direction: column;
+        gap: 10px;
+        padding: 15px;
+    }
+    
+    .navigation a {
+        width: 100%;
+        text-align: center;
+    }
+    
+    input, select, textarea, button {
+        font-size: 16px; /* Prevents iOS zoom on focus */
+    }
+    
+    .checkbox-group {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .checkbox-label {
+        margin-bottom: 8px;
+    }
+}
+
+@media (max-width: 480px) {
+    h1 {
+        font-size: 18px;
+    }
+    
+    h2 {
+        font-size: 16px;
+    }
+    
+    .inline-field {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .alert {
+        width: 90%;
+        padding: 10px 15px;
+    }
+}
+
+/* Touch-friendly improvements */
+@media (pointer: coarse) {
+    input[type="checkbox"] {
+        transform: scale(1.4);
+        margin-right: 8px;
+    }
+    
+    .navigation a,
+    button,
+    select {
+        min-height: 44px; /* Apple's recommended minimum touch target size */
+    }
 }
