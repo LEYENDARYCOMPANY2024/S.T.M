@@ -37,23 +37,28 @@ async function cargarNiveles() {
                     </button>
                 </div>
                 <div class="level-description">
-                    <p>${nivel.descripcion}</p>
-                    <h4>Ejercicios:</h4>
-                    <ul class="exercise-list">
-                        ${ejercicios.map(ej => {
-                            const videoId = obtenerYouTubeID(ej.video_url);
-                            return `
+                    <div class="text-content">
+                        <p>${nivel.descripcion}</p>
+                        <h4>Ejercicios:</h4>
+                        <ul class="exercise-list">
+                            ${ejercicios.map(ej => `
                                 <li>
                                     <strong>${ej.nom_ejercicio}</strong>
                                     <p>${ej.instrucciones}</p>
-                                    ${videoId ? `<iframe width="300" height="200" src="https://www.youtube.com/embed/${videoId}" frameborder="0" allowfullscreen></iframe>` 
-                                              : `<p style="color:red;">No se puede mostrar el video</p>`}
                                 </li>
-                            `;
+                            `).join("")}
+                        </ul>
+                    </div>
+                    <div class="video-container">
+                        ${ejercicios.map(ej => {
+                            const videoId = obtenerYouTubeID(ej.video_url);
+                            return videoId ? `<iframe width="300" height="200" src="https://www.youtube.com/embed/${videoId}" frameborder="0" allowfullscreen></iframe>`
+                                        : `<p style="color:red;">No se puede mostrar el video</p>`;
                         }).join("")}
-                    </ul>
+                    </div>
                 </div>
             `;
+
 
             menuContainer.appendChild(nivelContainer);
         });
