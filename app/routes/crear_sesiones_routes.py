@@ -16,7 +16,11 @@ def add_sesion(id_paciente: int, descripcion: str, fecha: date, hora: str, db: S
         return {"error": "Formato de hora inválido. Usa HH:MM"}
 
 
-# 📌 Obtener sesiones con paginación (4 por página)
 @router.get("/sesiones/")
-def list_sesiones(page: int = Query(1, alias="page"), db: Session = Depends(get_db)):
-    return get_sesiones(db, page, 4)  # Mostramos 4 por página
+def list_sesiones(
+    id_paciente: int = Query(..., alias="id_paciente"),
+    page: int = Query(1, alias="page"),
+    per_page: int = Query(4, alias="per_page"),  # ✅ Agregado
+    db: Session = Depends(get_db)
+):
+    return get_sesiones(db, id_paciente, page, per_page)  # ✅ Pasamos per_page correctamente
