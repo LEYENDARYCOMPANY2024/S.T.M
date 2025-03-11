@@ -452,3 +452,44 @@ body {
     font-size: 24px; /* Aumenta el tamaño del icono */
     margin-right: 15px;
 }
+
+
+/* Estilos para la paginación */
+#pagination {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.9); /* Fondo semi-transparente */
+    padding: 10px 15px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+#pagination button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    margin: 0 5px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+#pagination button:hover {
+    background-color: #0056b3;
+}
+
+#pagination button.active {
+    background-color: #0056b3;
+    font-weight: bold;
+}
+
+#pagination button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
