@@ -321,6 +321,8 @@ body {
     fill: white;
 }
 
+
+
 /* Media queries para diferentes tamaños de pantalla */
 @media (max-width: 1024px) {
     .navigation {
@@ -412,4 +414,41 @@ body {
         padding: 5px 1px;
         font-size: 10px;
     }
+}
+
+
+/* Estilos para alertas/notificaciones */
+.alert {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translate(-50%, -20px);
+    padding: 20px 30px; /* Aumenta el padding para hacerla más grande */
+    font-size: 18px; /* Aumenta el tamaño del texto */
+    border-radius: 6px; /* Bordes más redondeados */
+    display: flex;
+    align-items: center;
+    color: white;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.2); /* Sombra más pronunciada */
+    z-index: 1000;
+    opacity: 0;
+    transition: transform 0.3s, opacity 0.3s;
+}
+
+.alert.show {
+    transform: translate(-50%, 0);
+    opacity: 1;
+}
+
+.alert.success {
+    background-color: #4CAF50;
+}
+
+.alert.error {
+    background-color: #f44336;
+}
+
+.alert-icon {
+    font-size: 24px; /* Aumenta el tamaño del icono */
+    margin-right: 15px;
 }
