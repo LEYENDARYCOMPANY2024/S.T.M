@@ -6,12 +6,12 @@
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: #1565C0 ;
-    color: #e0e0e0;
+    background: #08232b;
+    color: #ffffff;
 }
 
 .top-bar {
-    background: #1565C0 ;
+    background: #08232b;
     padding: 10px;
     display: flex;
     justify-content: space-between;
@@ -32,12 +32,12 @@ body {
 }
 
 .navigation {
-    background: #1565;
-    padding: 10px 0;
-    padding: 10px 0;
+    background: #c0c6f0;
+    padding: 15px 20px;
     display: flex;
-    justify-content: center;
-    gap: 30px;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    align-items: center;
     border-bottom: 1px solid #444;
 }
 
@@ -50,6 +50,8 @@ body {
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
+    margin: 5px;
+    flex: 0 1 auto;
 }
 
 .navigation a::before {
@@ -76,27 +78,9 @@ body {
     transform: scale(0.98);
 }
 
-/* Responsive design */
-@media (max-width: 600px) {
-    .navigation {
-        flex-direction: column;
-        gap: 15px;
-        padding: 20px;
-    }
-    
-    .navigation a {
-        width: 100%;
-        text-align: center;
-    }
-}
-
-.navigation {
-    gap: 270px;
-}
-
 .navigation a.selected {
-    background-color: #260035; /* Fondo para el enlace activo */
-    color: #ffffff;            /* Color del texto */
+    background-color: #260035;
+    color: #ffffff;
 }
 
 .navigation a.selected::before {
@@ -104,7 +88,43 @@ body {
     left: 0;
 }
 
-/*sesiones
+/* Responsive design */
+@media (max-width: 1200px) {
+    .navigation {
+        gap: 20px;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 768px) {
+    .navigation {
+        flex-direction: column;
+        align-items: center;
+        padding: 10px;
+    }
+    
+    .navigation a {
+        width: 80%;
+        text-align: center;
+        margin: 5px 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .navigation a {
+        width: 100%;
+        padding: 10px 15px;
+        font-size: 16px;
+    }
+    
+    .top-bar {
+        padding: 8px;
+    }
+    
+    .menu-icon, .user-icon {
+        font-size: 20px;
+    }
+}
 
 /* Header */
 .header {
@@ -113,17 +133,14 @@ body {
     padding: 20px;
     border-radius: 10px;
     margin: 20px auto;
-    max-width: 1900px; /* Ajusta el ancho máximo */
+    max-width: 1900px;
     display: flex;
     align-items: center;
     transition: background-color 0.3s ease-in-out;
     font-size: 20px;
     box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
-    border: 2px solid black; 
-	
-
+    border: 2px solid black;
 }
-
 
 .header:hover {
     background-color: #1565;
@@ -156,7 +173,7 @@ body {
     min-height: 550px;
     grid-column: 1;
     box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
-    border: 2px solid black; 
+    border: 2px solid black;
 }
 
 /* Columna de gráficos */
@@ -174,15 +191,14 @@ body {
     padding: 20px;
     position: relative;
     box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
-    border: 2px solid black; 
-	
+    border: 2px solid black;
 }
 
 /* Columna derecha */
 .right-column {
     display: flex;
     flex-direction: column;
-    gap: 0; /* Eliminado el gap entre elementos */
+    gap: 0;
     grid-column: 3;
 }
 
@@ -194,22 +210,22 @@ body {
     padding: 20px;
     width: 100%;
     box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
-    border: 2px solid black; 
+    border: 2px solid black;
 }
 
 .description-box {
-    margin-bottom: 0; /* Eliminado completamente el margen inferior */
+    margin-bottom: 0;
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
-    padding-bottom: 10px; /* Reducido el padding inferior */
+    padding-bottom: 10px;
 }
 
 .evolution-box {
     grid-column: 3;
-    border-top-left-radius: 0; /* Quita el redondeo superior */
-    border-top-right-radius: 0; /* Quita el redondeo superior */
-    margin-top: -1px; /* Crea un ligero solapamiento */
-    padding-top: 10px; /* Reducido el padding superior */
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    margin-top: -1px;
+    padding-top: 10px;
 }
 
 .black-header {
@@ -236,6 +252,7 @@ body {
     font-size: 14px;
     outline: none;
     pointer-events: auto;
+    color: white;
 }
 
 .description-lines textarea {
@@ -252,10 +269,8 @@ body {
 .evolution-lines textarea:focus {
     border-color: #007bff;
     background: transparent;
+    color: white;
 }
-
-
-
 
 /* Media queries para responsividad */
 @media (max-width: 1200px) {
