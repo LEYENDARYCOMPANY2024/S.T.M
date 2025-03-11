@@ -6,66 +6,69 @@
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: #08232b ;
+    background: #08232b;
     color: #e0e0e0;
+    width: 100%;
+    overflow-x: hidden;
 }
 
-        /* Contenedor del loader */
-        .loader-container {
-            text-align: center;
-            margin-top: 50px;
-            opacity: 0;
-            animation: fadeIn 1s forwards;
-        }
+/* Contenedor del loader */
+.loader-container {
+    text-align: center;
+    margin-top: 50px;
+    opacity: 0;
+    animation: fadeIn 1s forwards;
+}
 
-        /* Loader circular */
-        .loader {
-            width: 50px;
-            height: 50px;
-            border: 5px solid white;
-            border-top-color: #1565;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            box-shadow: #08232b;
-        }
+/* Loader circular */
+.loader {
+    width: 50px;
+    height: 50px;
+    border: 5px solid white;
+    border-top-color: #1565;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    box-shadow: #08232b;
+    margin: 0 auto;
+}
 
-        /* Texto de carga */
-        .loader-text {
-            margin-top: 10px;
-            font-size: 18px;
-            color: #333;
-        }
+/* Texto de carga */
+.loader-text {
+    margin-top: 10px;
+    font-size: 18px;
+    color: #333;
+}
 
-        /* Animaciones */
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
+/* Animaciones */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
 
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
-        }
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
 
-        /* Clase para el efecto de pulso */
-        .pulse {
-            animation: pulse 1.5s infinite;
-        }
+/* Clase para el efecto de pulso */
+.pulse {
+    animation: pulse 1.5s infinite;
+}
 
-        
 .top-bar {
-    background: #08232b ;
-    padding: 10px;
+    background: #08232b;
+    padding: 15px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    width: 100%;
 }
 
 .menu-icon, .user-icon {
@@ -81,13 +84,14 @@ body {
 }
 
 .navigation {
-    background: #c0c6f0 ;
-    padding: 10px 0;
+    background: #c0c6f0;
     padding: 10px 0;
     display: flex;
     justify-content: center;
     gap: 30px;
     border-bottom: 1px solid #444;
+    flex-wrap: wrap;
+    width: 100%;
 }
 
 .navigation a {
@@ -99,6 +103,7 @@ body {
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
+    margin: 5px;
 }
 
 .navigation a::before {
@@ -126,8 +131,8 @@ body {
 }
 
 .navigation a.selected {
-    background-color: #260035; /* Fondo para el enlace activo */
-    color: #ffffff;            /* Color del texto */
+    background-color: #260035;
+    color: #ffffff;
 }
 
 .navigation a.selected::before {
@@ -135,62 +140,31 @@ body {
     left: 0;
 }
 
-
-/* Responsive design */
-@media (max-width: 600px) {
-    .navigation {
-        flex-direction: column;
-        gap: 15px;
-        padding: 20px;
-    }
-    
-    .navigation a {
-        width: 100%;
-        text-align: center;
-    }
-}
-
-.navigation {
-    gap: 270px;
-}
-
-
-.top-bar {
-    background: #08232b ;
-    padding: 15px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.menu-icon, .user-icon {
-    color: black;
-    font-size: 24px;
-    cursor: pointer;
-}
-
 .container {
     display: flex;
     justify-content: center;
     align-items: flex-start;
-    gap: 50px;
-    padding: 50px;
+    gap: 30px;
+    padding: 30px 15px;
     max-width: 1200px;
     margin: 0 auto;
+    flex-wrap: wrap;
 }
 
 .session-button {
-    background:  #c0c6f0;
+    background: #c0c6f0;
     color: white;
-    padding: 40px;
+    padding: 30px;
     border-radius: 10px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     cursor: pointer;
-    width: 500px;
+    width: 100%;
+    max-width: 500px;
     height: 100px;
     box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+    margin-bottom: 20px;
 }
 
 .session-button span {
@@ -215,14 +189,13 @@ body {
 }
 
 .add-session {
-    background:  #c0c6f0;
+    background: #c0c6f0;
     color: black;
-    padding: 30px;
+    padding: 20px;
     border-radius: 10px;
-    width: 500px;
-    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+    width: 100%;
+    max-width: 500px;
     box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
-
 }
 
 .add-session h2 {
@@ -237,26 +210,26 @@ body {
     padding: 12px;
     margin-bottom: 15px;
     width: 100%;
-    border: none;
+    border: 2px solid black;
     border-radius: 5px;
     font-size: 0.9rem;
-    border: 2px solid black; 
-
 }
 
 .calendar {
     background: transparent;
-    padding: 20px;
+    padding: 15px;
     border-radius: 15px;
     margin: 20px 0;
     box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-    border: 2px solid black; 
+    border: 2px solid black;
+    width: 100%;
 }
 
 .month {
-    font-size: 22px;
+    font-size: 20px;
     margin-bottom: 15px;
     color: white;
+    text-align: center;
 }
 
 .controls {
@@ -278,7 +251,8 @@ body {
 }
 
 .calendar button:hover {
-    background: white ;
+    background: white;
+    color: #08232b;
 }
 
 .days {
@@ -288,10 +262,10 @@ body {
 }
 
 .day, .empty {
-    padding: 12px;
+    padding: 10px 5px;
     border-radius: 10px;
     text-align: center;
-    font-size: 16px;
+    font-size: 14px;
 }
 
 .day {
@@ -301,7 +275,7 @@ body {
 }
 
 .day:hover {
-    background: #08232b ;
+    background: #08232b;
     color: white;
 }
 
@@ -311,10 +285,11 @@ body {
     padding: 3px;
     border-radius: 10px;
     margin: 4px;
+    font-size: 14px;
 }
 
 .create-button {
-    background-color: #08232b ;
+    background-color: #08232b;
     color: white;
     padding: 10px 25px;
     border: none;
@@ -323,17 +298,12 @@ body {
     display: block;
     margin: 20px auto 0;
     font-size: 0.9rem;
-}
-
-@media (max-width: 600px) {
-    .container {
-        flex-direction: column;
-        padding: 20px;
-    }
+    width: 100%;
+    max-width: 200px;
 }
 
 .btn {
-    background-color: #08232b ;
+    background-color: #08232b;
     border: none;
     padding: 8px;
     border-radius: 5px;
@@ -341,12 +311,105 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-  }
-  
-  .btn:hover {
-    background: #08232b ;
-  }
-  
-  .btn svg {
+}
+
+.btn:hover {
+    background: #143842;
+}
+
+.btn svg {
     fill: white;
-  }
+}
+
+/* Media queries para diferentes tamaños de pantalla */
+@media (max-width: 1024px) {
+    .navigation {
+        gap: 20px;
+    }
+    
+    .container {
+        padding: 20px 10px;
+    }
+}
+
+@media (max-width: 768px) {
+    .navigation {
+        gap: 10px;
+        justify-content: space-around;
+    }
+    
+    .navigation a {
+        padding: 10px 15px;
+        font-size: 16px;
+    }
+    
+    .session-button, .add-session {
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 600px) {
+    .navigation {
+        flex-direction: column;
+        gap: 5px;
+        padding: 10px;
+    }
+    
+    .navigation a {
+        width: 100%;
+        text-align: center;
+        margin: 3px 0;
+    }
+    
+    .container {
+        flex-direction: column;
+        padding: 15px 10px;
+        gap: 20px;
+    }
+    
+    .session-button {
+        padding: 20px;
+        height: 80px;
+    }
+    
+    .session-button span {
+        font-size: 1.2rem;
+    }
+    
+    .days {
+        gap: 2px;
+    }
+    
+    .day, .empty {
+        padding: 8px 2px;
+        font-size: 12px;
+    }
+    
+    .header {
+        font-size: 12px;
+        padding: 2px;
+    }
+}
+
+@media (max-width: 400px) {
+    .top-bar {
+        padding: 10px;
+    }
+    
+    .menu-icon, .user-icon {
+        font-size: 20px;
+    }
+    
+    .add-session h2 {
+        font-size: 1.2rem;
+    }
+    
+    .month {
+        font-size: 18px;
+    }
+    
+    .day, .empty {
+        padding: 5px 1px;
+        font-size: 10px;
+    }
+}
