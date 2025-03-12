@@ -6,12 +6,12 @@
 
             body {
                 font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                background: linear-gradient(135deg, #71b7e6, #9b59b6);
+                background: #08232b;
                 color: #e0e0e0;
             }
 
             .top-bar {
-                background: linear-gradient(135deg, #71b7e6, #9b59b6);
+                background: #08232b;
                 padding: 10px;
                 display: flex;
                 justify-content: space-between;
@@ -32,7 +32,7 @@
             }
 
             .navigation {
-                background: #6fe0e6;
+                background: #c0c6f0;
                 padding: 10px 0;
                 padding: 10px 0;
                 display: flex;
@@ -530,6 +530,63 @@
                 border-radius: 8px;
             }
 
+            
+            /* Media Queries adicionales para mejor responsividad */
+            @media (max-width: 768px) {
+                .navigation {
+                    gap: 10px;
+                    padding: 15px;
+                }
+                
+                .level-row {
+                    flex-wrap: wrap;
+                }
+                
+                .lock-button, .arrow-button {
+                    margin-top: 10px;
+                }
+                
+                #levels-menu {
+                    padding: 15px;
+                }
+                
+                .level-description.open {
+                    max-height: 300px;
+                    overflow-y: auto;
+                }
+            }
+
+            @media (max-width: 480px) {
+                .top-bar {
+                    padding: 10px;
+                }
+                
+                .navigation {
+                    flex-direction: column;
+                    padding: 10px;
+                }
+                
+                .navigation a {
+                    width: 100%;
+                    text-align: center;
+                    margin-bottom: 5px;
+                }
+                
+                .level-name {
+                    font-size: 16px;
+                }
+                
+                .level-indicator {
+                    width: 20px;
+                    height: 20px;
+                }
+                
+                .lock-button, .arrow-button {
+                    width: 30px;
+                    height: 30px;
+                }
+            }
+
 
 
 
@@ -537,27 +594,76 @@
 
 
 /*DISEÑOS DE LOD VIDEOS*/
+.level-description {
+    display: flex; /* Activa el diseño en fila */
+    align-items: flex-start; /* Alinea los elementos arriba */
+    justify-content: space-between; /* Distribuye los elementos */
+    gap: 30px; /* Espacio entre los elementos */
+    flex-wrap: wrap; /* Asegura que se adapte a pantallas pequeñas */
+    padding: 20px; /* Añade espaciado interno */
+    background-color: #08232b; /* Color de fondo ligero */
+    border-radius: 10px; /* Bordes redondeados */
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); /* Sombra ligera */
+}
 
-            .level-description {
-                display: flex; /* Activa el diseño en fila */
-                align-items: center; /* Alinea los elementos verticalmente */
-                gap: 20px; /* Espacio entre la descripción y el video */
-                flex-wrap: wrap; /* Permite que los elementos se acomoden en móviles */
-            }
-            
-            .level-description p {
-                flex: 1; /* La descripción ocupará el espacio disponible */
-            }
-            
-            .level-description .exercise-list {
-                flex: 1; /* Lista de ejercicios con mismo espacio */
-                display: flex;
-                flex-direction: column;
-                gap: 10px;
-            }
-            
-            .level-description iframe {
-                flex: 0 0 300px; /* Establece el tamaño fijo del video */
-                max-width: 100%; /* Asegura que no se desborde */
-            }
-            
+.level-description p {
+    flex: 1; /* La descripción ocupa el espacio disponible */
+    font-size: 1.1rem; /* Aumenta el tamaño de la fuente */
+    line-height: 1.6; /* Mejora la legibilidad */
+    color: #333; /* Color de texto oscuro */
+    padding: 10px; /* Espaciado interno */
+    background-color: #08232b; /* Fondo blanco para resaltar */
+    border-radius: 8px; /* Bordes suaves */
+    box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.05); /* Sombra ligera */
+}
+
+.level-description .exercise-list {
+    flex: 1; /* Lista de ejercicios con mismo espacio */
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* Espaciado entre ejercicios */
+    padding: 10px; /* Espaciado interno */
+    background-color: #08232b; /* Fondo para destacar */
+    border-radius: 8px;
+    box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.level-description .exercise-list h3 {
+    font-size: 1.2rem; /* Tamaño de encabezado */
+    color: #007bff; /* Azul para destacar */
+    margin-bottom: 5px;
+}
+
+.level-description .exercise-list ul {
+    list-style-type: none; /* Elimina viñetas */
+    padding: 0;
+}
+
+.level-description .exercise-list ul li {
+    font-size: 1rem;
+    padding: 8px;
+    background: #f1f3f5; /* Fondo gris claro */
+    border-left: 5px solid #007bff; /* Barra de color azul */
+    border-radius: 5px;
+}
+
+.level-description iframe {
+    flex: 0 0 350px; /* Tamaño fijo del video */
+    max-width: 100%; /* Evita desbordes */
+    height: 200px; /* Ajusta la altura */
+    border-radius: 8px;
+    box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+
+.level-description p {
+    color: #ffffff; /* Texto en blanco */
+}
+
+.level-description .exercise-list h3 {
+    color: #ffffff; /* Texto en blanco */
+}
+
+.level-description .exercise-list ul li {
+    color: #08232b; /* O puedes poner #ffffff si lo quieres blanco también */
+}
