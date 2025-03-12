@@ -428,3 +428,38 @@ label {
 input[type="file"] {
     display: none;
 }
+
+
+
+
+
+
+
+
+.session-alert {
+    display: none; /* Se ocultará por defecto */
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(255, 0, 0, 0.9);
+    color: white;
+    padding: 15px 25px;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: bold;
+    text-align: center;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+    z-index: 9999;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.session-alert.show {
+    display: block; /* Se muestra cuando se activa */
+    opacity: 1;
+}
+
+.hidden {
+    display: none !important;
+}
+
