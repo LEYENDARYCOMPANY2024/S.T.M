@@ -33,6 +33,7 @@ if (!idPaciente) {
 // 📌 Función para obtener sesiones con paginación
 async function fetchSesiones(page) {
     try {
+        currentPage = page; // Actualizar la página actual
         const response = await fetch(`/sesiones/?id_paciente=${idPaciente}&page=${page}&per_page=${sessionsPerPage}`);
         if (!response.ok) throw new Error("No se pudieron obtener las sesiones");
 
@@ -44,6 +45,71 @@ async function fetchSesiones(page) {
         console.error(error);
     }
 }
+
+// 📌 Actualizar los controles de paginación
+function updatePagination(totalSesiones, currentPage) {
+    const sesionesPorPagina = 100; // Ahora cada página tendrá 8 sesiones
+    const totalPages = Math.ceil(totalSesiones / sesionesPorPagina);
+    const paginationContainer = document.getElementById("pagination");
+    paginationContainer.innerHTML = "";
+
+    if (totalPages > 1) {
+        let maxVisiblePages = 100;
+        let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+        let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+        if (endPage - startPage < maxVisiblePages - 1) {
+            startPage = Math.max(1, endPage - maxVisiblePages + 1);
+        }
+
+        // Botón "«" para ir a la primera página
+        if (currentPage > 1) {
+            let firstPageBtn = document.createElement("button");
+            firstPageBtn.textContent = "«";
+            firstPageBtn.classList.add("pagination-btn", "pagination-nav");
+            firstPageBtn.addEventListener("click", () => fetchSesiones(1));
+            paginationContainer.appendChild(firstPageBtn);
+        }
+
+        // Puntos suspensivos si no se empieza desde la página 1
+        if (startPage > 1) {
+            let dots = document.createElement("span");
+            dots.textContent = "...";
+            dots.classList.add("pagination-dots");
+            paginationContainer.appendChild(dots);
+        }
+
+        // Generar botones de página
+        for (let i = startPage; i <= endPage; i++) {
+            const button = document.createElement("button");
+            button.textContent = i;
+            button.classList.add("pagination-btn");
+            if (i === currentPage) {
+                button.classList.add("active");
+            }
+            button.addEventListener("click", () => fetchSesiones(i));
+            paginationContainer.appendChild(button);
+        }
+
+        // Puntos suspensivos si no se llega hasta la última página
+        if (endPage < totalPages) {
+            let dots = document.createElement("span");
+            dots.textContent = "...";
+            dots.classList.add("pagination-dots");
+            paginationContainer.appendChild(dots);
+        }
+
+        // Botón "»" para ir a la última página
+        if (currentPage < totalPages) {
+            let lastPageBtn = document.createElement("button");
+            lastPageBtn.textContent = "»";
+            lastPageBtn.classList.add("pagination-btn", "pagination-nav");
+            lastPageBtn.addEventListener("click", () => fetchSesiones(totalPages));
+            paginationContainer.appendChild(lastPageBtn);
+        }
+    }
+}
+
 
 // 📌 Renderizar sesiones en la interfaz con botones interactivos
 function renderSesiones(sesiones) {
@@ -214,3 +280,5 @@ function changeMonth(step) {
 // 📌 Cargar calendario y sesiones al inicio
 renderCalendar();
 fetchSesiones(currentPage);
+
+
