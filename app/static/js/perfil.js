@@ -1,10 +1,31 @@
 document.addEventListener("DOMContentLoaded", async function () {
     const token = localStorage.getItem("session_token");
 
-    // 📌 Si no hay token, redirigir al login
-    if (!token) {
-        console.warn("⚠️ No hay token en localStorage, redirigiendo al login...");
+    function showSessionExpiredMessage() {
+        const sessionAlert = document.getElementById("session-alert");
         
+        if (!sessionAlert) {
+            console.error("⚠️ No se encontró el elemento #session-alert");
+            return;
+        }
+    
+        sessionAlert.classList.remove("hidden");  // Asegurar que no esté oculto
+        sessionAlert.classList.add("show");  
+    
+        console.warn("⚠️ Mostrando alerta de sesión expirada");
+    
+        // Forzar una actualización de la pantalla para asegurarnos de que se vea el mensaje
+        setTimeout(() => {
+            localStorage.removeItem("session_token");
+            window.location.href = "/login";
+        }, 3000);
+    }
+    
+
+    // 📌 Si no hay token, mostrar mensaje y redirigir
+    if (!token) {
+        console.warn("⚠️ No hay token en localStorage, mostrando mensaje...");
+        showSessionExpiredMessage();
         return;
     }
 
@@ -20,28 +41,18 @@ document.addEventListener("DOMContentLoaded", async function () {
         }
     }
 
-    // Agregar funcionalidad para el botón de regreso
-    const backButton = document.querySelector(".back-button");
-    if (backButton) {
-        backButton.addEventListener("click", function () {
-            window.history.back();
-        });
-    }
-
     const decodedToken = parseJwt(token);
     if (!decodedToken || !decodedToken.sub || !decodedToken.exp) {
         console.warn("⚠️ Token inválido o corrupto, eliminando...");
-        localStorage.removeItem("session_token");
-        window.location.replace("/login");
+        showSessionExpiredMessage();
         return;
     }
 
     // 📌 Verificar si el token ha expirado
     const currentTime = Math.floor(Date.now() / 1000);
     if (decodedToken.exp < currentTime) {
-        console.warn("⏳ Token expirado, eliminando y redirigiendo a login...");
-        localStorage.removeItem("session_token");
-        
+        console.warn("⏳ Token expirado, mostrando mensaje...");
+        showSessionExpiredMessage();
         return;
     }
 
