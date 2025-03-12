@@ -136,3 +136,27 @@ body {
     margin-right: 10px;
     font-size: 24px;
 }
+
+/* Estilo para el contenedor del input */
+.input-container {
+    position: relative;
+    margin-bottom: 15px;
+}
+
+/* Estilo para el icono del ojo */
+#togglePassword {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #666;
+    z-index: 10;
+}
+
+/* Ajuste para el campo de contraseña */
+#contrasena {
+    padding-right: 35px; /* Espacio para el icono */
+    width: 100%;
+    box-sizing: border-box;
+}
