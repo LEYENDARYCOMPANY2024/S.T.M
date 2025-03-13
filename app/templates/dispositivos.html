@@ -55,54 +55,19 @@
           </a>
     </nav>
     <div class="container">
-        <div class="header">Dispositivos</div>
-        <table class="table">
-            <thead>
-                <tr>
-                    <th style="width: 20%;">Nombre</th>
-                    <th style="width: 20%;">Fecha de Registro</th>
-                    <th style="width: 20%;">Tipo de Dispositivo</th>
-                    <th style="width: 10%;">ON-OFF</th>
-                </tr>
-            </thead>
-            <tbody id="device-list">
-                <!-- Rows will be added here by JavaScript -->
-            </tbody>
-        </table>
-        <button class="add-button" id="add-button">Agregar</button>
-        
-        <div class="form-container" id="form-container">
-            <div class="form-title">Agregar Dispositivo Nuevo</div>
-            <div class="form-group">
-                <label for="device-name">Nombre</label>
-                <input type="text" id="device-name">
-            </div>
-            <div class="form-group">
-                <label for="registration-date">Fecha de Registro</label>
-                <input type="date" id="registration-date">
-            </div>
-            <div class="form-group">
-                <label for="device-type">Tipo de Dispositivo</label>
-                <select id="device-type">
-                    <option value="">Seleccionar...</option>
-                    <option value="Smartphone">Smartphone</option>
-                    <option value="Tablet">Tablet</option>
-                    <option value="Laptop">Laptop</option>
-                    <option value="Desktop">Desktop</option>
-                    <option value="Router">Router</option>
-                    <option value="Otro">Otro</option>
-                </select>
-            </div>
-            <div class="form-buttons">
-                <button class="form-button cancel-button" id="cancel-button">Cancelar</button>
-                <button class="form-button save-button" id="save-button">Guardar</button>
-            </div>
-        </div>
-        <div id="notification" class="notification">Dispositivo agregado exitosamente</div>
-
-        
-        <div class="empty-space"></div>
-    </div>
+      <div class="header">Dispositivos</div>
+      <table class="table">
+          <thead>
+              <tr>
+                  <th style="width: 20%;">Nombre</th>
+                  <th style="width: 20%;">Fecha de Registro</th>
+                  <th style="width: 20%;">Tipo de Dispositivo</th>
+                  <th style="width: 10%;">ON-OFF</th>
+              </tr>
+          </thead>
+          <tbody id="device-list"></tbody>
+      </table>
+  </div>
   <script src="/static/js/dispositivos.js"></script>
 </body>
 </html>
