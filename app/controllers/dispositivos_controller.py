@@ -32,7 +32,15 @@ def obtener_dispositivos(db: Session, paciente_id: int):
 
     return dispositivos_con_estado
 
+
 def cambiar_estado_dispositivo(db: Session, dispositivo_id: int, paciente_id: int):
+    # Verificar si el dispositivo existe en dispositivos_iot
+    dispositivo = db.query(DispositivoIOT).filter(DispositivoIOT.id_dispositivo == dispositivo_id).first()
+    
+    if not dispositivo:
+        raise HTTPException(status_code=404, detail="El dispositivo no existe")
+
+    # Buscar si ya hay una relación entre el paciente y el dispositivo
     paciente_dispositivo = (
         db.query(PacienteDispositivo)
         .filter(
@@ -43,20 +51,21 @@ def cambiar_estado_dispositivo(db: Session, dispositivo_id: int, paciente_id: in
     )
 
     if not paciente_dispositivo:
-        # Si no existe una relación, se crea con estado activado por defecto
+        # Si no existe, lo insertamos con estado "activado" por defecto
         paciente_dispositivo = PacienteDispositivo(
             id_paciente_pd_fk=paciente_id,
             id_dispositivo_pd_fk=dispositivo_id,
             estado_dispositivo="activado"
         )
         db.add(paciente_dispositivo)
+        nuevo_estado = "activado"
     else:
-        # Alternar el estado del dispositivo SOLO para este paciente
+        # Si ya existe, alternar el estado
         nuevo_estado = "activado" if paciente_dispositivo.estado_dispositivo == "desactivado" else "desactivado"
         paciente_dispositivo.estado_dispositivo = nuevo_estado
 
     db.commit()
     db.refresh(paciente_dispositivo)
     
-    return {"id_dispositivo": dispositivo_id, "estado": paciente_dispositivo.estado_dispositivo}
+    return {"id_dispositivo": dispositivo_id, "estado": nuevo_estado}
 

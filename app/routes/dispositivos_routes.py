@@ -14,3 +14,4 @@ def listar_dispositivos(paciente_id: int, db: Session = Depends(get_db)):
 @router.put("/dispositivos/{paciente_id}/{dispositivo_id}/toggle")
 def toggle_estado_dispositivo(paciente_id: int, dispositivo_id: int, db: Session = Depends(get_db)):
     return cambiar_estado_dispositivo(db, dispositivo_id, paciente_id)
+
