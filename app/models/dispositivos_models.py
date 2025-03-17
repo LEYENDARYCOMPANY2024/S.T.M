@@ -1,10 +1,7 @@
 from sqlalchemy import Column, Integer, String, Date, Enum, ForeignKey
 from sqlalchemy.orm import relationship
 from database import Base
-
-class EstadoDispositivoEnum(str, Enum):
-    ACTIVADO = "activado"
-    DESACTIVADO = "desactivado"
+from .dispositivos_schemas import LadoPiernaEnum, EstadoDispositivoEnum
 
 class DispositivoIOT(Base):
     __tablename__ = "dispositivos_iot"
@@ -24,7 +21,18 @@ class PacienteDispositivo(Base):
     id_paciente_dispositivo = Column(Integer, primary_key=True, index=True)
     id_paciente_pd_fk = Column(Integer, ForeignKey("pacientes.id_paciente"), nullable=False)
     id_dispositivo_pd_fk = Column(Integer, ForeignKey("dispositivos_iot.id_dispositivo"), nullable=False)
-    estado_dispositivo = Column(String, default="activado")
 
     dispositivo = relationship("DispositivoIOT")
     paciente = relationship("Paciente")
+
+
+class SesionDispositivo(Base):
+    __tablename__ = "sesion_dispositivo"
+
+    id_sesion_dispositivo = Column(Integer, primary_key=True, index=True)
+    id_sesion_fk = Column(Integer, ForeignKey("sesiones.id_sesion"), nullable=False)
+    id_dispositivo_pd_fk = Column(Integer, ForeignKey("paciente_dispositivo.id_paciente_dispositivo"), nullable=False)
+    estado_activado = Column(String, default="desactivado")  # Ahora se almacena como String
+
+    sesion = relationship("Sesion")
+    dispositivo = relationship("PacienteDispositivo")

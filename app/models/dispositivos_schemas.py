@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from datetime import date
+from sqlalchemy import Enum
 
 class DispositivoResponse(BaseModel):
     id_dispositivo: int
@@ -11,3 +12,11 @@ class DispositivoResponse(BaseModel):
 
     class Config:
         orm_mode = True
+
+class EstadoDispositivoEnum(Enum):
+    ACTIVADO = "activado"
+    DESACTIVADO = "desactivado"
+
+class LadoPiernaEnum(Enum):
+    IZQUIERDA = "izquierda"
+    DERECHA = "derecha"

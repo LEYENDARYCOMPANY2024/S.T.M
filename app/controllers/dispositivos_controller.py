@@ -1,46 +1,57 @@
 from sqlalchemy.orm import Session
-from models.dispositivos_models import DispositivoIOT, PacienteDispositivo
+from models.dispositivos_models import DispositivoIOT, PacienteDispositivo, SesionDispositivo, EstadoDispositivoEnum
 from fastapi import HTTPException
 
 def obtener_dispositivos(db: Session, paciente_id: int):
-    dispositivos = db.query(DispositivoIOT).all()
-    
+    """
+    Obtiene todos los dispositivos disponibles. 
+    Si el dispositivo ya ha sido activado en una sesión por el paciente, devuelve su estado.
+    """
+    dispositivos = db.query(DispositivoIOT).all()  # Obtiene TODOS los dispositivos
+
     dispositivos_con_estado = []
     for dispositivo in dispositivos:
-        # Buscar el estado del dispositivo para el paciente específico
-        paciente_dispositivo = (
-            db.query(PacienteDispositivo)
-            .filter(
-                PacienteDispositivo.id_paciente_pd_fk == paciente_id,
-                PacienteDispositivo.id_dispositivo_pd_fk == dispositivo.id_dispositivo
-            )
+        # Buscar si el dispositivo ha sido activado en una sesión por este paciente
+        sesion_dispositivo = (
+            db.query(SesionDispositivo)
+            .join(PacienteDispositivo, SesionDispositivo.id_dispositivo_pd_fk == PacienteDispositivo.id_paciente_dispositivo)
+            .filter(PacienteDispositivo.id_paciente_pd_fk == paciente_id,
+                    SesionDispositivo.id_dispositivo_pd_fk == dispositivo.id_dispositivo)
             .first()
         )
 
-        # Si el dispositivo no está registrado en `paciente_dispositivo`, se marca como 'desactivado' por defecto
-        estado = paciente_dispositivo.estado_dispositivo if paciente_dispositivo else "desactivado"
+        estado = "desactivado"  # Por defecto, todos los dispositivos están desactivados
+        sesion_id = None
 
-        # Agregar estado personalizado para este paciente
+        if sesion_dispositivo:
+            estado = sesion_dispositivo.estado_activado
+            sesion_id = sesion_dispositivo.id_sesion_fk
+
         dispositivos_con_estado.append({
             "id_dispositivo": dispositivo.id_dispositivo,
             "nombre_dispositivo": dispositivo.nombre_dispositivo,
             "fecha_registro": dispositivo.fecha_registro,
             "tipo_de_dispositivo": dispositivo.tipo_de_dispositivo,
             "uuid": dispositivo.uuid,
-            "estado_dispositivo": estado
+            "estado_dispositivo": estado,
+            "sesion_id": sesion_id
         })
 
     return dispositivos_con_estado
 
 
-def cambiar_estado_dispositivo(db: Session, dispositivo_id: int, paciente_id: int):
-    # Verificar si el dispositivo existe en dispositivos_iot
+
+
+def cambiar_estado_dispositivo(db: Session, dispositivo_id: int, paciente_id: int, sesion_id: int):
+    """
+    Activa o desactiva un dispositivo en una sesión, asignándolo al paciente si es necesario.
+    """
     dispositivo = db.query(DispositivoIOT).filter(DispositivoIOT.id_dispositivo == dispositivo_id).first()
     
     if not dispositivo:
         raise HTTPException(status_code=404, detail="El dispositivo no existe")
 
-    # Buscar si ya hay una relación entre el paciente y el dispositivo
+    # Buscar si el dispositivo ya está asociado con este paciente
     paciente_dispositivo = (
         db.query(PacienteDispositivo)
         .filter(
@@ -50,22 +61,45 @@ def cambiar_estado_dispositivo(db: Session, dispositivo_id: int, paciente_id: in
         .first()
     )
 
+    # Si el dispositivo no está asociado al paciente, creamos la relación
     if not paciente_dispositivo:
-        # Si no existe, lo insertamos con estado "activado" por defecto
         paciente_dispositivo = PacienteDispositivo(
             id_paciente_pd_fk=paciente_id,
-            id_dispositivo_pd_fk=dispositivo_id,
-            estado_dispositivo="activado"
+            id_dispositivo_pd_fk=dispositivo_id
         )
         db.add(paciente_dispositivo)
-        nuevo_estado = "activado"
+        db.commit()
+        db.refresh(paciente_dispositivo)
+
+    # Verificar si el dispositivo ya tiene una sesión activa
+    sesion_dispositivo = (
+        db.query(SesionDispositivo)
+        .filter(
+            SesionDispositivo.id_sesion_fk == sesion_id,
+            SesionDispositivo.id_dispositivo_pd_fk == paciente_dispositivo.id_paciente_dispositivo
+        )
+        .first()
+    )
+
+    if not sesion_dispositivo:
+        sesion_dispositivo = SesionDispositivo(
+            id_sesion_fk=sesion_id,
+            id_dispositivo_pd_fk=paciente_dispositivo.id_paciente_dispositivo,
+            estado_activado=EstadoDispositivoEnum.ACTIVADO
+        )
+        db.add(sesion_dispositivo)
+        nuevo_estado = EstadoDispositivoEnum.ACTIVADO
     else:
-        # Si ya existe, alternar el estado
-        nuevo_estado = "activado" if paciente_dispositivo.estado_dispositivo == "desactivado" else "desactivado"
-        paciente_dispositivo.estado_dispositivo = nuevo_estado
+        nuevo_estado = (
+            EstadoDispositivoEnum.ACTIVADO 
+            if sesion_dispositivo.estado_activado == EstadoDispositivoEnum.DESACTIVADO 
+            else EstadoDispositivoEnum.DESACTIVADO
+        )
+        sesion_dispositivo.estado_activado = nuevo_estado
 
     db.commit()
-    db.refresh(paciente_dispositivo)
+    db.refresh(sesion_dispositivo)
     
-    return {"id_dispositivo": dispositivo_id, "estado": nuevo_estado}
+    return {"id_dispositivo": dispositivo_id, "estado": nuevo_estado.value}
+
 
