@@ -1,6 +1,11 @@
 from sqlalchemy import Column, Integer, Text, Date, Time, ForeignKey, JSON
 from sqlalchemy.orm import relationship
+from pydantic import BaseModel
 from database import Base
+
+# 📌 Definir el esquema de datos esperado en la solicitud
+class NotaEvolutivaUpdate(BaseModel):
+    nota_evolutiva: str  # 📌 Debe coincidir con el JSON enviado desde el frontend
 
 class Sesion(Base):
     __tablename__ = 'sesiones'
@@ -8,6 +13,7 @@ class Sesion(Base):
     descripcion_sesion = Column(Text, nullable=False)
     fecha_inicio = Column(Date, nullable=False)
     hora_inicio = Column(Time, nullable=False)
+    nota_evolutiva = Column(Text, nullable=True) 
     video_mediapipe_t = Column(JSON, nullable=False, default={})  # ✅ JSON vacío por defecto
 
     pacientes = relationship("PacienteSesion", back_populates="sesion")

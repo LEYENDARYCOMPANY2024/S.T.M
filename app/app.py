@@ -10,6 +10,8 @@ from routes.paciente_terapeuta_routes import router as paciente_terapeuta_router
 from routes.historial_clinico_routes import router as historial_router  
 from routes.crear_sesiones_routes import router as crear_sesiones_routes
 from routes.ejercicios_routes import router as niveles_router
+from routes.dispositivos_routes import router as dispositivos_routes
+from routes.detalle_sesiones_routes import router as detalle_sesiones_routes
 
 
 
@@ -23,7 +25,9 @@ app.include_router(perfil_router)
 app.include_router(paciente_terapeuta_router)
 app.include_router(historial_router)  
 app.include_router(crear_sesiones_routes)
-app.include_router(niveles_router, prefix="/api")  
+app.include_router(niveles_router, prefix="/api")
+app.include_router(dispositivos_routes)
+app.include_router(detalle_sesiones_routes)
 
 # 📌 Montamos archivos estáticos
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -54,3 +58,11 @@ def serve_sesiones():
 @app.get("/niveles_ejercicios")
 def serve_niveles():
     return FileResponse("templates/ejercicios.html")
+
+@app.get("/dispositivos")
+def serve_niveles():
+    return FileResponse("templates/dispositivos.html")
+
+@app.get("/detalle_sesiones")
+def serve_niveles():
+    return FileResponse("templates/detalle_sesiones.html")

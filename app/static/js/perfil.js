@@ -1,6 +1,18 @@
 document.addEventListener("DOMContentLoaded", async function () {
     const token = localStorage.getItem("session_token");
 
+    
+        const backButton = document.querySelector(".back-button");
+    
+        if (backButton) {
+            backButton.addEventListener("click", function () {
+                window.history.back(); // Regresar a la página anterior
+            });
+        } else {
+            console.error("⚠️ No se encontró el botón de regresar.");
+        }
+    
+
     function showSessionExpiredMessage() {
         const sessionAlert = document.getElementById("session-alert");
         
