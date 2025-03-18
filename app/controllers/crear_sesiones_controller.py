@@ -42,14 +42,16 @@ def get_sesiones(db: Session, id_paciente: int, page: int, per_page: int):
         .all()
     )
 
-    # ✅ Convertir la hora a formato "HH:MM"
+    # ✅ Convertir la hora a formato "hh:mm AM/PM"
     sesiones_formateadas = []
     for sesion in sesiones:
+        hora_12hrs = sesion.hora_inicio.strftime("%I:%M %p")  # 🔹 Formato de 12 horas (AM/PM)
+
         sesiones_formateadas.append({
             "id_sesion": sesion.id_sesion,
             "descripcion_sesion": sesion.descripcion_sesion,
             "fecha_inicio": sesion.fecha_inicio.strftime("%Y-%m-%d"),
-            "hora_inicio": sesion.hora_inicio.strftime("%H:%M")
+            "hora_inicio": hora_12hrs  # ✅ Ahora se mostrará en 12 horas
         })
 
     # 📌 Obtener el total de sesiones del paciente

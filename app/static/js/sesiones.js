@@ -65,13 +65,17 @@ function renderSesiones(sesiones) {
         // 📌 Redirige al detalle de la sesión al hacer clic
         sessionDiv.addEventListener("click", () => {
             localStorage.setItem("id_sesion", sesion.id_sesion);  // ✅ Guardar el ID correctamente
+            localStorage.setItem("nombre_sesion", `Sesión ${index + 1 + (currentPage - 1) * sessionsPerPage}`);  // ✅ Guardar el nombre correctamente
             console.log(`📝 ID de sesión guardado: ${sesion.id_sesion}`);
+            console.log(`📌 Nombre de sesión guardado: Sesión ${index + 1 + (currentPage - 1) * sessionsPerPage}`);
             window.location.href = "/detalle_sesiones";  // ✅ Redirigir al detalle
         });
 
         sessionContainer.appendChild(sessionDiv);
     });
 }
+
+
 
 // 📌 Verificar si hay sesión activa al cargar sesiones
 document.addEventListener("DOMContentLoaded", () => {
@@ -149,15 +153,24 @@ function updatePagination(totalPages, currentPage) {
         }
     }
 }
+
+
 async function crearSesion() {
     const desc = document.getElementById("session-desc").value;
-    const date = document.getElementById("session-date").value;
+    let date = document.getElementById("session-date").value;
     const time = document.getElementById("session-time").value;
 
     if (!desc || !date || !time) {
         mostrarMensaje("Por favor, completa todos los campos.", "error");
         return;
     }
+
+    // ✅ Ajustar la fecha para evitar conversión incorrecta de zona horaria
+    const selectedDate = new Date(date + "T00:00:00");  // Convertir a Date en la zona horaria del navegador
+    selectedDate.setMinutes(selectedDate.getMinutes() - selectedDate.getTimezoneOffset());  // Ajustar a UTC
+    date = selectedDate.toISOString().split("T")[0];  // Convertir de nuevo a YYYY-MM-DD
+
+    console.log(`📌 Fecha corregida antes de enviarla al backend: ${date}`);
 
     try {
         const response = await fetch(
@@ -168,15 +181,22 @@ async function crearSesion() {
             }
         );
 
-        if (!response.ok) throw new Error("Error al crear la sesión");
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(`Error: ${errorData.detail}`);
+        }
 
         mostrarMensaje("Sesión creada exitosamente", "success");
-        fetchSesiones(currentPage); // Recargar sesiones
+        fetchSesiones(currentPage);
+
     } catch (error) {
-        mostrarMensaje("Error al crear sesión", "error");
-        console.error(error);
+        console.error("❌ Error al crear la sesión:", error);
+        mostrarMensaje("Error al crear sesión: " + error.message, "error");
     }
 }
+
+
+
 
 
 
@@ -186,45 +206,58 @@ function toggleCalendar() {
 }
 
 // 📌 Renderizar el calendario
+const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+
 function renderCalendar() {
     const monthYear = document.getElementById("month-year");
     const calendarDays = document.getElementById("calendar-days");
 
     if (!monthYear || !calendarDays) {
-        console.error("No se encontró el contenedor del calendario. Verifica el HTML.");
+        console.error("No se encontró el contenedor del calendario.");
         return;
     }
 
-    const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
-    
+    const today = new Date();
+    const todayDate = today.getDate();
+    const todayMonth = today.getMonth();
+    const todayYear = today.getFullYear();
+
     let year = currentDate.getFullYear();
     let month = currentDate.getMonth();
-    
+
     monthYear.textContent = `${monthNames[month]} ${year}`;
     calendarDays.innerHTML = "";
-    
+
     let firstDay = new Date(year, month, 1).getDay();
     let lastDate = new Date(year, month + 1, 0).getDate();
     let startDay = (firstDay === 0) ? 6 : firstDay - 1;
-    
+
     for (let i = 0; i < startDay; i++) {
         let emptyCell = document.createElement("div");
         emptyCell.classList.add("empty");
         calendarDays.appendChild(emptyCell);
     }
-    
+
     for (let i = 1; i <= lastDate; i++) {
         let dayCell = document.createElement("div");
         dayCell.classList.add("day");
         dayCell.textContent = i;
-        dayCell.addEventListener("click", () => {
-            document.getElementById("session-date").value = `${year}-${(month + 1).toString().padStart(2, '0')}-${i.toString().padStart(2, '0')}`;
-            toggleCalendar();
-        });
+
+        // 📌 Bloquear fechas anteriores a hoy
+        if (year < todayYear || (year === todayYear && month < todayMonth) || (year === todayYear && month === todayMonth && i < todayDate)) {
+            dayCell.classList.add("disabled"); // 🔴 Bloquear días pasados
+        } else {
+            dayCell.addEventListener("click", () => {
+                document.getElementById("session-date").value = `${year}-${(month + 1).toString().padStart(2, '0')}-${i.toString().padStart(2, '0')}`;
+                toggleCalendar();
+            });
+        }
 
         calendarDays.appendChild(dayCell);
     }
 }
+
+
 
 // 📌 Cambiar mes en el calendario
 function changeMonth(step) {
