@@ -62,15 +62,16 @@ function renderSesiones(sesiones) {
             <span>Sesión ${index + 1 + (currentPage - 1) * sessionsPerPage}: ${sesion.fecha_inicio} a las ${sesion.hora_inicio}</span>
         `;
 
-        // 📌 Evento de clic (por ahora no redirige)
+        // 📌 Redirige al detalle de la sesión al hacer clic
         sessionDiv.addEventListener("click", () => {
-            console.log(`Sesión seleccionada: ${sesion.descripcion_sesion}`);
-            mostrarMensaje(`Seleccionaste: ${sesion.descripcion_sesion}`, "success");
+            localStorage.setItem("id_sesion", sesion.id_sesion);  // Guarda el ID en localStorage
+            window.location.href = "/detalle_sesiones";  // Redirige a la página de detalles
         });
 
         sessionContainer.appendChild(sessionDiv);
     });
 }
+
 
 // 📌 Actualizar los controles de paginación
 function updatePagination(totalPages, currentPage) {
