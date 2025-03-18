@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", async () => {
-    const idSesion = localStorage.getItem("id_sesion");
+    let idSesion = localStorage.getItem("id_sesion");
 
     if (!idSesion) {
         alert("No hay sesión seleccionada.");
@@ -39,6 +39,16 @@ document.addEventListener("DOMContentLoaded", async () => {
                 console.error(error);
             }
         });
+
+        // 📌 Evento para salir del detalle de sesión y volver a la lista de sesiones
+        const salirDetalleBtn = document.getElementById("salir-detalle");
+        if (salirDetalleBtn) {
+            salirDetalleBtn.addEventListener("click", () => {
+                console.log("🗑️ Saliendo del detalle de sesión.");
+                localStorage.removeItem("id_sesion");  // ✅ Eliminar la sesión activa
+                window.location.href = "/sesiones";  // ✅ Redirigir a la lista de sesiones
+            });
+        }
 
     } catch (error) {
         console.error(error);

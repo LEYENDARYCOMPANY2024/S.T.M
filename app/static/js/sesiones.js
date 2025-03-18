@@ -64,13 +64,33 @@ function renderSesiones(sesiones) {
 
         // 📌 Redirige al detalle de la sesión al hacer clic
         sessionDiv.addEventListener("click", () => {
-            localStorage.setItem("id_sesion", sesion.id_sesion);  // Guarda el ID en localStorage
-            window.location.href = "/detalle_sesiones";  // Redirige a la página de detalles
+            localStorage.setItem("id_sesion", sesion.id_sesion);  // ✅ Guardar el ID correctamente
+            console.log(`📝 ID de sesión guardado: ${sesion.id_sesion}`);
+            window.location.href = "/detalle_sesiones";  // ✅ Redirigir al detalle
         });
 
         sessionContainer.appendChild(sessionDiv);
     });
 }
+
+// 📌 Verificar si hay sesión activa al cargar sesiones
+document.addEventListener("DOMContentLoaded", () => {
+    const idSesion = localStorage.getItem("id_sesion");
+    const currentPath = window.location.pathname;
+    const sessionContainer = document.getElementById("sessions-container");
+
+    // 📌 Si hay sesión activa y el usuario está en "/sesiones", ocultar solo la lista de sesiones antes de redirigir
+    if (currentPath === "/sesiones" && idSesion) {
+        console.log("🔄 Sesión activa detectada, redirigiendo a detalle_sesiones.");
+        if (sessionContainer) {
+            sessionContainer.style.display = "none";  // 🔹 Oculta solo la lista de sesiones
+        }
+        window.location.replace("/detalle_sesiones"); // ✅ Redirección sin pantallazo
+    }
+});
+
+
+
 
 
 // 📌 Actualizar los controles de paginación

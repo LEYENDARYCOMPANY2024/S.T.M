@@ -667,3 +667,15 @@
 .level-description .exercise-list ul li {
     color: #08232b; /* O puedes poner #ffffff si lo quieres blanco también */
 }
+
+
+.home-button {
+    font-size: 24px;  /* Aumenta el tamaño del icono */
+    color: #c0c6f0;  /* Color negro */
+    text-decoration: none;  /* Elimina subrayado */
+    margin-left: 10px;
+}
+
+.home-button:hover {
+    color: #007bff; /* Cambia de color al pasar el mouse */
+}
