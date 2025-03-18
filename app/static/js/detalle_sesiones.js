@@ -72,6 +72,25 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
         });
 
+        
+        // 📌 Evento para actualizar la descripción
+        document.getElementById("session-description").addEventListener("change", async () => {
+            try {
+                const updateResponse = await fetch(`/detalle_sesiones/${idSesion}/descripcion`, {
+                    method: "PATCH",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ descripcion_sesion: document.getElementById("session-description").value })
+                });
+
+                if (!updateResponse.ok) throw new Error("Error al actualizar la descripción");
+                alert("Descripción actualizada correctamente");
+
+            } catch (error) {
+                alert("Error al actualizar la descripción");
+                console.error(error);
+            }
+        });
+
         // 📌 Evento para salir del detalle de sesión y volver a la lista de sesiones
         const salirDetalleBtn = document.getElementById("salir-detalle");
         if (salirDetalleBtn) {
