@@ -505,3 +505,11 @@ body {
 .home-button:hover {
     color: #007bff; /* Cambia de color al pasar el mouse */
 }
+
+
+.day.disabled {
+    color: #ccc;
+    pointer-events: none; /* Bloquea clics */
+    text-decoration: line-through;
+}
+
