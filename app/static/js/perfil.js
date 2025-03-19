@@ -29,7 +29,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         // Forzar una actualización de la pantalla para asegurarnos de que se vea el mensaje
         setTimeout(() => {
             localStorage.removeItem("session_token");
-            window.location.href = "/login";
+            window.location.href = "/";
         }, 3000);
     }
     
@@ -70,6 +70,10 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     const idTerapeuta = decodedToken.sub;
     console.log(`📌 Usuario autenticado en perfil. ID: ${idTerapeuta}, Token: ${token}`);
+
+    // 📌 Guardar `id_terapeuta` en localStorage
+    localStorage.setItem("id_terapeuta", idTerapeuta); // 🔥 Guardar ID del terapeuta
+    console.log(`📌 Usuario autenticado en perfil. ID Terapeuta guardado: ${idTerapeuta}`);
 
     // 📌 Obtener datos del perfil desde la API
     try {
