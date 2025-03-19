@@ -247,6 +247,19 @@ body {
     border: 2px solid black; 
     box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
 }
+.black-header2 {
+    background-color: transparent;
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 12px;
+    font-size: 16px;
+    text-align: center;
+    font-weight: bold;
+    border: 2px solid black; 
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+    margin-top: 14px;
+}
 
 /* Estilos para textareas */
 .description-lines textarea,

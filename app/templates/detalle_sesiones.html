@@ -56,7 +56,9 @@
     <!-- Contenedor principal -->
     <div class="container">
         <!-- Panel izquierdo -->
-        <div class="left-panel"></div>
+        <div class="left-panel">
+            <div class="black-header2">Video mediapipe</div>
+        </div>
 
         <!-- Columna central con gráficos (Aquí ahora está la "Nota Evolutiva") -->
         <div class="charts-column">
@@ -75,13 +77,12 @@
               </div>
             </div>
 
-            <!-- Descripción editable centrada -->
+            <!-- Apartado de cambios de tabla y gráficas -->
             <div class="description-box">
-              <div class="black-header">Descripción</div>
-              <div class="black-header">Descripción</div>
-              <div class="black-header">Descripción</div>
-            
-            </div>
+                <div class="black-header">Cambios</div>
+                <button id="btn-grafica" class="change-btn">Ver Gráfica</button>
+                <button id="btn-tabla" class="change-btn">Ver Tabla</button>
+            </div>      
         </div>
 
         <!-- 📌 Área donde antes estaba "Nota Evolutiva", ahora es para gráficos -->
@@ -90,7 +91,7 @@
             <div class="charts">
                 <div class="chart-placeholder">📊 Aquí se mostrarán los gráficos</div>
             </div>
-        </div>           
+        </div>
     </div>
     <div id="message-container"></div>
 </body>
