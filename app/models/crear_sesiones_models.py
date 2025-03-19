@@ -7,6 +7,9 @@ from database import Base
 class NotaEvolutivaUpdate(BaseModel):
     nota_evolutiva: str  # 📌 Debe coincidir con el JSON enviado desde el frontend
 
+class DescripcionUpdate(BaseModel):
+    descripcion_sesion: str
+
 class Sesion(Base):
     __tablename__ = 'sesiones'
     id_sesion = Column(Integer, primary_key=True)
