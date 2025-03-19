@@ -126,29 +126,28 @@ body {
     }
 }
 
-/* Header */
+/* 📌 Centrar el encabezado de la sesión */
 .header {
+    display: flex;
+    flex-direction: column; /* 📌 Asegura que los elementos estén en columna */
+    justify-content: center; /* 📌 Centra verticalmente */
+    align-items: center; /* 📌 Centra horizontalmente */
+    text-align: center; /* 📌 Asegura que el texto esté centrado */
     background-color: #1565;
     color: white;
     padding: 20px;
     border-radius: 10px;
     margin: 20px auto;
-    max-width: 1900px;
-    display: flex;
-    align-items: center;
-    transition: background-color 0.3s ease-in-out;
-    font-size: 20px;
+    max-width: 900px; /* 📌 Define un ancho máximo */
     box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
     border: 2px solid black;
 }
 
-.header:hover {
-    background-color: #1565;
-}
-
+/* 📌 Ajusta el botón de retroceso */
 .back-arrow {
+    position: absolute;
+    left: 400px; /* 📌 Mantiene la flecha en la izquierda */
     font-size: 24px;
-    margin-right: 20px;
     cursor: pointer;
     transition: transform 0.2s ease-in-out;
 }
@@ -157,6 +156,14 @@ body {
     transform: scale(1.2);
     color: #FFD700;
 }
+
+/* 📌 Asegura que los elementos dentro del header estén centrados */
+.header div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
 
 /* Layout principal */
 .container {
@@ -297,4 +304,47 @@ body {
 
 .home-button:hover {
     color: #007bff; /* Cambia de color al pasar el mouse */
+}
+
+
+
+
+
+/* 📌 Estilos para alertas/notificaciones */
+.alert {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translate(-50%, -20px);
+    padding: 15px 25px; /* Ajusta el padding para tamaño óptimo */
+    font-size: 16px; /* Tamaño del texto */
+    border-radius: 8px; /* Bordes redondeados */
+    display: flex;
+    align-items: center;
+    color: white;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.2); /* Sombra */
+    z-index: 1000;
+    opacity: 0;
+    transition: transform 0.3s, opacity 0.3s;
+}
+
+/* 📌 Efecto de entrada */
+.alert.show {
+    transform: translate(-50%, 0);
+    opacity: 1;
+}
+
+/* 📌 Colores según el tipo de alerta */
+.alert.success {
+    background-color: #4CAF50; /* Verde para éxito */
+}
+
+.alert.error {
+    background-color: #f44336; /* Rojo para errores */
+}
+
+/* 📌 Iconos en las alertas */
+.alert-icon {
+    font-size: 20px;
+    margin-right: 12px;
 }

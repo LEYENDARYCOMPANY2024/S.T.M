@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from database import get_db
-from controllers.detalle_sesiones_controller import get_sesion_detalle, update_nota_evolutiva
-from models.crear_sesiones_models import NotaEvolutivaUpdate
+from controllers.detalle_sesiones_controller import get_sesion_detalle, update_nota_evolutiva, update_descripcion_sesion
+from models.crear_sesiones_models import NotaEvolutivaUpdate, DescripcionUpdate
 
 router = APIRouter()
 
@@ -18,6 +18,14 @@ def obtener_detalle_sesion(sesion_id: int, db: Session = Depends(get_db)):
 @router.patch("/detalle_sesiones/{sesion_id}/nota")
 def modificar_nota_evolutiva(sesion_id: int, nota: NotaEvolutivaUpdate, db: Session = Depends(get_db)):
     resultado = update_nota_evolutiva(db, sesion_id, nota.nota_evolutiva)  # 📌 Se pasa el JSON correctamente
+    if "error" in resultado:
+        raise HTTPException(status_code=404, detail=resultado["error"])
+    return resultado
+
+# 📌 **Ruta para actualizar la descripción**
+@router.patch("/detalle_sesiones/{sesion_id}/descripcion")
+def modificar_descripcion_sesion(sesion_id: int, descripcion: DescripcionUpdate, db: Session = Depends(get_db)):
+    resultado = update_descripcion_sesion(db, sesion_id, descripcion.descripcion_sesion)
     if "error" in resultado:
         raise HTTPException(status_code=404, detail=resultado["error"])
     return resultado
