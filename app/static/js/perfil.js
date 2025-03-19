@@ -29,7 +29,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         // Forzar una actualización de la pantalla para asegurarnos de que se vea el mensaje
         setTimeout(() => {
             localStorage.removeItem("session_token");
-            window.location.href = "/login";
+            window.location.href = "/";
         }, 3000);
     }
     

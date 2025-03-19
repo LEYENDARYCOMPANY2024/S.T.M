@@ -1,5 +1,7 @@
 document.addEventListener("DOMContentLoaded", async function () {
 
+    const token = localStorage.getItem("session_token");
+
     // Función para mostrar mensajes de forma uniforme
     function mostrarMensaje(mensaje, tipo = "success") {
         const alertBox = document.createElement("div");
@@ -19,6 +21,17 @@ document.addEventListener("DOMContentLoaded", async function () {
             setTimeout(() => alertBox.remove(), 300);
         }, 3000);
     }
+
+    // 📌 Función para mostrar mensajes de error antes de redirigir
+    function mostrarMensajeYRedirigir(mensaje) {
+        mostrarMensaje(mensaje, "error"); // 🔥 Muestra el mensaje en pantalla
+
+        setTimeout(() => {
+            localStorage.removeItem("session_token");
+            window.location.href = "/";
+        }, 3000); // 🔥 Espera 3 segundos antes de redirigir
+    }
+
 
     // Función para mostrar una ventana de confirmación estilizada
     function mostrarConfirmacionEstilizada(mensaje) {
@@ -119,25 +132,37 @@ document.addEventListener("DOMContentLoaded", async function () {
             });
         });
     }
-    
-    const token = localStorage.getItem("session_token");
+
     if (!token) {
-        window.location.href = "/login";
+        console.warn("⚠️ No hay token en localStorage, redirigiendo a login...");
+        mostrarMensajeYRedirigir("⚠️ Tu sesión ha expirado. Inicia sesión nuevamente.");
         return;
     }
-    
+
+    console.log("📌 Token detectado en `principal.js`:", token);
+
+    // 📌 Función para decodificar el token y obtener el ID del terapeuta
     function parseJwt(token) {
         try {
             return JSON.parse(atob(token.split(".")[1]));
         } catch (e) {
+            console.error("❌ Error al decodificar el token:", e);
             return null;
         }
     }
-    
+
     const decodedToken = parseJwt(token);
-    if (!decodedToken || !decodedToken.sub) {
-        localStorage.removeItem("session_token");
-        window.location.href = "/login";
+    if (!decodedToken || !decodedToken.sub || !decodedToken.exp) {
+        console.warn("⚠️ Token inválido o corrupto, eliminando...");
+        mostrarMensajeYRedirigir("⚠️ Tu sesión es inválida. Inicia sesión nuevamente.");
+        return;
+    }
+
+    // 📌 Verificar si el token ha expirado
+    const currentTime = Math.floor(Date.now() / 1000);
+    if (decodedToken.exp < currentTime) {
+        console.warn("⏳ Token expirado, redirigiendo a login...");
+        mostrarMensajeYRedirigir("⏳ Tu sesión ha expirado. Inicia sesión nuevamente.");
         return;
     }
     const idTerapeuta = decodedToken.sub;
@@ -166,6 +191,10 @@ document.addEventListener("DOMContentLoaded", async function () {
     
     // Perfil
     const profileIcon    = document.getElementById("profileIcon");
+
+    // 📌 Guardar el ID del terapeuta en localStorage
+    localStorage.setItem("id_terapeuta", idTerapeuta); // ✅ Guardamos el id del terapeuta
+    console.log(`📌 Usuario autenticado - ID Terapeuta: ${idTerapeuta}`);
     
     function cambiarPestaña(tipo) {
         if (tipo === "activos") {
