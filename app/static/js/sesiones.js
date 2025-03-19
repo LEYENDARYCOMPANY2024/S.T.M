@@ -1,6 +1,7 @@
 let currentPage = 1;
 const sessionsPerPage = 4;
 let currentDate = new Date();
+let contadorPorTerapeuta = {}; // 🔥 Mantendrá el conteo aunque cambie de página
 
 // 📌 Función para mostrar mensajes de éxito o error
 function mostrarMensaje(mensaje, tipo = "success") {
@@ -31,116 +32,114 @@ if (!idPaciente) {
 }
 
 // 📌 Función para obtener sesiones con paginación
-async function fetchSesiones(page) {
+async function fetchSesiones(page = 1) {
     try {
-        currentPage = page; // Actualizar la página actual
-        const response = await fetch(`/sesiones/?id_paciente=${idPaciente}&page=${page}&per_page=${sessionsPerPage}`);
+        let idTerapeuta = localStorage.getItem("id_terapeuta");
+
+        if (!idTerapeuta) {
+            console.error("❌ No se encontró id_terapeuta en localStorage.");
+            mostrarMensaje("Error: No se encontró el terapeuta actual.", "error");
+            return;
+        }
+
+        const response = await fetch(`/sesiones/?id_paciente=${idPaciente}&id_terapeuta_actual=${idTerapeuta}&page=${page}&per_page=${sessionsPerPage}`);
+
         if (!response.ok) throw new Error("No se pudieron obtener las sesiones");
 
         const data = await response.json();
-        renderSesiones(data.sesiones);
-        updatePagination(data.total_pages, data.page);
+        renderSesionesPorTerapeuta(data.terapeutas);
+        updatePagination(data.total_pages, page);
     } catch (error) {
         mostrarMensaje("Error al obtener sesiones", "error");
         console.error(error);
     }
 }
 
-// 📌 Actualizar los controles de paginación
-function updatePagination(totalSesiones, currentPage) {
-    const sesionesPorPagina = 100; // Ahora cada página tendrá 8 sesiones
-    const totalPages = Math.ceil(totalSesiones / sesionesPorPagina);
-    const paginationContainer = document.getElementById("pagination");
-    paginationContainer.innerHTML = "";
-
-    if (totalPages > 1) {
-        let maxVisiblePages = 100;
-        let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
-        let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-
-        if (endPage - startPage < maxVisiblePages - 1) {
-            startPage = Math.max(1, endPage - maxVisiblePages + 1);
-        }
-
-        // Botón "«" para ir a la primera página
-        if (currentPage > 1) {
-            let firstPageBtn = document.createElement("button");
-            firstPageBtn.textContent = "«";
-            firstPageBtn.classList.add("pagination-btn", "pagination-nav");
-            firstPageBtn.addEventListener("click", () => fetchSesiones(1));
-            paginationContainer.appendChild(firstPageBtn);
-        }
-
-        // Puntos suspensivos si no se empieza desde la página 1
-        if (startPage > 1) {
-            let dots = document.createElement("span");
-            dots.textContent = "...";
-            dots.classList.add("pagination-dots");
-            paginationContainer.appendChild(dots);
-        }
-
-        // Generar botones de página
-        for (let i = startPage; i <= endPage; i++) {
-            const button = document.createElement("button");
-            button.textContent = i;
-            button.classList.add("pagination-btn");
-            if (i === currentPage) {
-                button.classList.add("active");
-            }
-            button.addEventListener("click", () => fetchSesiones(i));
-            paginationContainer.appendChild(button);
-        }
-
-        // Puntos suspensivos si no se llega hasta la última página
-        if (endPage < totalPages) {
-            let dots = document.createElement("span");
-            dots.textContent = "...";
-            dots.classList.add("pagination-dots");
-            paginationContainer.appendChild(dots);
-        }
-
-        // Botón "»" para ir a la última página
-        if (currentPage < totalPages) {
-            let lastPageBtn = document.createElement("button");
-            lastPageBtn.textContent = "»";
-            lastPageBtn.classList.add("pagination-btn", "pagination-nav");
-            lastPageBtn.addEventListener("click", () => fetchSesiones(totalPages));
-            paginationContainer.appendChild(lastPageBtn);
-        }
-    }
-}
 
 
 // 📌 Renderizar sesiones en la interfaz con botones interactivos
-function renderSesiones(sesiones) {
+function renderSesiones(data) {
     const sessionContainer = document.getElementById("sessions-container");
-    sessionContainer.innerHTML = ""; // Limpiar sesiones previas
+    sessionContainer.innerHTML = "";
 
-    if (sesiones.length === 0) {
+    let sesionesAMostrar = mostrarSesionesPropias ? data.propias : data.otros;
+
+    if (sesionesAMostrar.length === 0) {
         sessionContainer.innerHTML = "<p>No hay sesiones registradas.</p>";
         return;
     }
 
-    sesiones.forEach((sesion, index) => {
-        const sessionDiv = document.createElement("button"); // Convertir en botón
+    sesionesAMostrar.forEach((sesion, index) => {
+        const sessionDiv = document.createElement("button");
         sessionDiv.classList.add("session-button");
+
         sessionDiv.innerHTML = `
-            <span>Sesión ${index + 1 + (currentPage - 1) * sessionsPerPage}: ${sesion.fecha_inicio} a las ${sesion.hora_inicio}</span>
+            <span>
+                Sesión ${index + 1}: ${sesion.fecha_inicio} a las ${sesion.hora_inicio}
+            </span><br>
+            <small>Terapeuta: ${sesion.terapeuta}</small>
         `;
 
-        // 📌 Redirige al detalle de la sesión al hacer clic
         sessionDiv.addEventListener("click", () => {
-            localStorage.setItem("id_sesion", sesion.id_sesion);  // ✅ Guardar el ID correctamente
-            localStorage.setItem("nombre_sesion", `Sesión ${index + 1 + (currentPage - 1) * sessionsPerPage}`);  // ✅ Guardar el nombre correctamente
-            console.log(`📝 ID de sesión guardado: ${sesion.id_sesion}`);
-            console.log(`📌 Nombre de sesión guardado: Sesión ${index + 1 + (currentPage - 1) * sessionsPerPage}`);
-            window.location.href = "/detalle_sesiones";  // ✅ Redirigir al detalle
+            localStorage.setItem("id_sesion", sesion.id_sesion);
+            localStorage.setItem("nombre_sesion", `Sesión ${index + 1}`);
+            window.location.href = "/detalle_sesiones";
         });
 
         sessionContainer.appendChild(sessionDiv);
     });
+
+    // 🔥 Botón para alternar entre sesiones propias y de otros terapeutas
+    const toggleButton = document.createElement("button");
+    toggleButton.classList.add("toggle-sessions-btn");
+    toggleButton.textContent = mostrarSesionesPropias ? "Ver sesiones anteriores" : "Ver mis sesiones";
+    
+    toggleButton.addEventListener("click", () => {
+        mostrarSesionesPropias = !mostrarSesionesPropias;
+        renderSesiones(data);
+    });
+
+    sessionContainer.appendChild(toggleButton);
 }
 
+
+function renderSesionesPorTerapeuta(terapeutas) {
+    const sessionContainer = document.getElementById("sessions-container");
+    sessionContainer.innerHTML = "";
+
+    if (terapeutas.length === 0) {
+        sessionContainer.innerHTML = "<p>No hay sesiones registradas.</p>";
+        return;
+    }
+
+    terapeutas.forEach((terapeuta) => {
+        const terapeutaDiv = document.createElement("div");
+        terapeutaDiv.classList.add("terapeuta-container");
+
+        terapeutaDiv.innerHTML = `<h3>Terapeuta: ${terapeuta.terapeuta}</h3>`;
+
+        terapeuta.sesiones.forEach((sesion, index) => {
+            const sessionDiv = document.createElement("button");
+            sessionDiv.classList.add("session-button");
+
+            sessionDiv.innerHTML = `
+                <span>
+                    Sesión ${index + 1}: ${sesion.fecha_inicio} a las ${sesion.hora_inicio}
+                </span>
+            `;
+
+            sessionDiv.addEventListener("click", () => {
+                localStorage.setItem("id_sesion", sesion.id_sesion);
+                localStorage.setItem("nombre_sesion", `Sesión ${index + 1}`);
+                window.location.href = "/detalle_sesiones";
+            });
+
+            terapeutaDiv.appendChild(sessionDiv);
+        });
+
+        sessionContainer.appendChild(terapeutaDiv);
+    });
+}
 
 
 // 📌 Verificar si hay sesión activa al cargar sesiones
@@ -225,22 +224,20 @@ async function crearSesion() {
     const desc = document.getElementById("session-desc").value;
     let date = document.getElementById("session-date").value;
     const time = document.getElementById("session-time").value;
+    const idTerapeuta = localStorage.getItem("id_terapeuta"); // 🔥 importante
 
-    if (!desc || !date || !time) {
-        mostrarMensaje("Por favor, completa todos los campos.", "error");
+    if (!desc || !date || !time || !idTerapeuta) {
+        mostrarMensaje("Completa todos los campos.", "error");
         return;
     }
 
-    // ✅ Ajustar la fecha para evitar conversión incorrecta de zona horaria
-    const selectedDate = new Date(date + "T00:00:00");  // Convertir a Date en la zona horaria del navegador
-    selectedDate.setMinutes(selectedDate.getMinutes() - selectedDate.getTimezoneOffset());  // Ajustar a UTC
-    date = selectedDate.toISOString().split("T")[0];  // Convertir de nuevo a YYYY-MM-DD
-
-    console.log(`📌 Fecha corregida antes de enviarla al backend: ${date}`);
+    const selectedDate = new Date(date + "T00:00:00");
+    selectedDate.setMinutes(selectedDate.getMinutes() - selectedDate.getTimezoneOffset());
+    date = selectedDate.toISOString().split("T")[0];
 
     try {
         const response = await fetch(
-            `/sesiones/?id_paciente=${idPaciente}&descripcion=${encodeURIComponent(desc)}&fecha=${date}&hora=${time}`,
+            `/sesiones/?id_paciente=${idPaciente}&descripcion=${encodeURIComponent(desc)}&fecha=${date}&hora=${time}&id_terapeuta=${idTerapeuta}`,
             {
                 method: "POST",
                 headers: { "Content-Type": "application/json" }
@@ -254,9 +251,7 @@ async function crearSesion() {
 
         mostrarMensaje("Sesión creada exitosamente", "success");
         fetchSesiones(currentPage);
-
     } catch (error) {
-        console.error("❌ Error al crear la sesión:", error);
         mostrarMensaje("Error al crear sesión: " + error.message, "error");
     }
 }
