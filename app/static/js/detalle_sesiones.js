@@ -110,4 +110,13 @@ document.addEventListener("DOMContentLoaded", async () => {
         console.error(error);
         mostrarMensaje("Error cargando la sesión", "error");
     }
+
+    document.getElementById("btn-grafica").addEventListener("click", () => {
+        cargarGrafica(); // 📌 Llamará a la función de grafica.js
+    });
+    
+    document.getElementById("btn-tabla").addEventListener("click", () => {
+        cargarTablaMediapipe(); // 📌 Llamará a la función de tabla_mediapipe.js
+    });
+    
 });
