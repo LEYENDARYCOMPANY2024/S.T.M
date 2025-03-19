@@ -71,6 +71,10 @@ document.addEventListener("DOMContentLoaded", async function () {
     const idTerapeuta = decodedToken.sub;
     console.log(`📌 Usuario autenticado en perfil. ID: ${idTerapeuta}, Token: ${token}`);
 
+    // 📌 Guardar `id_terapeuta` en localStorage
+    localStorage.setItem("id_terapeuta", idTerapeuta); // 🔥 Guardar ID del terapeuta
+    console.log(`📌 Usuario autenticado en perfil. ID Terapeuta guardado: ${idTerapeuta}`);
+
     // 📌 Obtener datos del perfil desde la API
     try {
         const response = await fetch(`/perfil/${idTerapeuta}`, {
