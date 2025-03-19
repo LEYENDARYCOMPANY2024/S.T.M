@@ -27,6 +27,8 @@ class PacienteSesion(Base):
     id_paciente_sesion = Column(Integer, primary_key=True)
     id_paciente_ps_fk = Column(Integer, ForeignKey("pacientes.id_paciente"), nullable=False)
     id_sesion_ps_fk = Column(Integer, ForeignKey("sesiones.id_sesion"), nullable=False)
+    id_terapeuta_fk = Column(Integer, ForeignKey("terapeutas.id_terapeuta"), nullable=False)
 
     paciente = relationship("Paciente", back_populates="sesiones")
     sesion = relationship("Sesion", back_populates="pacientes")
+    terapeuta = relationship("Terapeuta")
