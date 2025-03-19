@@ -1,9 +1,26 @@
+// 📌 Función para mostrar mensajes de éxito o error con el diseño personalizado
+function mostrarMensaje(mensaje, tipo = "success") {
+    const alertBox = document.createElement("div");
+    alertBox.classList.add("alert", tipo === "success" ? "success" : "error");
+    alertBox.innerHTML = `
+        <span class="alert-icon">${tipo === "success" ? "✅" : "❌"}</span> 
+        ${mensaje}
+    `;
+    document.body.appendChild(alertBox);
+
+    setTimeout(() => alertBox.classList.add("show"), 100);
+    setTimeout(() => {
+        alertBox.classList.remove("show");
+        setTimeout(() => alertBox.remove(), 300);
+    }, 3000);
+}
+
 document.addEventListener("DOMContentLoaded", async () => {
     let idSesion = localStorage.getItem("id_sesion");
     const nombreSesion = localStorage.getItem("nombre_sesion"); // ✅ Obtener el nombre de la sesión
 
     if (!idSesion) {
-        alert("No hay sesión seleccionada.");
+        mostrarMensaje("No hay sesión seleccionada.", "error");
         window.location.href = "/sesiones";
         return;
     }
@@ -17,63 +34,50 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         // ✅ Mostrar el nombre de la sesión en lugar del ID
         document.getElementById("session-title").textContent = nombreSesion || `Sesión ${idSesion}`;  
-        document.getElementById("session-description").textContent = sesion.descripcion_sesion;
+        document.getElementById("session-description").value = sesion.descripcion_sesion || "";
+        document.getElementById("nota-evolutiva").value = sesion.nota_evolutiva || "";
+
         console.log("📌 Datos de la sesión recibidos:", sesion);
-        console.log("📌 Fecha sin procesar:", sesion.fecha_inicio);
-        console.log("📌 Hora sin procesar:", sesion.hora_inicio);
 
-
-        // ✅ Mostrar la fecha y la hora formateadas
-        // 📌 Extraer la fecha sin alterar la zona horaria
-        const fechaISO = sesion.fecha_inicio; // "2025-03-17"
+        // 📌 Mostrar la fecha y la hora formateadas
+        const fechaISO = sesion.fecha_inicio;
         const fechaFormateada = new Date(fechaISO + "T00:00:00").toLocaleDateString("es-ES", {
             year: "numeric",
             month: "long",
             day: "numeric"
         });
 
-        // 📌 Extraer y convertir la hora a formato de 12 horas
-        // 📌 Extraer solo la hora de la cadena sin conversión de zona horaria
-        const horaISO = sesion.hora_inicio; // "2025-03-17T22:27:00+00:00"
-        const horaSinZona = horaISO.split("T")[1].split("+")[0]; // "22:27:00"
-
-        // 📌 Convertir a formato de 12 horas (AM/PM)
-        const [hora, minutos] = horaSinZona.split(":"); // ["22", "27"]
+        const horaISO = sesion.hora_inicio;
+        const horaSinZona = horaISO.split("T")[1].split("+")[0];
+        const [hora, minutos] = horaSinZona.split(":");
         const horaNumerica = parseInt(hora, 10);
         const ampm = horaNumerica >= 12 ? "PM" : "AM";
-        const hora12 = horaNumerica % 12 || 12; // Convierte 0 en 12 para formato de 12 horas
+        const hora12 = horaNumerica % 12 || 12;
 
         const horaFormateada = `${hora12}:${minutos} ${ampm}`;
 
-
         document.getElementById("session-date").textContent = `📅 ${fechaFormateada}`;
-        // 📌 Mostrar la hora en la interfaz
         document.getElementById("session-time").textContent = `⏰ ${horaFormateada}`;
 
-        // 📌 Mostrar la nota evolutiva si existe
-        const notaTextarea = document.getElementById("nota-evolutiva");
-        notaTextarea.value = sesion.nota_evolutiva || "";
-
         // 📌 Evento para actualizar la nota evolutiva
-        notaTextarea.addEventListener("change", async () => {
+        document.getElementById("nota-evolutiva").addEventListener("change", async () => {
             try {
                 const updateResponse = await fetch(`/detalle_sesiones/${idSesion}/nota`, {
                     method: "PATCH",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ nota_evolutiva: notaTextarea.value })  // 📌 Enviar JSON correctamente
+                    body: JSON.stringify({ nota_evolutiva: document.getElementById("nota-evolutiva").value })
                 });
 
                 if (!updateResponse.ok) throw new Error("Error al actualizar la nota");
-                alert("Nota evolutiva actualizada correctamente");
+                mostrarMensaje("Nota evolutiva actualizada correctamente", "success");
 
             } catch (error) {
-                alert("Error al actualizar la nota evolutiva");
+                mostrarMensaje("Error al actualizar la nota evolutiva", "error");
                 console.error(error);
             }
         });
 
-        
-        // 📌 Evento para actualizar la descripción
+        // 📌 **Evento para actualizar la descripción**
         document.getElementById("session-description").addEventListener("change", async () => {
             try {
                 const updateResponse = await fetch(`/detalle_sesiones/${idSesion}/descripcion`, {
@@ -83,10 +87,10 @@ document.addEventListener("DOMContentLoaded", async () => {
                 });
 
                 if (!updateResponse.ok) throw new Error("Error al actualizar la descripción");
-                alert("Descripción actualizada correctamente");
+                mostrarMensaje("Descripción actualizada correctamente", "success");
 
             } catch (error) {
-                alert("Error al actualizar la descripción");
+                mostrarMensaje("Error al actualizar la descripción", "error");
                 console.error(error);
             }
         });
@@ -96,14 +100,23 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (salirDetalleBtn) {
             salirDetalleBtn.addEventListener("click", () => {
                 console.log("🗑️ Saliendo del detalle de sesión.");
-                localStorage.removeItem("id_sesion");  // ✅ Eliminar la sesión activa
-                localStorage.removeItem("nombre_sesion");  // ✅ Eliminar el nombre de la sesión
-                window.location.href = "/sesiones";  // ✅ Redirigir a la lista de sesiones
+                localStorage.removeItem("id_sesion");
+                localStorage.removeItem("nombre_sesion");
+                window.location.href = "/sesiones";
             });
         }
 
     } catch (error) {
         console.error(error);
-        alert("Error cargando la sesión");
+        mostrarMensaje("Error cargando la sesión", "error");
     }
+
+    document.getElementById("btn-grafica").addEventListener("click", () => {
+        cargarGrafica(); // 📌 Llamará a la función de grafica.js
+    });
+    
+    document.getElementById("btn-tabla").addEventListener("click", () => {
+        cargarTablaMediapipe(); // 📌 Llamará a la función de tabla_mediapipe.js
+    });
+    
 });
