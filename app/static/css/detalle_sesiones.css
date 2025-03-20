@@ -126,29 +126,28 @@ body {
     }
 }
 
-/* Header */
+/* 📌 Centrar el encabezado de la sesión */
 .header {
+    display: flex;
+    flex-direction: column; /* 📌 Asegura que los elementos estén en columna */
+    justify-content: center; /* 📌 Centra verticalmente */
+    align-items: center; /* 📌 Centra horizontalmente */
+    text-align: center; /* 📌 Asegura que el texto esté centrado */
     background-color: #1565;
     color: white;
     padding: 20px;
     border-radius: 10px;
     margin: 20px auto;
-    max-width: 1900px;
-    display: flex;
-    align-items: center;
-    transition: background-color 0.3s ease-in-out;
-    font-size: 20px;
+    max-width: 900px; /* 📌 Define un ancho máximo */
     box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
     border: 2px solid black;
 }
 
-.header:hover {
-    background-color: #1565;
-}
-
+/* 📌 Ajusta el botón de retroceso */
 .back-arrow {
+    position: absolute;
+    left: 400px; /* 📌 Mantiene la flecha en la izquierda */
     font-size: 24px;
-    margin-right: 20px;
     cursor: pointer;
     transition: transform 0.2s ease-in-out;
 }
@@ -156,6 +155,13 @@ body {
 .back-arrow:hover {
     transform: scale(1.2);
     color: #FFD700;
+}
+
+/* 📌 Asegura que los elementos dentro del header estén centrados */
+.header div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 /* Layout principal */
@@ -240,6 +246,19 @@ body {
     border: 2px solid black; 
     box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
 }
+.black-header2 {
+    background-color: transparent;
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 12px;
+    font-size: 16px;
+    text-align: center;
+    font-weight: bold;
+    border: 2px solid black; 
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+    margin-top: 14px;
+}
 
 /* Estilos para textareas */
 .description-lines textarea,
@@ -298,3 +317,458 @@ body {
 .home-button:hover {
     color: #007bff; /* Cambia de color al pasar el mouse */
 }
+
+
+
+
+
+/* 📌 Estilos para alertas/notificaciones */
+.alert {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translate(-50%, -20px);
+    padding: 15px 25px; /* Ajusta el padding para tamaño óptimo */
+    font-size: 16px; /* Tamaño del texto */
+    border-radius: 8px; /* Bordes redondeados */
+    display: flex;
+    align-items: center;
+    color: white;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.2); /* Sombra */
+    z-index: 1000;
+    opacity: 0;
+    transition: transform 0.3s, opacity 0.3s;
+}
+
+/* 📌 Efecto de entrada */
+.alert.show {
+    transform: translate(-50%, 0);
+    opacity: 1;
+}
+
+/* 📌 Colores según el tipo de alerta */
+.alert.success {
+    background-color: #4CAF50; /* Verde para éxito */
+}
+
+.alert.error {
+    background-color: #f44336; /* Rojo para errores */
+}
+
+/* 📌 Iconos en las alertas */
+.alert-icon {
+    font-size: 20px;
+    margin-right: 12px;
+}
+
+.main-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    background-color: var(--light-bg);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.app-header {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.app-title {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 500;
+    flex-grow: 1;
+}
+
+.status-badge {
+    background-color: rgba(255, 255, 255, 0.2);
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 14px;
+}
+
+.content-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    padding: 20px;
+}
+
+.panel {
+    background-color: transparent;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    overflow: hidden;
+    height: 100%;
+    border: 2px solid black;
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+}
+
+.panel-header {
+    background-color: var(--light-gray);
+    padding: 15px;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    font-weight: 500;
+    color: var(--dark-gray);
+}
+
+.panel-content {
+    padding: 20px;
+}
+
+.video-container {
+    margin-bottom: 15px;
+    position: relative;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    background-color: var(--light-gray);
+    aspect-ratio: 4/3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+video, canvas {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+#recordedVideo {
+    display: none;
+}
+
+.placeholder {
+    text-align: center;
+    color: var(--dark-gray);
+    font-size: 14px;
+}
+
+.button-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    color: #007bff;
+    border: 2px solid black;
+}
+
+
+button {
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: white;
+}
+
+button:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+button:disabled {
+    background-color: var(--light-gray);
+    color: var(--dark-gray);
+    cursor: not-allowed;
+    transform: none;
+    opacity: 0.7;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+}
+
+.btn-danger {
+    background-color: var(--accent-color);
+}
+
+.btn-secondary {
+    background-color: var(--dark-gray);
+}
+
+.btn-success {
+    background-color: var(--success-color);
+}
+
+.btn-warning {
+    background-color: var(--secondary-color);
+    color: var(--text-color);
+}
+
+.control-group {
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: var(--light-gray);
+    border-radius: var(--border-radius);
+}
+
+.control-group-title {
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 10px;
+    color: var(--dark-gray);
+}
+
+.checkbox-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}
+
+.slider-control {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.slider-label {
+    min-width: 150px;
+    font-size: 14px;
+}
+
+input[type="range"] {
+    flex-grow: 1;
+    height: 5px;
+    border-radius: 5px;
+    background-color: #ddd;
+    outline: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background-color: var(--primary-color);
+    cursor: pointer;
+}
+
+.slider-value {
+    min-width: 30px;
+    text-align: right;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.filter-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 15px;
+}
+
+.filter-btn {
+    background-color: var(--light-gray);
+    border: 1px solid #ddd;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: var(--text-color);
+}
+
+.filter-btn.active {
+    background-color: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+
+.color-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.color-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 13px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    background-color: var(--light-gray);
+}
+
+.color-box {
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+}
+
+.data-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.search-box {
+    display: flex;
+    gap: 8px;
+}
+
+.search-input {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    width: 200px;
+}
+
+.table-container {
+    border: 1px solid transparent;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    height: 910px;
+    overflow-y: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 10px 15px;
+    text-align: left;
+    font-size: 14px;
+}
+
+th {
+    background-color: var(--light-gray);
+    font-weight: 500;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+tr:nth-child(even) {
+    background-color: #1565C0;
+    border: 2px solid black;
+}
+
+tr:hover {
+    background-color: transparent;
+    border: 2px solid black;
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+}
+
+.badge {
+    display: inline-block;
+    padding: 2px 6px;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+@media (max-width: 900px) {
+    .content-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Estilos generales de los botones */
+.button-row {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    padding: 20px;
+}
+
+button {
+    font-family: Arial, sans-serif;
+    font-size: 16px;
+    font-weight: bold;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+}
+
+button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Estilos específicos de cada botón */
+.btn-primary {
+    background-color: #1565C0;
+    color: white;
+}
+.btn-primary:hover {
+    background-color: #1565C0;
+}
+
+.btn-danger {
+    background-color: #1565C0;
+    color: white;
+}
+.btn-danger:hover {
+    background-color: #1565C0;
+}
+
+.btn-secondary {
+    background-color: #1565C0;
+    color: white;
+}
+.btn-secondary:hover {
+    background-color: #1565C0;
+}
+
+.btn-success {
+    background-color: #1565C0;
+    color: white;
+}
+.btn-success:hover {
+    background-color: #1565C0;
+}
+
+.btn-warning {
+    background-color: #1565C0;
+    color: black;
+}
+.btn-warning:hover {
+    background-color: #1565C0;
+}
+
+/* Iconos Material Icons */
+.material-icons {
+    font-size: 20px;
+}
+
+
