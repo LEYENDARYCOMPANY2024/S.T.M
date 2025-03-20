@@ -57,6 +57,7 @@ async function fetchSesiones(page = 1) {
 
 
 
+
 // 📌 Renderizar sesiones en la interfaz con botones interactivos
 function renderSesiones(data) {
     const sessionContainer = document.getElementById("sessions-container");
