@@ -1,7 +1,4 @@
-<<<<<<< HEAD
-=======
 
->>>>>>> pruebas2
 // 📌 Función para mostrar mensajes de éxito o error con el diseño personalizado
 function mostrarMensaje(mensaje, tipo = "success") {
     const alertBox = document.createElement("div");
@@ -113,8 +110,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     } catch (error) {
         console.error(error);
         mostrarMensaje("Error cargando la sesión", "error");
-<<<<<<< HEAD
-=======
     }
 
     document.getElementById("btn-grafica").addEventListener("click", () => {
@@ -1310,17 +1305,7 @@ canvasElement.addEventListener('mousemove', function(event) {
         }
     } else {
         pointInfo.style.display = 'none';
->>>>>>> pruebas2
     }
-
-    document.getElementById("btn-grafica").addEventListener("click", () => {
-        cargarGrafica(); // 📌 Llamará a la función de grafica.js
-    });
-    
-    document.getElementById("btn-tabla").addEventListener("click", () => {
-        cargarTablaMediapipe(); // 📌 Llamará a la función de tabla_mediapipe.js
-    });
-    
 });
 
 // Añadir filtro de rango de visibilidad para mejorar la precisión de la detección
@@ -1526,5 +1511,3 @@ tableBody.addEventListener('mouseout', function(event) {
         row.style.backgroundColor = '';
     }
 });
-   
-
