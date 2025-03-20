@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -52,6 +53,7 @@
             <p id="session-time">⏰ Cargando hora...</p>
         </div>
     </header>
+<<<<<<< HEAD
 
     <!-- Contenedor principal -->
     <div class="container">
@@ -67,16 +69,163 @@
                 <div class="black-header">Nota Evolutiva</div>
                 <div class="evolution-lines">
                     <textarea id="nota-evolutiva" class="line" placeholder="Escribe aquí..." rows="10" cols="50" style="resize: none;"></textarea>
+=======
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <!-- Incluir las librerías de MediaPipe -->
+        <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
+    </head>
+    <body>
+        <div class="main-container">
+            <header class="app-header">
+                <h1 class="app-title">MediaPipe Processor</h1>
+                <div class="status-badge" id="status">Esperando iniciar cámara</div>
+            </header>
+            
+            <div class="content-grid">
+                <div class="panel">
+                    <div class="panel-header">Visualización</div>
+                    <div class="panel-content">
+                        <div class="video-container">
+                            <video id="videoElement" autoplay playsinline></video>
+                            <canvas id="canvasElement"></canvas>
+                            <video id="recordedVideo" controls playsinline></video>
+                            <div class="placeholder">La previsualización aparecerá aquí</div>
+                        </div>
+                        
+                        <div class="button-row">
+                            <button id="startButton" class="btn-primary">
+                                <span class="material-icons"></span> Iniciar Cámara
+                            </button>
+                            <button id="recordButton" class="btn-danger" disabled>
+                                <span class="material-icons"></span> Grabar
+                            </button>
+                            <button id="stopButton" class="btn-secondary" disabled>
+                                <span class="material-icons"></span> Detener
+                            </button>
+                            <button id="processButton" class="btn-success" disabled>
+                                <span class="material-icons"></span> Procesar
+                            </button>
+                            <button id="playPauseButton" class="btn-warning" disabled>
+                                <span class="material-icons"></span> Pausar
+                            </button>
+                        </div>
+                        
+                        <div class="control-group">
+                            <div class="control-group-title">Filtros</div>
+                            <div class="filter-buttons" id="groupFilter">
+                                <!-- Generado dinámicamente -->
+                            </div>
+                        </div>
+                        
+                        <div class="control-group">
+                            <div class="control-group-title">Controles de Visualización</div>
+                            
+                            <div class="slider-control">
+                                <span class="slider-label">Velocidad de procesamiento:</span>
+                                <input type="range" id="speedSlider" min="1" max="20" value="3" step="1">
+                                <span class="slider-value" id="speedValue">3</span>
+                            </div>
+                            
+                            <div class="slider-control">
+                                <span class="slider-label">Tamaño de puntos:</span>
+                                <input type="range" id="pointSizeSlider" min="3" max="15" value="6" step="1">
+                                <span class="slider-value" id="pointSizeValue">6px</span>
+                            </div>
+                            
+                            <div class="checkbox-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="showLabels" checked>
+                                    Mostrar etiquetas
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="showConnections" checked>
+                                    Mostrar conexiones
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="showHoverInfo" checked>
+                                    Info al pasar mouse
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="control-group">
+                            <div class="control-group-title">Leyenda de Colores</div>
+                            <div class="color-legend" id="colorLegend">
+                                <!-- Generado dinámicamente -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="panel">
+                    <div class="panel-header">Datos de Puntos de Pose</div>
+                    <div class="panel-content">
+                        <div class="control-group">
+                            <div class="slider-control">
+                                <span class="slider-label">Seleccionar Frame:</span>
+                                <input type="range" id="frameSlider" min="0" max="0" value="0" step="1">
+                                <span class="slider-value">
+                                    <span id="frameValue">0</span> / <span id="totalFrameValue">0</span>
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="data-header">
+                            <div class="search-box">
+                                <input type="text" id="tableFilter" class="search-input" placeholder="Filtrar puntos...">
+                            </div>
+                            
+                            <button id="exportButton" class="btn-secondary" disabled>
+                                <span class="material-icons">download</span>
+                                Exportar CSV
+                            </button>
+                        </div>
+                        
+                        <div class="table-container">
+                            <table id="dataTable">
+                                <thead>
+                                    <tr>
+                                        <th>Punto</th>
+                                        <th>Grupo</th>
+                                        <th>Color</th>
+                                        <th>X</th>
+                                        <th>Y</th>
+                                        <th>Visibilidad</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tableBody">
+                                    <!-- Datos generados dinámicamente -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+>>>>>>> pruebas2
                 </div>
             </div>
-            <!-- Descripción editable centrada -->
-            <div class="description-box">
-              <div class="black-header">Descripción</div>
-              <div class="description-lines">
-                  <textarea id="session-description" class="line" placeholder="Escribe la descripción aquí..." rows="3"></textarea>
-              </div>
-            </div>
+        </div>
+    
+            <!-- Columna central con gráficos -->
+            <div class="charts-column">
+                <!-- Nota Evolutiva -->
+                <div class="evolution-box">
+                    <div class="black-header">Nota Evolutiva</div>
+                    <div class="evolution-lines">
+                        <textarea id="nota-evolutiva" class="line" placeholder="Escribe aquí..." rows="10" cols="50" style="resize: none;"></textarea>
+                    </div>
+                </div>
+                <!-- Descripción editable centrada -->
+                <div class="description-box">
+                    <div class="black-header">Descripción</div>
+                    <div class="description-lines">
+                        <textarea id="session-description" class="line" placeholder="Escribe la descripción aquí..." rows="3"></textarea>
+                    </div>
+                </div>
+    
 
+<<<<<<< HEAD
             <!-- Apartado de cambios de tabla y gráficas -->
             <div class="description-box">
                 <div class="black-header">Cambios</div>
@@ -97,3 +246,20 @@
 </body>
 <script src="/static/js/detalle_sesiones.js"></script>
 </html>
+=======
+    
+            <!-- Área para gráficos -->
+            <div class="evolution-box">
+                <div class="black-header">Gráficos</div>
+                <div class="charts">
+                    <div class="chart-placeholder">📊 Aquí se mostrarán los gráficos</div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="message-container"></div>
+        
+        <script src="/static/js/detalle_sesiones.js"></script>
+    </body>
+    </html>
+>>>>>>> pruebas2
