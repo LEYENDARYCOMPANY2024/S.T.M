@@ -1,3 +1,9 @@
+const supabase = window.supabase.createClient(
+    'https://hxjmzijhcmhfcrjcptge.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh4am16aWpoY21oZmNyamNwdGdlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDAwODMxODgsImV4cCI6MjA1NTY1OTE4OH0.fZ1QaYkFTfJTdupOUkV7V9a7kIIVHCt_XusnNWxkyqw'
+);
+
+
 let chartData = {
     derecha: {
         labels: [],
@@ -71,8 +77,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    startPolling();
-
     // ⬇️ Botón Importar CSV
     const importInput = document.createElement("input");
     importInput.type = "file";
@@ -114,34 +118,28 @@ function exportarGraficaCSV() {
 }
 
 
-function startPolling() {
-    setInterval(() => {
-        if (!realtimePaused) fetchData();  // Usamos realtimePaused
-    }, 1000);
-}
 
-async function fetchData() {
+function suscribirseAGraficasRealtime() {
     const ids = JSON.parse(localStorage.getItem("sesion_dispositivo_ids"));
     if (!ids || ids.length === 0) return;
 
-    const time = new Date().toLocaleTimeString();
+    supabase
+        .channel('graficas_realtime')
+        .on(
+            'postgres_changes',
+            {
+                event: 'INSERT',
+                schema: 'public',
+                table: 'graficas'
+            },
+            payload => {
+                const data = payload.new;
 
-    for (const sesionDispositivoId of ids) {
-        try {
-            const response = await fetch(`/graficas/stream/${sesionDispositivoId}`);
+                // Solo escuchar si el ID del sesion_dispositivo está en localStorage
+                if (!ids.includes(data.id_sesion_dispositivo_fk)) return;
 
-            if (!response.ok) {
-                // Si no hay datos, graficar 0
-                if (!chartData.derecha.labels.includes(time)) {
-                    chartData.derecha.labels.push(time);
-                    chartData.izquierda.labels.push(time);
-                }
-                chartData.derecha.data.push(0);
-                chartData.izquierda.data.push(0);
-            } else {
-                const data = await response.json();
+                const time = new Date().toLocaleTimeString();
 
-                // Asegurarnos de que el tiempo se agregue una sola vez por fetchData()
                 if (!chartData.derecha.labels.includes(time)) {
                     chartData.derecha.labels.push(time);
                     chartData.izquierda.labels.push(time);
@@ -149,25 +147,21 @@ async function fetchData() {
 
                 if (data.lado_pierna === 'derecha') {
                     chartData.derecha.data.push(data.aceleracion_y);
-                    chartData.izquierda.data.push(0);  // Para mantener el sync
+                    chartData.izquierda.data.push(0);
                 } else {
                     chartData.izquierda.data.push(data.aceleracion_y);
                     chartData.derecha.data.push(0);
                 }
+
+                limitData(chartData.derecha.labels);
+                limitData(chartData.derecha.data);
+                limitData(chartData.izquierda.labels);
+                limitData(chartData.izquierda.data);
+
+                chart.update();
             }
-        } catch (err) {
-            mostrarMensaje("Error al obtener datos de la gráfica", "error");
-            console.error("Error al obtener datos de gráfica:", err);
-        }
-    }
-
-    // Limitar datos para que no crezca infinitamente
-    limitData(chartData.derecha.labels);
-    limitData(chartData.derecha.data);
-    limitData(chartData.izquierda.labels);
-    limitData(chartData.izquierda.data);
-
-    chart.update();
+        )
+        .subscribe();
 }
 
 
@@ -239,5 +233,5 @@ async function cargarDispositivosActivos() {
         contenedor.appendChild(row);
     });
 }
-
+suscribirseAGraficasRealtime(); 
 cargarDispositivosActivos();
