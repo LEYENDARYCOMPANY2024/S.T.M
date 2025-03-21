@@ -8,6 +8,10 @@ from models.dispositivos_models import SesionDispositivo
 
 router = APIRouter()
 
+@router.get("/dispositivos/estado/{uuid}")
+def obtener_estado_dispositivo(uuid: str, db: Session = Depends(get_db)):
+    return verificar_estado_dispositivo(db, uuid)
+
 @router.get("/dispositivos/{paciente_id}/{terapeuta_id}", response_model=list[DispositivoResponse])
 def listar_dispositivos(paciente_id: int, terapeuta_id: int, db: Session = Depends(get_db)):
     return obtener_dispositivos(db, paciente_id, terapeuta_id)
@@ -23,9 +27,7 @@ def toggle_estado_dispositivo(paciente_id: int, sesion_id: int, dispositivo_id: 
 def registrar_dispositivo(correo: str = Body(...), nombre: str = Body(...), tipo: str = Body(...), db: Session = Depends(get_db)):
     return registrar_dispositivo_por_correo(db, correo, nombre, tipo)
 
-@router.get("/dispositivos/estado/{uuid}")
-def obtener_estado_dispositivo(uuid: str, db: Session = Depends(get_db)):
-    return verificar_estado_dispositivo(db, uuid)
+
 
 # routes/dispositivos_routes.py
 @router.put("/dispositivos/lado_pierna/{sesion_dispositivo_id}")
