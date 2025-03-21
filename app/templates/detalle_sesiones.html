@@ -189,34 +189,37 @@
             </div>
         </div>
     
-            <!-- Columna central con gráficos -->
-            <div class="charts-column">
-                <!-- Nota Evolutiva -->
-                <div class="evolution-box">
-                    <div class="black-header">Nota Evolutiva</div>
-                    <div class="evolution-lines">
-                        <textarea id="nota-evolutiva" class="line" placeholder="Escribe aquí..." rows="10" cols="50" style="resize: none;"></textarea>
-                    </div>
-                </div>
-                <!-- Descripción editable centrada -->
-                <div class="description-box">
-                    <div class="black-header">Descripción</div>
-                    <div class="description-lines">
-                        <textarea id="session-description" class="line" placeholder="Escribe la descripción aquí..." rows="3"></textarea>
-                    </div>
-                </div>
+<div class="container">
+    <!-- Panel izquierdo -->
+    <div class="left-panel">
+        <div class="chart">
+            <div class="black-header">Gráficos</div>
+            <div class="charts">
+                <div class="chart-placeholder">📊 Aquí se mostrarán los gráficos</div>
+            </div>
+        </div>
+    </div>
     
-
-    
-            <!-- Área para gráficos -->
-            <div class="evolution-box">
-                <div class="black-header">Gráficos</div>
-                <div class="charts">
-                    <div class="chart-placeholder">📊 Aquí se mostrarán los gráficos</div>
-                </div>
+   
+    <!-- Columna derecha -->
+    <div class="right-column">
+        <!-- Descripción editable -->
+        <div class="description-box">
+            <div class="black-header">Descripción</div>
+            <div class="description-lines">
+                <textarea id="session-description" class="line" placeholder="Escribe la descripción aquí..." rows="3"></textarea>
             </div>
         </div>
         
+        <!-- Nota Evolutiva -->
+        <div class="evolution-box">
+            <div class="black-header">Nota Evolutiva</div>
+            <div class="evolution-lines">
+                <textarea id="nota-evolutiva" class="line" placeholder="Escribe aquí..." rows="10" cols="50" style="resize: none;"></textarea>
+            </div>
+        </div>
+    </div>
+</div>
         <div id="message-container"></div>
         
         <script src="/static/js/detalle_sesiones.js"></script>
