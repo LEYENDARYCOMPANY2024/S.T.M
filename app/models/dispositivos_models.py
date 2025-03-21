@@ -11,7 +11,9 @@ class DispositivoIOT(Base):
     fecha_registro = Column(Date, nullable=False)
     tipo_de_dispositivo = Column(String, nullable=False)
     uuid = Column(String, unique=True, nullable=False)
-
+    id_terapeuta_fk = Column(Integer, ForeignKey("terapeutas.id_terapeuta"), nullable=False)
+    
+    terapeuta = relationship("Terapeuta", back_populates="dispositivos")
     paciente_dispositivos = relationship("PacienteDispositivo", back_populates="dispositivo")
 
 
