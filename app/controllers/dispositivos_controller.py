@@ -2,16 +2,15 @@ from sqlalchemy.orm import Session
 from models.dispositivos_models import DispositivoIOT, PacienteDispositivo, SesionDispositivo, EstadoDispositivoEnum
 from fastapi import HTTPException
 
-def obtener_dispositivos(db: Session, paciente_id: int):
-    """
-    Obtiene todos los dispositivos disponibles. 
-    Si el dispositivo ya ha sido activado en una sesión por el paciente, devuelve su estado.
-    """
-    dispositivos = db.query(DispositivoIOT).all()  # Obtiene TODOS los dispositivos
+def obtener_dispositivos(db: Session, paciente_id: int, terapeuta_id: int):
+    dispositivos = (
+        db.query(DispositivoIOT)
+        .filter(DispositivoIOT.id_terapeuta_fk == terapeuta_id)
+        .all()
+    )
 
     dispositivos_con_estado = []
     for dispositivo in dispositivos:
-        # Buscar si el dispositivo ha sido activado en una sesión por este paciente
         sesion_dispositivo = (
             db.query(SesionDispositivo)
             .join(PacienteDispositivo, SesionDispositivo.id_dispositivo_pd_fk == PacienteDispositivo.id_paciente_dispositivo)
@@ -20,9 +19,8 @@ def obtener_dispositivos(db: Session, paciente_id: int):
             .first()
         )
 
-        estado = "desactivado"  # Por defecto, todos los dispositivos están desactivados
+        estado = "desactivado"
         sesion_id = None
-
         if sesion_dispositivo:
             estado = sesion_dispositivo.estado_activado
             sesion_id = sesion_dispositivo.id_sesion_fk
@@ -38,6 +36,8 @@ def obtener_dispositivos(db: Session, paciente_id: int):
         })
 
     return dispositivos_con_estado
+
+
 
 
 

@@ -6,9 +6,9 @@ from models.dispositivos_schemas import DispositivoResponse
 
 router = APIRouter()
 
-@router.get("/dispositivos/{paciente_id}", response_model=list[DispositivoResponse])
-def listar_dispositivos(paciente_id: int, db: Session = Depends(get_db)):
-    return obtener_dispositivos(db, paciente_id)
+@router.get("/dispositivos/{paciente_id}/{terapeuta_id}", response_model=list[DispositivoResponse])
+def listar_dispositivos(paciente_id: int, terapeuta_id: int, db: Session = Depends(get_db)):
+    return obtener_dispositivos(db, paciente_id, terapeuta_id)
 
 
 

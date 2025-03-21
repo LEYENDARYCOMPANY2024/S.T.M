@@ -31,6 +31,8 @@ class Terapeuta(Base):
     segundo_apellido = Column(String, nullable=True)
     correo = Column(String, unique=True, nullable=False)
     contrasena = Column(String, nullable=False)
+    
+    dispositivos = relationship("DispositivoIOT", back_populates="terapeuta")
 
     # 🔹 Relación con `Paciente` a través de `TerapeutaPaciente`
     pacientes = relationship("Paciente", secondary="terapeuta_paciente", back_populates="terapeutas")  # ✅ Agregado
