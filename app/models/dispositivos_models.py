@@ -34,7 +34,6 @@ class SesionDispositivo(Base):
     id_sesion_dispositivo = Column(Integer, primary_key=True, index=True)
     id_sesion_fk = Column(Integer, ForeignKey("sesiones.id_sesion"), nullable=False)
     id_dispositivo_pd_fk = Column(Integer, ForeignKey("paciente_dispositivo.id_paciente_dispositivo"), nullable=False)
-    estado_activado = Column(String, default="desactivado")  # Ahora se almacena como String
+    estado_activado = Column(String, default="desactivado")
 
-    sesion = relationship("Sesion")
-    dispositivo = relationship("PacienteDispositivo")
+    graficas = relationship("GraficaDispositivo", back_populates="sesion_dispositivo")

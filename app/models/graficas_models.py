@@ -24,8 +24,10 @@ class GraficaDispositivo(Base):
     __tablename__ = "graficas_dispositivos"
 
     id_grafica_dispositivo = Column(Integer, primary_key=True, index=True)
-    id_grafica_fk = Column(Integer, ForeignKey("graficas.id_grafica", ondelete="CASCADE"))
-    id_sesion_dispositivo_fk = Column(Integer, ForeignKey("sesion_dispositivo.id_sesion_dispositivo", ondelete="CASCADE"))
-    lado_pierna = Column(String(10), nullable=True)  # 'izquierda' o 'derecha'
+    id_grafica_fk = Column(Integer, ForeignKey("graficas.id_grafica"), nullable=False)
+    id_sesion_dispositivo_fk = Column(Integer, ForeignKey("sesion_dispositivo.id_sesion_dispositivo"), nullable=False)
+    lado_pierna = Column(String, nullable=True)
 
     grafica = relationship("Grafica", back_populates="dispositivos")
+    sesion_dispositivo = relationship("SesionDispositivo", back_populates="graficas")
+

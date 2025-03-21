@@ -1,8 +1,10 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Body
 from sqlalchemy.orm import Session
 from database import get_db
-from controllers.dispositivos_controller import obtener_dispositivos, cambiar_estado_dispositivo
+from controllers.dispositivos_controller import obtener_dispositivos, cambiar_estado_dispositivo, registrar_dispositivo_por_correo, verificar_estado_dispositivo, asignar_lado_dispositivo
 from models.dispositivos_schemas import DispositivoResponse
+from models.graficas_models import GraficaDispositivo
+from models.dispositivos_models import SesionDispositivo
 
 router = APIRouter()
 
@@ -15,3 +17,37 @@ def listar_dispositivos(paciente_id: int, terapeuta_id: int, db: Session = Depen
 @router.put("/dispositivos/{paciente_id}/{sesion_id}/{dispositivo_id}/toggle")
 def toggle_estado_dispositivo(paciente_id: int, sesion_id: int, dispositivo_id: int, db: Session = Depends(get_db)):
     return cambiar_estado_dispositivo(db, dispositivo_id, paciente_id, sesion_id)
+
+
+@router.post("/dispositivos/registrar")
+def registrar_dispositivo(correo: str = Body(...), nombre: str = Body(...), tipo: str = Body(...), db: Session = Depends(get_db)):
+    return registrar_dispositivo_por_correo(db, correo, nombre, tipo)
+
+@router.get("/dispositivos/estado/{uuid}")
+def obtener_estado_dispositivo(uuid: str, db: Session = Depends(get_db)):
+    return verificar_estado_dispositivo(db, uuid)
+
+# routes/dispositivos_routes.py
+@router.put("/dispositivos/lado_pierna/{sesion_dispositivo_id}")
+def asignar_lado_pierna(sesion_dispositivo_id: int, lado: str = Body(...), db: Session = Depends(get_db)):
+    return asignar_lado_dispositivo(db, sesion_dispositivo_id, lado)
+
+@router.get("/dispositivos/activos")
+def obtener_dispositivos_activados(db: Session = Depends(get_db)):
+    dispositivos_activados = (
+        db.query(SesionDispositivo)
+        .filter(SesionDispositivo.estado_activado == "activado")
+        .all()
+    )
+
+    resultado = []
+    for sd in dispositivos_activados:
+        grafica = db.query(GraficaDispositivo).filter(GraficaDispositivo.id_sesion_dispositivo_fk == sd.id_sesion_dispositivo).first()
+        dispositivo = sd.dispositivo.dispositivo
+        resultado.append({
+            "id": sd.id_sesion_dispositivo,
+            "nombre": dispositivo.nombre_dispositivo,
+            "pierna": grafica.lado_pierna if grafica else ""
+        })
+
+    return resultado
