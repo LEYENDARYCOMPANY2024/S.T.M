@@ -69,6 +69,19 @@ document.addEventListener("DOMContentLoaded", async function () {
                 if (!response.ok) throw new Error("No se pudo cambiar el estado del dispositivo.");
 
                 const result = await response.json();
+                if (result.estado === "activado") {
+                    let ids = JSON.parse(localStorage.getItem("sesion_dispositivo_ids")) || [];
+                    if (!ids.includes(result.sesion_dispositivo_id)) {
+                        ids.push(result.sesion_dispositivo_id);
+                        localStorage.setItem("sesion_dispositivo_ids", JSON.stringify(ids));
+                    }
+                } else {
+                    // Si se desactiva, lo quitamos del array
+                    let ids = JSON.parse(localStorage.getItem("sesion_dispositivo_ids")) || [];
+                    ids = ids.filter(id => id !== result.sesion_dispositivo_id);
+                    localStorage.setItem("sesion_dispositivo_ids", JSON.stringify(ids));
+                }
+                
                 console.log(`Estado actualizado: ${result.estado}`);
                 fetchDevices();  // Recargar lista después de cambiar estado
             } catch (error) {
