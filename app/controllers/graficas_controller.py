@@ -2,6 +2,9 @@
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from models.graficas_models import Grafica, GraficaDispositivo
+import csv
+from io import StringIO
+from fastapi.responses import StreamingResponse
 
 def guardar_datos_sensor(db: Session, datos: dict):
     try:
@@ -48,10 +51,6 @@ def etiquetar_datos(db: Session, id_sesion_dispositivo: int, etiqueta: str):
     return {"mensaje": f"Datos etiquetados como '{etiqueta}'"}
 
 def exportar_datos_csv(db: Session, id_sesion_dispositivo: int):
-    import csv
-    from io import StringIO
-    from fastapi.responses import StreamingResponse
-
     registros = (
         db.query(Grafica)
         .join(GraficaDispositivo, Grafica.id_grafica == GraficaDispositivo.id_grafica_fk)
@@ -75,9 +74,6 @@ def exportar_datos_csv(db: Session, id_sesion_dispositivo: int):
     })
 
 def importar_csv(file, etiqueta: str, db: Session):
-    import csv
-    from io import StringIO
-    from models.graficas_models import Grafica
 
     content = file.file.read().decode("utf-8").splitlines()
     reader = csv.DictReader(content)
