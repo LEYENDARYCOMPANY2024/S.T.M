@@ -38,3 +38,87 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 });   
+
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    const messagesContainer = document.getElementById('messagesContainer');
+    const messageInput = document.getElementById('messageInput');
+    const sendButton = document.getElementById('sendButton');
+    const typingIndicator = document.getElementById('typingIndicator');
+    
+    // Cargar mensajes al iniciar
+    loadMessages();
+    
+    // Enviar mensaje al hacer clic en el botón o presionar Enter
+    sendButton.addEventListener('click', sendMessage);
+    messageInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            sendMessage();
+        }
+    });
+    
+    function loadMessages() {
+        fetch('/api/messages')
+            .then(response => response.json())
+            .then(messages => {
+                messages.forEach(message => {
+                    addMessageToUI(message.sender_type, message.content);
+                });
+                scrollToBottom();
+            })
+            .catch(error => console.error('Error cargando mensajes:', error));
+    }
+    
+    function sendMessage() {
+        const messageText = messageInput.value.trim();
+        if (messageText === '') return;
+        
+        // Agregar mensaje a la UI
+        addMessageToUI('user', messageText);
+        messageInput.value = '';
+        scrollToBottom();
+        
+        // Mostrar indicador de escritura
+        typingIndicator.style.display = 'flex';
+        
+        // Enviar mensaje al servidor
+        fetch('/api/messages', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ message: messageText }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Ocultar indicador de escritura
+            typingIndicator.style.display = 'none';
+            
+            // Mostrar respuesta
+            addMessageToUI('system', data.message);
+            scrollToBottom();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            typingIndicator.style.display = 'none';
+        });
+    }
+    
+    function addMessageToUI(sender, text) {
+        const messageDiv = document.createElement('div');
+        messageDiv.classList.add('message');
+        messageDiv.classList.add(sender === 'user' ? 'user-message' : 'system-message');
+        
+        const messageContent = document.createElement('div');
+        messageContent.classList.add('message-content');
+        messageContent.textContent = text;
+        
+        messageDiv.appendChild(messageContent);
+        messagesContainer.appendChild(messageDiv);
+    }
+    
+    function scrollToBottom() {
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+});
