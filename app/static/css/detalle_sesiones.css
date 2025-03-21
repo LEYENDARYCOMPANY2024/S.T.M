@@ -132,20 +132,19 @@ body {
         font-size: 20px;
     }
 }
-
 /* 📌 Centrar el encabezado de la sesión */
 .header {
     display: flex;
-    flex-direction: column; /* 📌 Asegura que los elementos estén en columna */
-    justify-content: center; /* 📌 Centra verticalmente */
-    align-items: center; /* 📌 Centra horizontalmente */
-    text-align: center; /* 📌 Asegura que el texto esté centrado */
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
     background-color: #1565;
     color: white;
     padding: 20px;
     border-radius: 10px;
     margin: 20px auto;
-    max-width: 900px; /* 📌 Define un ancho máximo */
+    max-width: 900px;
     box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
     border: 2px solid black;
 }
@@ -153,7 +152,7 @@ body {
 /* 📌 Ajusta el botón de retroceso */
 .back-arrow {
     position: absolute;
-    left: 400px; /* 📌 Mantiene la flecha en la izquierda */
+    left: 400px;
     font-size: 24px;
     cursor: pointer;
     transition: transform 0.2s ease-in-out;
@@ -171,48 +170,51 @@ body {
     align-items: center;
 }
 
-/* Layout principal */
+/* Layout principal - Eliminamos el gap para reducir separación */
 .container {
     display: grid;
-    grid-template-columns: 1fr 300px 1fr;
-    gap: 15px;
-    padding: 15px;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    padding: 0;
+    background-color: #002130;
+    width: 100%;
+    min-height: 100vh;
 }
 
-/* Panel izquierdo */
+/* Panel izquierdo - Ajustado para eliminar espacios */
 .left-panel {
     background-color: #1565;
     border-radius: 10px;
-    min-height: 550px;
+    min-height: 100px;
     grid-column: 1;
     box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
     border: 2px solid black;
+    margin: 10px;
 }
 
-/* Columna de gráficos */
-.charts-column {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    grid-column: 2;
+/* Ajustar el elemento chart para el panel izquierdo */
+.left-panel .chart {
+    height: 50%;
+    margin: 0;
+    padding: 0;
+    border: none;
+    box-shadow: none;
+    background-color: transparent;
 }
 
-.chart {
-    background-color: #1565;
-    border-radius: 10px;
-    height: 260px;
-    padding: 20px;
-    position: relative;
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
-    border: 2px solid black;
+/* Ajustar los márgenes del chart placeholder */
+.chart-placeholder {
+    margin-top: 15px;
+    padding: 10px;
 }
 
-/* Columna derecha */
+/* Columna derecha - Ajustada para eliminar espacios */
 .right-column {
     display: flex;
     flex-direction: column;
     gap: 0;
-    grid-column: 3;
+    grid-column: 2;
+    margin: 10px;
 }
 
 /* Estilos para descripción y nota evolutiva */
@@ -226,6 +228,7 @@ body {
     border: 2px solid black;
 }
 
+/* Eliminamos margen inferior y ajustamos bordes */
 .description-box {
     margin-bottom: 0;
     border-bottom-left-radius: 0;
@@ -233,14 +236,17 @@ body {
     padding-bottom: 10px;
 }
 
+/* Conectamos directamente con la caja superior */
 .evolution-box {
     grid-column: 3;
     border-top-left-radius: 0;
     border-top-right-radius: 0;
-    margin-top: -1px;
+    margin-top: -2px; /* Ajustado para eliminar el espacio */
     padding-top: 10px;
+    border-top: none; /* Eliminamos el borde superior para una transición suave */
 }
 
+/* Ajustamos el diseño del encabezado */
 .black-header {
     background-color: transparent;
     color: white;
@@ -252,19 +258,6 @@ body {
     font-weight: bold;
     border: 2px solid black; 
     box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
-}
-.black-header2 {
-    background-color: transparent;
-    color: white;
-    padding: 10px;
-    border-radius: 5px;
-    margin-bottom: 12px;
-    font-size: 16px;
-    text-align: center;
-    font-weight: bold;
-    border: 2px solid black; 
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
-    margin-top: 14px;
 }
 
 /* Estilos para textareas */
@@ -305,28 +298,35 @@ body {
     }  
     
     .left-panel,
-    .charts-column,
     .right-column,
     .description-box,
     .evolution-box {
         grid-column: 1;
+        margin: 5px;
     }
 }
 
-
 .home-button {
-    font-size: 24px;  /* Aumenta el tamaño del icono */
-    color: #c0c6f0;  /* Color negro */
-    text-decoration: none;  /* Elimina subrayado */
+    font-size: 24px;
+    color: #c0c6f0;
+    text-decoration: none;
     margin-left: 10px;
 }
 
 .home-button:hover {
-    color: #007bff; /* Cambia de color al pasar el mouse */
+    color: #007bff;
 }
 
+/* Ajustes adicionales para eliminar espacios no deseados */
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #002130;
+}
 
-
+* {
+    box-sizing: border-box;
+}
 
 
 /* 📌 Estilos para alertas/notificaciones */
