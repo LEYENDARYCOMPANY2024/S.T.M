@@ -90,7 +90,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 function exportarGraficaCSV() {
     if (!chart || !chart.data.labels.length) {
-        alert("No hay datos para exportar.");
+        mostrarMensaje("❌ No hay datos para exportar.", "error");
         return;
     }
 
@@ -109,7 +109,10 @@ function exportarGraficaCSV() {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+
+    mostrarMensaje("✅ Archivo CSV exportado con éxito.", "success");
 }
+
 
 function startPolling() {
     setInterval(() => {
