@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 from datetime import date
 from sqlalchemy import Enum
 
@@ -13,6 +13,12 @@ class DispositivoResponse(BaseModel):
     class Config:
         orm_mode = True
 
+class DispositivoRegistro(BaseModel):
+    nombre_dispositivo: str
+    tipo_de_dispositivo: str
+    uuid: str
+    correo_terapeuta: EmailStr  # 🔹 Usamos el correo del terapeuta en lugar del ID
+    
 class EstadoDispositivoEnum(Enum):
     ACTIVADO = "activado"
     DESACTIVADO = "desactivado"

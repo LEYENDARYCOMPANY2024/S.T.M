@@ -3,6 +3,7 @@ from models.crear_sesiones_models import Sesion, PacienteSesion
 from models.terapeutas import Terapeuta
 from datetime import datetime
 from sqlalchemy import func
+from models.paciente_terapeuta_principal import Paciente
 
 # Crear sesión
 def create_sesion(db: Session, id_paciente: int, descripcion: str, fecha, hora: str, id_terapeuta: int):
@@ -29,17 +30,25 @@ def create_sesion(db: Session, id_paciente: int, descripcion: str, fecha, hora: 
 
 # Obtener sesiones
 def get_sesiones(db: Session, id_paciente: int, id_terapeuta_actual: int, page: int, per_page: int):
-    sesiones = (
+    # 🔥 Verificar si el paciente tiene un código único
+    paciente = db.query(Paciente).filter(Paciente.id_paciente == id_paciente).first()
+    codigo_unico = paciente.codigo if paciente else None  # ✅ Tomamos el código único
+
+    sesiones_query = (
         db.query(Sesion, Terapeuta)
         .join(PacienteSesion, Sesion.id_sesion == PacienteSesion.id_sesion_ps_fk)
         .join(Terapeuta, PacienteSesion.id_terapeuta_fk == Terapeuta.id_terapeuta)
         .filter(PacienteSesion.id_paciente_ps_fk == id_paciente)
-        .order_by(Terapeuta.nombre, Sesion.fecha_inicio, Sesion.hora_inicio)  # 🔥 Agrupamos por terapeuta
-        .all()
     )
 
+    # 🔥 Si el paciente no tiene código único, solo mostrar sesiones del terapeuta actual
+    if not codigo_unico:
+        sesiones_query = sesiones_query.filter(PacienteSesion.id_terapeuta_fk == id_terapeuta_actual)
+
+    sesiones_query = sesiones_query.order_by(Sesion.fecha_inicio, Sesion.hora_inicio).all()
+
     sesiones_por_terapeuta = {}
-    for sesion, terapeuta in sesiones:
+    for sesion, terapeuta in sesiones_query:
         id_terapeuta = terapeuta.id_terapeuta
         if id_terapeuta not in sesiones_por_terapeuta:
             sesiones_por_terapeuta[id_terapeuta] = {
@@ -54,7 +63,7 @@ def get_sesiones(db: Session, id_paciente: int, id_terapeuta_actual: int, page: 
             "hora_inicio": sesion.hora_inicio.strftime("%I:%M %p")
         })
 
-    # 🔥 Convertir a lista y aplicar paginación por terapeuta
+    # 🔥 Convertimos a lista y aplicamos paginación por terapeuta
     terapeutas_paginados = list(sesiones_por_terapeuta.values())
     total_pages = (len(terapeutas_paginados) // per_page) + (1 if len(terapeutas_paginados) % per_page > 0 else 0)
 
@@ -67,3 +76,4 @@ def get_sesiones(db: Session, id_paciente: int, id_terapeuta_actual: int, page: 
         "total_pages": total_pages,
         "page": page
     }
+

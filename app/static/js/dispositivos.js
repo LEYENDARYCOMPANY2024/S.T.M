@@ -1,7 +1,8 @@
 document.addEventListener("DOMContentLoaded", async function () {
     const deviceList = document.getElementById("device-list");
     const pacienteId = localStorage.getItem("id_paciente");
-    const sesionId = localStorage.getItem("id_sesion"); // Obtenemos la sesión (puede ser null)
+    const sesionId = localStorage.getItem("id_sesion"); 
+    const terapeutaId = localStorage.getItem("id_terapeuta");
 
     if (!pacienteId) {
         alert("No hay paciente seleccionado.");
@@ -11,28 +12,29 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     async function fetchDevices() {
         const pacienteId = localStorage.getItem("id_paciente");
-    
-        if (!pacienteId) {
-            alert("No hay paciente seleccionado.");
+
+        if (!pacienteId || !terapeutaId) {
+            alert("No hay paciente o terapeuta seleccionado.");
             window.location.href = "/principal";
             return;
         }
-    
+
         try {
-            const response = await fetch(`/dispositivos/${pacienteId}`);
+            const response = await fetch(`/dispositivos/${pacienteId}/${terapeutaId}`);
             if (!response.ok) throw new Error(`Error ${response.status}: No se encontraron dispositivos.`);
-    
+
             const devices = await response.json();
-    
+
             if (!Array.isArray(devices)) throw new Error("Respuesta de la API no es una lista.");
-    
+
             deviceList.innerHTML = "";
             devices.forEach(device => addDeviceRow(device));
         } catch (error) {
             console.error("Error al obtener dispositivos:", error.message);
             deviceList.innerHTML = '<tr><td colspan="4">No se encontraron dispositivos.</td></tr>';
         }
-    }    
+    }
+
 
     function addDeviceRow(device) {
         const row = document.createElement("tr");
@@ -67,6 +69,19 @@ document.addEventListener("DOMContentLoaded", async function () {
                 if (!response.ok) throw new Error("No se pudo cambiar el estado del dispositivo.");
 
                 const result = await response.json();
+                if (result.estado === "activado") {
+                    let ids = JSON.parse(localStorage.getItem("sesion_dispositivo_ids")) || [];
+                    if (!ids.includes(result.sesion_dispositivo_id)) {
+                        ids.push(result.sesion_dispositivo_id);
+                        localStorage.setItem("sesion_dispositivo_ids", JSON.stringify(ids));
+                    }
+                } else {
+                    // Si se desactiva, lo quitamos del array
+                    let ids = JSON.parse(localStorage.getItem("sesion_dispositivo_ids")) || [];
+                    ids = ids.filter(id => id !== result.sesion_dispositivo_id);
+                    localStorage.setItem("sesion_dispositivo_ids", JSON.stringify(ids));
+                }
+                
                 console.log(`Estado actualizado: ${result.estado}`);
                 fetchDevices();  // Recargar lista después de cambiar estado
             } catch (error) {

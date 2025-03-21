@@ -12,7 +12,9 @@ from routes.crear_sesiones_routes import router as crear_sesiones_routes
 from routes.ejercicios_routes import router as niveles_router
 from routes.dispositivos_routes import router as dispositivos_routes
 from routes.detalle_sesiones_routes import router as detalle_sesiones_routes
-from routes.chat_routes import router as chat_router  # Agregamos la importación del router de chat
+from routes.graficas_routes import router as graficas_routes
+
+
 
 
 app = FastAPI()
@@ -28,7 +30,7 @@ app.include_router(crear_sesiones_routes)
 app.include_router(niveles_router, prefix="/api")
 app.include_router(dispositivos_routes)
 app.include_router(detalle_sesiones_routes)
-app.include_router(chat_router)  # Incluimos el router de chat
+app.include_router(graficas_routes)
 
 # 📌 Montamos archivos estáticos
 app.mount("/static", StaticFiles(directory="static"), name="static")
