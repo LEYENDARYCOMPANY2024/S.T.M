@@ -106,28 +106,28 @@ def obtener_sesion_dispositivo_activo(uuid: str, db: Session = Depends(get_db)):
     if not dispositivo:
         raise HTTPException(status_code=404, detail="Dispositivo no encontrado")
 
-    pd = db.query(PacienteDispositivo).filter(
-        PacienteDispositivo.id_dispositivo_pd_fk == dispositivo.id_dispositivo
-    ).first()
+    sesion_dispositivo = (
+        db.query(SesionDispositivo)
+        .join(PacienteDispositivo, SesionDispositivo.id_dispositivo_pd_fk == PacienteDispositivo.id_paciente_dispositivo)
+        .filter(
+            PacienteDispositivo.id_dispositivo_pd_fk == dispositivo.id_dispositivo,
+            SesionDispositivo.estado_activado == "activado"
+        )
+        .order_by(SesionDispositivo.id_sesion_dispositivo.desc())
+        .first()
+    )
 
-    if not pd:
-        raise HTTPException(status_code=404, detail="Relación paciente-dispositivo no encontrada")
-
-    sd = db.query(SesionDispositivo).filter(
-        SesionDispositivo.id_dispositivo_pd_fk == pd.id_paciente_dispositivo,
-        SesionDispositivo.estado_activado == "activado"
-    ).first()
-
-    if not sd:
+    if not sesion_dispositivo:
         raise HTTPException(status_code=404, detail="No hay sesión activa para este dispositivo")
 
-    # Obtener lado de pierna si existe
+    # Buscar lado de pierna (opcional)
     graf = db.query(GraficaDispositivo).filter(
-        GraficaDispositivo.id_sesion_dispositivo_fk == sd.id_sesion_dispositivo
+        GraficaDispositivo.id_sesion_dispositivo_fk == sesion_dispositivo.id_sesion_dispositivo
     ).first()
 
     return {
-        "id_sesion_dispositivo": sd.id_sesion_dispositivo,
+        "id_sesion_dispositivo": sesion_dispositivo.id_sesion_dispositivo,
         "lado_pierna": graf.lado_pierna if graf else None
     }
+
 
