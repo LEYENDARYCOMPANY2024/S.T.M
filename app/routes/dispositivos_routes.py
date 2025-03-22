@@ -1,16 +1,34 @@
-from fastapi import APIRouter, Depends, Body
+from fastapi import APIRouter, Depends, Body, HTTPException
 from sqlalchemy.orm import Session
 from database import get_db
 from controllers.dispositivos_controller import obtener_dispositivos, cambiar_estado_dispositivo, registrar_dispositivo_por_correo, verificar_estado_dispositivo, asignar_lado_dispositivo, desactivar_dispositivos_por_sesion
 from models.dispositivos_schemas import DispositivoResponse
 from models.graficas_models import GraficaDispositivo
 from models.dispositivos_models import SesionDispositivo, PacienteDispositivo, DispositivoIOT
+from models.dispositivos_schemas import LadoRequest
 
 router = APIRouter()
 
 @router.get("/dispositivos/estado/{uuid}")
 def obtener_estado_dispositivo(uuid: str, db: Session = Depends(get_db)):
-    return verificar_estado_dispositivo(db, uuid)
+    dispositivo = db.query(DispositivoIOT).filter(DispositivoIOT.uuid == uuid).first()
+    if not dispositivo:
+        raise HTTPException(status_code=404, detail="Dispositivo no registrado")
+
+    paciente_dispositivo = db.query(PacienteDispositivo).filter(
+        PacienteDispositivo.id_dispositivo_pd_fk == dispositivo.id_dispositivo
+    ).first()
+
+    if not paciente_dispositivo:
+        return {"estado": "desactivado"}
+
+    sesion_activa = db.query(SesionDispositivo).filter(
+        SesionDispositivo.id_dispositivo_pd_fk == paciente_dispositivo.id_paciente_dispositivo,
+        SesionDispositivo.estado_activado == "activado"
+    ).first()
+
+    return {"estado": "activo" if sesion_activa else "desactivado"}
+
 
 @router.get("/dispositivos/{paciente_id}/{terapeuta_id}", response_model=list[DispositivoResponse])
 def listar_dispositivos(paciente_id: int, terapeuta_id: int, db: Session = Depends(get_db)):
@@ -30,9 +48,10 @@ def registrar_dispositivo(correo: str = Body(...), nombre: str = Body(...), tipo
 
 
 # routes/dispositivos_routes.py
+
 @router.put("/dispositivos/lado_pierna/{sesion_dispositivo_id}")
-def asignar_lado_pierna(sesion_dispositivo_id: int, lado: str = Body(...), db: Session = Depends(get_db)):
-    return asignar_lado_dispositivo(db, sesion_dispositivo_id, lado)
+def asignar_lado_pierna(sesion_dispositivo_id: int, body: LadoRequest, db: Session = Depends(get_db)):
+    return asignar_lado_dispositivo(db, sesion_dispositivo_id, body.lado)
 
 @router.get("/dispositivos/activos")
 def obtener_dispositivos_activados(db: Session = Depends(get_db)):
