@@ -99,3 +99,35 @@ def desactivar_dispositivos_por_sesion(id_sesion: int, db: Session = Depends(get
 
     db.commit()
     return {"mensaje": f"{len(dispositivos)} dispositivos desactivados"}
+
+@router.get("/dispositivos/sesion_dispositivo/{uuid}")
+def obtener_sesion_dispositivo_activo(uuid: str, db: Session = Depends(get_db)):
+    dispositivo = db.query(DispositivoIOT).filter(DispositivoIOT.uuid == uuid).first()
+    if not dispositivo:
+        raise HTTPException(status_code=404, detail="Dispositivo no encontrado")
+
+    pd = db.query(PacienteDispositivo).filter(
+        PacienteDispositivo.id_dispositivo_pd_fk == dispositivo.id_dispositivo
+    ).first()
+
+    if not pd:
+        raise HTTPException(status_code=404, detail="Relación paciente-dispositivo no encontrada")
+
+    sd = db.query(SesionDispositivo).filter(
+        SesionDispositivo.id_dispositivo_pd_fk == pd.id_paciente_dispositivo,
+        SesionDispositivo.estado_activado == "activado"
+    ).first()
+
+    if not sd:
+        raise HTTPException(status_code=404, detail="No hay sesión activa para este dispositivo")
+
+    # Obtener lado de pierna si existe
+    graf = db.query(GraficaDispositivo).filter(
+        GraficaDispositivo.id_sesion_dispositivo_fk == sd.id_sesion_dispositivo
+    ).first()
+
+    return {
+        "id_sesion_dispositivo": sd.id_sesion_dispositivo,
+        "lado_pierna": graf.lado_pierna if graf else None
+    }
+
