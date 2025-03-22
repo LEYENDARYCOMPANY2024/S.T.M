@@ -1,7 +1,8 @@
 # models/graficas_models.py
-from sqlalchemy import Column, Integer, String, Numeric, ForeignKey, JSON
+from sqlalchemy import Column, Integer, String, Numeric, ForeignKey, JSON, DateTime
 from sqlalchemy.orm import relationship
 from database import Base
+from datetime import datetime, timezone
 
 class Grafica(Base):
     __tablename__ = "graficas"
@@ -16,6 +17,7 @@ class Grafica(Base):
     rotacion_x = Column(Numeric(10, 2))
     rotacion_y = Column(Numeric(10, 2))
     rotacion_z = Column(Numeric(10, 2))
+    fecha_hora = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
     dispositivos = relationship("GraficaDispositivo", back_populates="grafica")
 
