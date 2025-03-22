@@ -66,3 +66,17 @@ def obtener_dispositivos_activados(db: Session = Depends(get_db)):
 @router.put("/sesiones/{sesion_id}/cerrar")
 def cerrar_sesion(sesion_id: int, db: Session = Depends(get_db)):
     return desactivar_dispositivos_por_sesion(db, sesion_id)
+
+
+@router.put("/dispositivos/desactivar/{id_sesion}")
+def desactivar_dispositivos_por_sesion(id_sesion: int, db: Session = Depends(get_db)):
+    dispositivos = db.query(SesionDispositivo).filter(
+        SesionDispositivo.id_sesion_fk == id_sesion,
+        SesionDispositivo.estado_activado == "activado"
+    ).all()
+
+    for dispositivo in dispositivos:
+        dispositivo.estado_activado = "desactivado"
+
+    db.commit()
+    return {"mensaje": f"{len(dispositivos)} dispositivos desactivados."}
