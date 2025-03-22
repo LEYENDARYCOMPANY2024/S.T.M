@@ -26,3 +26,6 @@ class EstadoDispositivoEnum(Enum):
 class LadoPiernaEnum(Enum):
     IZQUIERDA = "izquierda"
     DERECHA = "derecha"
+    
+class LadoRequest(BaseModel):
+    lado: str
