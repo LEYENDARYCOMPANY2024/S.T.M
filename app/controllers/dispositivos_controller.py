@@ -61,16 +61,22 @@ def cambiar_estado_dispositivo(db: Session, dispositivo_id: int, paciente_id: in
         raise HTTPException(status_code=404, detail="El dispositivo no existe")
     
     # Verificar si ya está asociado a otro paciente
-    otro_paciente = (
-        db.query(PacienteDispositivo)
+    # Verificar si ya está activado por otro paciente en esta misma sesión
+    dispositivo_ya_usado = (
+        db.query(SesionDispositivo)
+        .join(PacienteDispositivo, SesionDispositivo.id_dispositivo_pd_fk == PacienteDispositivo.id_paciente_dispositivo)
         .filter(
+            SesionDispositivo.id_sesion_fk == sesion_id,
             PacienteDispositivo.id_dispositivo_pd_fk == dispositivo_id,
-            PacienteDispositivo.id_paciente_pd_fk != paciente_id
+            PacienteDispositivo.id_paciente_pd_fk != paciente_id,
+            SesionDispositivo.estado_activado == "activado"
         )
         .first()
     )
-    if otro_paciente:
-        raise HTTPException(status_code=400, detail="Este dispositivo ya está asignado a otro paciente.")
+
+    if dispositivo_ya_usado:
+        raise HTTPException(status_code=400, detail="Este dispositivo ya está activado por otro paciente.")
+
 
     # 2) Verificar o crear la relación PacienteDispositivo
     paciente_dispositivo = (
