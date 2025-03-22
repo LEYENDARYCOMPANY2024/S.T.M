@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, Body
 from sqlalchemy.orm import Session
 from database import get_db
-from controllers.dispositivos_controller import obtener_dispositivos, cambiar_estado_dispositivo, registrar_dispositivo_por_correo, verificar_estado_dispositivo, asignar_lado_dispositivo
+from controllers.dispositivos_controller import obtener_dispositivos, cambiar_estado_dispositivo, registrar_dispositivo_por_correo, verificar_estado_dispositivo, asignar_lado_dispositivo, desactivar_dispositivos_por_sesion
 from models.dispositivos_schemas import DispositivoResponse
 from models.graficas_models import GraficaDispositivo
 from models.dispositivos_models import SesionDispositivo
@@ -44,12 +44,25 @@ def obtener_dispositivos_activados(db: Session = Depends(get_db)):
 
     resultado = []
     for sd in dispositivos_activados:
-        grafica = db.query(GraficaDispositivo).filter(GraficaDispositivo.id_sesion_dispositivo_fk == sd.id_sesion_dispositivo).first()
-        dispositivo = sd.dispositivo.dispositivo
-        resultado.append({
-            "id": sd.id_sesion_dispositivo,
-            "nombre": dispositivo.nombre_dispositivo,
-            "pierna": grafica.lado_pierna if grafica else ""
-        })
+        try:
+            paciente_dispositivo = sd.dispositivo
+            dispositivo = paciente_dispositivo.dispositivo  # ✅ Corrección aquí
+
+            grafica = db.query(GraficaDispositivo).filter(
+                GraficaDispositivo.id_sesion_dispositivo_fk == sd.id_sesion_dispositivo
+            ).first()
+
+            resultado.append({
+                "id": sd.id_sesion_dispositivo,
+                "nombre": dispositivo.nombre_dispositivo,
+                "pierna": grafica.lado_pierna if grafica else ""
+            })
+        except Exception as e:
+            print(f"⚠️ Error al procesar dispositivo activo: {e}")
+            continue  # Saltar si algo falla en un registro
 
     return resultado
+
+@router.put("/sesiones/{sesion_id}/cerrar")
+def cerrar_sesion(sesion_id: int, db: Session = Depends(get_db)):
+    return desactivar_dispositivos_por_sesion(db, sesion_id)

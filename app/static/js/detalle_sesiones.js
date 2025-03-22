@@ -99,13 +99,29 @@ document.addEventListener("DOMContentLoaded", async () => {
         // 📌 Evento para salir del detalle de sesión y volver a la lista de sesiones
         const salirDetalleBtn = document.getElementById("salir-detalle");
         if (salirDetalleBtn) {
-            salirDetalleBtn.addEventListener("click", () => {
-                console.log("🗑️ Saliendo del detalle de sesión.");
+            salirDetalleBtn.addEventListener("click", async () => {
+                const sesionId = localStorage.getItem("id_sesion");
+
+                if (sesionId) {
+                    try {
+                        await fetch(`/dispositivos/desactivar/${sesionId}`, {
+                            method: "PUT"
+                        });
+                        console.log("🔌 Dispositivos desactivados al salir de la sesión.");
+                    } catch (error) {
+                        console.error("❌ Error al desactivar dispositivos:", error);
+                    }
+                }
+
+                // Limpiar localStorage
                 localStorage.removeItem("id_sesion");
                 localStorage.removeItem("nombre_sesion");
+                localStorage.removeItem("sesion_dispositivo_ids");
+
                 window.location.href = "/sesiones";
             });
         }
+
 
     } catch (error) {
         console.error(error);
@@ -1509,5 +1525,36 @@ tableBody.addEventListener('mouseout', function(event) {
         
         // Quitar resaltado de la fila
         row.style.backgroundColor = '';
+    }
+});
+
+
+document.addEventListener("DOMContentLoaded", () => {
+    const homeButton = document.querySelector(".home-button");
+    if (homeButton) {
+        homeButton.addEventListener("click", async (e) => {
+            e.preventDefault(); // ✋ prevenir redirección inmediata
+
+            const sesionId = localStorage.getItem("id_sesion");
+
+            if (sesionId) {
+                try {
+                    await fetch(`/dispositivos/desactivar/${sesionId}`, {
+                        method: "PUT"
+                    });
+                    console.log("🔌 Dispositivos desactivados correctamente.");
+                } catch (error) {
+                    console.error("❌ Error al desactivar dispositivos:", error);
+                }
+            }
+
+            console.log("🏠 Limpiando localStorage al volver a principal...");
+            localStorage.removeItem("id_sesion");
+            localStorage.removeItem("nombre_sesion");
+            localStorage.removeItem("sesion_dispositivo_ids");
+
+            // ✅ Redirigir luego de limpiar todo
+            window.location.href = "/principal";
+        });
     }
 });
