@@ -4,7 +4,7 @@ from database import get_db
 from controllers.dispositivos_controller import obtener_dispositivos, cambiar_estado_dispositivo, registrar_dispositivo_por_correo, verificar_estado_dispositivo, asignar_lado_dispositivo, desactivar_dispositivos_por_sesion
 from models.dispositivos_schemas import DispositivoResponse
 from models.graficas_models import GraficaDispositivo
-from models.dispositivos_models import SesionDispositivo
+from models.dispositivos_models import SesionDispositivo, PacienteDispositivo, DispositivoIOT
 
 router = APIRouter()
 
@@ -37,31 +37,31 @@ def asignar_lado_pierna(sesion_dispositivo_id: int, lado: str = Body(...), db: S
 @router.get("/dispositivos/activos")
 def obtener_dispositivos_activados(db: Session = Depends(get_db)):
     dispositivos_activados = (
-        db.query(SesionDispositivo)
+        db.query(SesionDispositivo, PacienteDispositivo, DispositivoIOT)
+        .join(PacienteDispositivo, SesionDispositivo.id_dispositivo_pd_fk == PacienteDispositivo.id_paciente_dispositivo)
+        .join(DispositivoIOT, PacienteDispositivo.id_dispositivo_pd_fk == DispositivoIOT.id_dispositivo)
         .filter(SesionDispositivo.estado_activado == "activado")
         .all()
     )
 
     resultado = []
-    for sd in dispositivos_activados:
+    for sesion_dispositivo, paciente_dispositivo, dispositivo in dispositivos_activados:
         try:
-            paciente_dispositivo = sd.dispositivo
-            dispositivo = paciente_dispositivo.dispositivo  # ✅ Corrección aquí
-
             grafica = db.query(GraficaDispositivo).filter(
-                GraficaDispositivo.id_sesion_dispositivo_fk == sd.id_sesion_dispositivo
+                GraficaDispositivo.id_sesion_dispositivo_fk == sesion_dispositivo.id_sesion_dispositivo
             ).first()
 
             resultado.append({
-                "id": sd.id_sesion_dispositivo,
+                "id": sesion_dispositivo.id_sesion_dispositivo,
                 "nombre": dispositivo.nombre_dispositivo,
                 "pierna": grafica.lado_pierna if grafica else ""
             })
         except Exception as e:
             print(f"⚠️ Error al procesar dispositivo activo: {e}")
-            continue  # Saltar si algo falla en un registro
+            continue
 
     return resultado
+
 
 @router.put("/sesiones/{sesion_id}/cerrar")
 def cerrar_sesion(sesion_id: int, db: Session = Depends(get_db)):

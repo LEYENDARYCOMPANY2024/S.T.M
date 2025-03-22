@@ -37,3 +37,4 @@ class SesionDispositivo(Base):
     estado_activado = Column(String, default="desactivado")
 
     graficas = relationship("GraficaDispositivo", back_populates="sesion_dispositivo")
+    paciente_dispositivo = relationship("PacienteDispositivo")  # 🔥 Aquí lo importante
