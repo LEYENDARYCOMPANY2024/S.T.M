@@ -15,11 +15,17 @@ def obtener_dispositivos(db: Session, paciente_id: int, terapeuta_id: int):
 
     dispositivos_con_estado = []
     for dispositivo in dispositivos:
+        # IMPORTANTE: Ajustamos la comparación
         sesion_dispositivo = (
             db.query(SesionDispositivo)
-            .join(PacienteDispositivo, SesionDispositivo.id_dispositivo_pd_fk == PacienteDispositivo.id_paciente_dispositivo)
-            .filter(PacienteDispositivo.id_paciente_pd_fk == paciente_id,
-                    SesionDispositivo.id_dispositivo_pd_fk == dispositivo.id_dispositivo)
+            .join(
+                PacienteDispositivo,
+                SesionDispositivo.id_dispositivo_pd_fk == PacienteDispositivo.id_paciente_dispositivo
+            )
+            .filter(
+                PacienteDispositivo.id_paciente_pd_fk == paciente_id,
+                PacienteDispositivo.id_dispositivo_pd_fk == dispositivo.id_dispositivo
+            )
             .first()
         )
 
@@ -44,18 +50,29 @@ def obtener_dispositivos(db: Session, paciente_id: int, terapeuta_id: int):
 
 
 
-
-
 def cambiar_estado_dispositivo(db: Session, dispositivo_id: int, paciente_id: int, sesion_id: int):
     """
-    Activa o desactiva un dispositivo en una sesión, asignándolo al paciente si es necesario.
+    Activa o desactiva (toggle) el dispositivo 'dispositivo_id' para el paciente 'paciente_id'
+    en la sesión 'sesion_id'. Solo permite un máximo de 2 dispositivos activados por sesión.
     """
+    # 1) Verificar que exista el dispositivo
     dispositivo = db.query(DispositivoIOT).filter(DispositivoIOT.id_dispositivo == dispositivo_id).first()
-    
     if not dispositivo:
         raise HTTPException(status_code=404, detail="El dispositivo no existe")
+    
+    # Verificar si ya está asociado a otro paciente
+    otro_paciente = (
+        db.query(PacienteDispositivo)
+        .filter(
+            PacienteDispositivo.id_dispositivo_pd_fk == dispositivo_id,
+            PacienteDispositivo.id_paciente_pd_fk != paciente_id
+        )
+        .first()
+    )
+    if otro_paciente:
+        raise HTTPException(status_code=400, detail="Este dispositivo ya está asignado a otro paciente.")
 
-    # Buscar si el dispositivo ya está asociado con este paciente
+    # 2) Verificar o crear la relación PacienteDispositivo
     paciente_dispositivo = (
         db.query(PacienteDispositivo)
         .filter(
@@ -64,8 +81,6 @@ def cambiar_estado_dispositivo(db: Session, dispositivo_id: int, paciente_id: in
         )
         .first()
     )
-
-    # Si el dispositivo no está asociado al paciente, creamos la relación
     if not paciente_dispositivo:
         paciente_dispositivo = PacienteDispositivo(
             id_paciente_pd_fk=paciente_id,
@@ -75,40 +90,75 @@ def cambiar_estado_dispositivo(db: Session, dispositivo_id: int, paciente_id: in
         db.commit()
         db.refresh(paciente_dispositivo)
 
-    # Verificar si el dispositivo ya tiene una sesión activa
+    # 3) Verificar si ya existe la relación SesionDispositivo para ESTA sesión
     sesion_dispositivo = (
         db.query(SesionDispositivo)
+        .join(
+            PacienteDispositivo,
+            SesionDispositivo.id_dispositivo_pd_fk == PacienteDispositivo.id_paciente_dispositivo
+        )
         .filter(
-            SesionDispositivo.id_sesion_fk == sesion_id,
-            SesionDispositivo.id_dispositivo_pd_fk == paciente_dispositivo.id_paciente_dispositivo
+            PacienteDispositivo.id_paciente_pd_fk == paciente_id,
+            PacienteDispositivo.id_dispositivo_pd_fk == dispositivo.id_dispositivo,
+            SesionDispositivo.id_sesion_fk == sesion_id  # Importante para que sea por sesión
         )
         .first()
     )
 
+    # 4) Contar cuántos dispositivos están activados en esta sesión
+    def dispositivos_activados_en_sesion():
+        return db.query(SesionDispositivo).filter(
+            SesionDispositivo.id_sesion_fk == sesion_id,
+            SesionDispositivo.estado_activado == "activado"
+        ).count()
+
     if not sesion_dispositivo:
+        # Si no existe aún la relación, significa que el usuario hace toggle por primera vez en esta sesión.
+        # Asumimos que si el usuario hace "toggle", quiere ACTIVAR el dispositivo.
+        activos = dispositivos_activados_en_sesion()
+        if activos >= 2:
+            raise HTTPException(
+                status_code=400,
+                detail="Solo se permiten 2 dispositivos activados a la vez en esta sesión."
+            )
+            
+        # Creamos el nuevo registro activado
         sesion_dispositivo = SesionDispositivo(
             id_sesion_fk=sesion_id,
             id_dispositivo_pd_fk=paciente_dispositivo.id_paciente_dispositivo,
-            estado_activado=EstadoDispositivoEnum.ACTIVADO
+            estado_activado="activado"
         )
         db.add(sesion_dispositivo)
-        nuevo_estado = EstadoDispositivoEnum.ACTIVADO
-    else:
-        nuevo_estado = (
-            EstadoDispositivoEnum.ACTIVADO 
-            if sesion_dispositivo.estado_activado == EstadoDispositivoEnum.DESACTIVADO 
-            else EstadoDispositivoEnum.DESACTIVADO
-        )
-        sesion_dispositivo.estado_activado = nuevo_estado
+        nuevo_estado = "activado"
 
+    else:
+        # Ya existe la relación para esta sesión, así que hacemos toggle
+        if sesion_dispositivo.estado_activado == "desactivado":
+            # Si está desactivado y se va a activar, primero verificamos que no haya 2 ya activos
+            activos = dispositivos_activados_en_sesion()
+            if activos >= 2:
+                raise HTTPException(
+                    status_code=400,
+                    detail="Solo se permiten 2 dispositivos activados a la vez en esta sesión."
+                )
+            sesion_dispositivo.estado_activado = "activado"
+            nuevo_estado = "activado"
+        else:
+            # Si está activado, lo desactivamos
+            sesion_dispositivo.estado_activado = "desactivado"
+            nuevo_estado = "desactivado"
+            
+
+    # 5) Guardar los cambios
     db.commit()
     db.refresh(sesion_dispositivo)
-    
+
     return {
-    "id_dispositivo": dispositivo_id,
-    "estado": nuevo_estado.value,
-    "sesion_dispositivo_id": sesion_dispositivo.id_sesion_dispositivo
-}
+        "id_dispositivo": dispositivo_id,
+        "estado": nuevo_estado,
+        "sesion_dispositivo_id": sesion_dispositivo.id_sesion_dispositivo
+    }
+
 
 
 
@@ -189,3 +239,15 @@ def asignar_lado_dispositivo(db: Session, sesion_dispositivo_id: int, lado: str)
 
     db.commit()
     return {"mensaje": "Lado asignado correctamente"}
+
+def desactivar_dispositivos_por_sesion(db: Session, sesion_id: int):
+    dispositivos = db.query(SesionDispositivo).filter(
+        SesionDispositivo.id_sesion_fk == sesion_id,
+        SesionDispositivo.estado_activado == "activado"
+    ).all()
+
+    for d in dispositivos:
+        d.estado_activado = "desactivado"
+
+    db.commit()
+    return {"mensaje": f"{len(dispositivos)} dispositivos desactivados"}
