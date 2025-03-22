@@ -79,4 +79,4 @@ def desactivar_dispositivos_por_sesion(id_sesion: int, db: Session = Depends(get
         dispositivo.estado_activado = "desactivado"
 
     db.commit()
-    return {"mensaje": f"{len(dispositivos)} dispositivos desactivados."}
+    return {"mensaje": f"{len(dispositivos)} dispositivos desactivados"}
