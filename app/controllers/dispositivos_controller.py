@@ -200,9 +200,21 @@ def verificar_estado_dispositivo(db: Session, uuid: str):
     if not dispositivo:
         raise HTTPException(status_code=404, detail="Dispositivo no registrado")
 
-    return {
-        "estado": "activo" if dispositivo.sesion_dispositivo and dispositivo.sesion_dispositivo.estado_activado == "activado" else "desactivado"
-    }
+    # Buscar si está activo en alguna sesión
+    paciente_dispositivo = db.query(PacienteDispositivo).filter(
+        PacienteDispositivo.id_dispositivo_pd_fk == dispositivo.id_dispositivo
+    ).first()
+
+    if not paciente_dispositivo:
+        return {"estado": "desactivado"}
+
+    sesion_activa = db.query(SesionDispositivo).filter(
+        SesionDispositivo.id_dispositivo_pd_fk == paciente_dispositivo.id_paciente_dispositivo,
+        SesionDispositivo.estado_activado == "activado"
+    ).first()
+
+    return {"estado": "activo" if sesion_activa else "desactivado"}
+
     
 
 # controllers/dispositivos_controller.py
@@ -210,41 +222,29 @@ def asignar_lado_dispositivo(db: Session, sesion_dispositivo_id: int, lado: str)
     if lado not in ["izquierda", "derecha"]:
         raise HTTPException(status_code=400, detail="Lado inválido")
 
-    registro = (
-        db.query(SesionDispositivo)
-        .filter(SesionDispositivo.id_sesion_dispositivo == sesion_dispositivo_id)
-        .first()
-    )
+    # Buscar registro existente en graficas_dispositivos
+    grafica = db.query(GraficaDispositivo).filter(
+        GraficaDispositivo.id_sesion_dispositivo_fk == sesion_dispositivo_id
+    ).first()
 
-    if not registro:
-        raise HTTPException(status_code=404, detail="Sesión del dispositivo no encontrada")
-
-    # Buscar o crear la entrada en graficas_dispositivos
-    grafica_asociada = (
-        db.query(GraficaDispositivo)
-        .filter(GraficaDispositivo.id_sesion_dispositivo_fk == sesion_dispositivo_id)
-        .first()
-    )
-
-    if grafica_asociada:
-        grafica_asociada.lado_pierna = lado
+    if grafica:
+        grafica.lado_pierna = lado
     else:
-        nueva_grafica = Grafica(
-            nombre_grafica="grafica_" + str(sesion_dispositivo_id)
-        )
+        nueva_grafica = Grafica(nombre_grafica=f"grafica_{sesion_dispositivo_id}")
         db.add(nueva_grafica)
         db.commit()
         db.refresh(nueva_grafica)
 
-        grafica_asociada = GraficaDispositivo(
+        grafica = GraficaDispositivo(
             id_grafica_fk=nueva_grafica.id_grafica,
             id_sesion_dispositivo_fk=sesion_dispositivo_id,
             lado_pierna=lado
         )
-        db.add(grafica_asociada)
+        db.add(grafica)
 
     db.commit()
     return {"mensaje": "Lado asignado correctamente"}
+
 
 def desactivar_dispositivos_por_sesion(db: Session, sesion_id: int):
     dispositivos = db.query(SesionDispositivo).filter(
