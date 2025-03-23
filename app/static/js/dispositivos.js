@@ -59,12 +59,15 @@ document.addEventListener("DOMContentLoaded", async function () {
         }
     }
 
-    async function enviarDatosAlESP(uuid, id_paciente, id_sesion_dispositivo) {
+    async function enviarDatosAlESP(uuid, id_paciente, id_sesion_dispositivo, lado_pierna) {
         try {
+            const payload = { uuid, id_paciente, id_sesion_dispositivo };
+            if (lado_pierna) payload.lado_pierna = lado_pierna;
+    
             const response = await fetch("/esp/configurar_paciente", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ uuid, id_paciente, id_sesion_dispositivo })
+                body: JSON.stringify(payload)
             });
     
             const data = await response.json();
@@ -77,6 +80,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             console.error("❌ Error de red al enviar datos al ESP:", error);
         }
     }
+    
     
 
     function addDeviceRow(device) {
@@ -127,12 +131,12 @@ document.addEventListener("DOMContentLoaded", async function () {
                         localStorage.setItem("sesion_dispositivo_ids", JSON.stringify(ids));
                     }
                 
+                    // También guardamos el lado si existe
+                    const lado = localStorage.getItem(`lado_pierna_${result.sesion_dispositivo_id}`) || "";
                     if (uuid) {
-                        await enviarDatosAlESP(uuid, parseInt(pacienteId), result.sesion_dispositivo_id);  // 👈 Nuevo parámetro
-                    } else {
-                        console.warn("⚠️ UUID no disponible para enviar al ESP");
+                        await enviarDatosAlESP(uuid, parseInt(pacienteId), result.sesion_dispositivo_id, lado);
                     }
-                }
+                }                
                  else {
                     let ids = JSON.parse(localStorage.getItem("sesion_dispositivo_ids")) || [];
                     ids = ids.filter(id => id !== result.sesion_dispositivo_id);

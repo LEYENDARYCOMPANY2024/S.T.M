@@ -194,13 +194,27 @@ async function cargarDispositivosActivos() {
             <option value="derecha" ${dispositivo.pierna === "derecha" ? "selected" : ""}>Derecha</option>
         `;
         select.onchange = async () => {
+            const nuevoLado = select.value;
+        
             await fetch(`/dispositivos/lado_pierna/${dispositivo.id}`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ lado: select.value })
+                body: JSON.stringify({ lado: nuevoLado })
             });
+        
+            // 🔄 Guardar el lado localmente
+            localStorage.setItem(`lado_pierna_${dispositivo.id}`, nuevoLado);
+        
+            // 📡 Volver a enviar al ESP si ya está activo
+            const ids = JSON.parse(localStorage.getItem("sesion_dispositivo_ids")) || [];
+            if (ids.includes(dispositivo.id)) {
+                const uuid = dispositivo.uuid;
+                const id_paciente = localStorage.getItem("id_paciente");
+                await enviarDatosAlESP(uuid, parseInt(id_paciente), dispositivo.id, nuevoLado);
+            }
+        
             mostrarMensaje("Lado actualizado correctamente", "success");
-        };
+        };        
 
         let row = document.createElement("div");
         row.innerHTML = `<strong>${dispositivo.nombre}</strong>`;
