@@ -173,12 +173,20 @@ def obtener_paciente_activo(uuid: str, db: Session = Depends(get_db)):
 def configurar_paciente(payload: dict = Body(...)):
     uuid = payload.get("uuid")
     id_paciente = payload.get("id_paciente")
+    id_sesion_dispositivo = payload.get("id_sesion_dispositivo")
 
-    if not uuid or not id_paciente:
-        raise HTTPException(status_code=400, detail="Faltan datos uuid o id_paciente")
+    if not uuid or not id_paciente or not id_sesion_dispositivo:
+        raise HTTPException(status_code=400, detail="Faltan datos uuid, id_paciente o id_sesion_dispositivo")
 
-    print(f"✅ Recibido del frontend: uuid={uuid}, id_paciente={id_paciente}")
-    return {"mensaje": "ID de paciente recibido correctamente", "uuid": uuid, "id_paciente": id_paciente}
+    print(f"✅ Recibido del frontend:\n  uuid = {uuid}\n  id_paciente = {id_paciente}\n  id_sesion_dispositivo = {id_sesion_dispositivo}")
+
+    return {
+        "mensaje": "Datos de paciente y sesión recibidos correctamente",
+        "uuid": uuid,
+        "id_paciente": id_paciente,
+        "id_sesion_dispositivo": id_sesion_dispositivo
+    }
+
 
 
 @router.get("/esp/id_paciente_por_uuid/{uuid}")
