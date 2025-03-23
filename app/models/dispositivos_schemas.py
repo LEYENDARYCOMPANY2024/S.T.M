@@ -1,6 +1,6 @@
 from pydantic import BaseModel, EmailStr
 from datetime import date
-from sqlalchemy import Enum
+from typing import Optional
 
 class DispositivoResponse(BaseModel):
     id_dispositivo: int
@@ -17,16 +17,8 @@ class DispositivoRegistro(BaseModel):
     nombre_dispositivo: str
     tipo_de_dispositivo: str
     uuid: str
-    correo_terapeuta: EmailStr  # 🔹 Usamos el correo del terapeuta en lugar del ID
-    
-class EstadoDispositivoEnum(Enum):
-    ACTIVADO = "activado"
-    DESACTIVADO = "desactivado"
+    correo_terapeuta: EmailStr
 
-class LadoPiernaEnum(Enum):
-    IZQUIERDA = "izquierda"
-    DERECHA = "derecha"
-    
 class LadoRequest(BaseModel):
     lado: str
 
@@ -35,9 +27,11 @@ class DatosSensor(BaseModel):
     id_sesion_dispositivo: int
     lado_pierna: str
     nombre_grafica: str
+
     aceleracion_x: float
     aceleracion_y: float
     aceleracion_z: float
     rotacion_x: float
     rotacion_y: float
     rotacion_z: float
+

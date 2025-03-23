@@ -1,4 +1,5 @@
 # routes/graficas_routes.py
+
 from fastapi import APIRouter, Depends, UploadFile, File, Form, HTTPException
 from sqlalchemy.orm import Session
 from database import get_db
@@ -9,16 +10,25 @@ import csv
 from io import StringIO
 from fastapi.responses import StreamingResponse
 
-
 router = APIRouter()
 
 @router.put("/graficas/datos")
 def recibir_dato_sensor(datos: DatosSensor, db: Session = Depends(get_db)):
+    """
+    Recibe datos de sensor (MPU, etc.) en JSON, y los guarda/actualiza
+    en la tabla 'graficas' y 'graficas_dispositivos'.
+    """
     return guardar_datos_sensor(db, datos.model_dump())
+
 
 @router.get("/graficas/exportar/{id_sesion_dispositivo}")
 def exportar_csv(id_sesion_dispositivo: int, db: Session = Depends(get_db)):
+    """
+    Exporta en CSV los datos de la gráfica asociados a la sesión
+    (buscando en 'graficas' y 'graficas_dispositivos').
+    """
     return exportar_datos_csv(db, id_sesion_dispositivo)
+
 
 @router.post("/graficas/importar")
 def importar_csv_route(
@@ -26,11 +36,18 @@ def importar_csv_route(
     etiqueta: str = Form(...),
     db: Session = Depends(get_db)
 ):
+    """
+    Importa un CSV y lo guarda como gráficas nuevas con la etiqueta dada.
+    """
     return importar_csv(file, etiqueta, db)
+
 
 @router.get("/graficas/exportar_historial/{id_sesion_dispositivo}")
 def exportar_historial_csv(id_sesion_dispositivo: int, db: Session = Depends(get_db)):
-    # Buscar la gráfica asociada a la sesión
+    """
+    Exporta solo la parte de 'datos_extra' (historial) de la gráfica
+    asociada a la sesión dada.
+    """
     relacion = db.query(GraficaDispositivo).filter(
         GraficaDispositivo.id_sesion_dispositivo_fk == id_sesion_dispositivo
     ).first()
@@ -67,8 +84,12 @@ def exportar_historial_csv(id_sesion_dispositivo: int, db: Session = Depends(get
         "Content-Disposition": "attachment; filename=historial_datos_extra.csv"
     })
 
+
 @router.get("/graficas/historial/{id_sesion_dispositivo}")
 def obtener_historial_datos_extra(id_sesion_dispositivo: int, db: Session = Depends(get_db)):
+    """
+    Retorna el historial (datos_extra) de la primera gráfica asociada a una sesión.
+    """
     grafica = (
         db.query(Grafica)
         .join(GraficaDispositivo, Grafica.id_grafica == GraficaDispositivo.id_grafica_fk)
