@@ -22,6 +22,7 @@ class DispositivoRegistro(BaseModel):
 class LadoRequest(BaseModel):
     lado: str
 
+
 class DatosSensor(BaseModel):
     uuid: str
     id_sesion_dispositivo: int
@@ -30,8 +31,8 @@ class DatosSensor(BaseModel):
 
     aceleracion_x: float
     aceleracion_y: float
-    aceleracion_z: float
-    rotacion_x: float
-    rotacion_y: float
-    rotacion_z: float
+    aceleracion_z: Optional[float] = None
+    rotacion_x: Optional[float] = None
+    rotacion_y: Optional[float] = None
+    rotacion_z: Optional[float] = None
 
