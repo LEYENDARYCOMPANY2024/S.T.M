@@ -209,10 +209,3 @@ def asignar_paciente_a_terapeuta(id_paciente: int, id_terapeuta: int, db: Sessio
     print("✅ Paciente asignado correctamente")
     return {"message": "Paciente asignado correctamente a un nuevo terapeuta."}
 
-
-@router.get("/pacientes/id_por_codigo/{codigo}")
-def obtener_id_paciente_por_codigo(codigo: str, db: Session = Depends(get_db)):
-    paciente = db.query(Paciente).filter(Paciente.codigo == codigo).first()
-    if not paciente:
-        raise HTTPException(status_code=404, detail="Paciente no encontrado")
-    return {"id_paciente": paciente.id_paciente}
