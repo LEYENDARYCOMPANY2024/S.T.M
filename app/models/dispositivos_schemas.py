@@ -33,6 +33,8 @@ class LadoRequest(BaseModel):
 class DatosSensor(BaseModel):
     uuid: str
     id_sesion_dispositivo: int
+    lado_pierna: str
+    nombre_grafica: str
     aceleracion_x: float
     aceleracion_y: float
     aceleracion_z: float
