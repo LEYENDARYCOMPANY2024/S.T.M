@@ -76,7 +76,12 @@ function limitData() {
 
 function suscribirseAGraficasRealtime() {
     const ids = JSON.parse(localStorage.getItem("sesion_dispositivo_ids"));
-    if (!ids || ids.length === 0) return;
+    if (!ids || ids.length === 0) {
+        console.warn("⚠️ No hay IDs de sesión_dispositivo activos en localStorage");
+        return;
+    }
+
+    console.log("🎧 Subscribiéndose a Supabase Realtime para 'graficas'...");
 
     supabase
         .channel('graficas_realtime')
@@ -85,19 +90,33 @@ function suscribirseAGraficasRealtime() {
             schema: 'public',
             table: 'graficas'
         }, payload => {
-            if (realtimePaused) return;
+            console.log("📥 Datos recibidos desde Supabase:", payload);
+
+            if (realtimePaused) {
+                console.log("⏸️ Ignorado porque está pausado");
+                return;
+            }
 
             const data = payload.new;
             const idSesion = data.id_sesion_dispositivo_fk;
             const lado = data.lado_pierna;
 
-            if (!idSesion || !lado || !ids.includes(idSesion)) return;
+            if (!idSesion) console.warn("⚠️ No se recibió id_sesion_dispositivo_fk");
+            if (!lado) console.warn("⚠️ No se recibió lado_pierna");
+
+            if (!idSesion || !lado || !ids.includes(idSesion)) {
+                console.log(`❌ Datos ignorados. idSesion: ${idSesion}, lado: ${lado}, ids en localStorage:`, ids);
+                return;
+            }
 
             const t = new Date(data.fecha_hora).toLocaleTimeString();
             chartData.labels.push(t);
 
             const grupo = chartData.datasets[lado];
-            if (!grupo) return;
+            if (!grupo) {
+                console.error("❌ Lado inválido:", lado);
+                return;
+            }
 
             grupo.ax.push(data.aceleracion_x ?? 0);
             grupo.ay.push(data.aceleracion_y ?? 0);
@@ -108,9 +127,17 @@ function suscribirseAGraficasRealtime() {
 
             limitData();
             chart.update();
+            console.log(`✅ Gráfica actualizada para ${lado} | Sesión ${idSesion}`);
         })
-        .subscribe();
+        .subscribe(status => {
+            if (status === "SUBSCRIBED") {
+                console.log("✅ Suscripción activa a Supabase Realtime");
+            } else {
+                console.warn("⚠️ Estado de suscripción:", status);
+            }
+        });
 }
+
 
 function reiniciarGrafica() {
     chartData.labels = [];
