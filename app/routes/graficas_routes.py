@@ -12,7 +12,7 @@ from fastapi.responses import StreamingResponse
 
 router = APIRouter()
 
-@router.post("/graficas/datos")
+@router.put("/graficas/datos")
 def recibir_dato_sensor(datos: DatosSensor, db: Session = Depends(get_db)):
     return guardar_datos_sensor(db, datos.model_dump())
 
