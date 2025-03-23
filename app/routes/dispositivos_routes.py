@@ -6,6 +6,7 @@ from models.dispositivos_schemas import DispositivoResponse
 from models.graficas_models import GraficaDispositivo
 from models.dispositivos_models import SesionDispositivo, PacienteDispositivo, DispositivoIOT
 from models.dispositivos_schemas import LadoRequest
+from fastapi.responses import JSONResponse
 
 router = APIRouter()
 
@@ -165,3 +166,11 @@ def obtener_paciente_activo(uuid: str, db: Session = Depends(get_db)):
         "id_sesion_dispositivo": sd.id_sesion_dispositivo,
         "lado_pierna": graf.lado_pierna if graf else None
     }
+
+
+
+@router.post("/esp/configurar_paciente")
+def configurar_paciente(uuid: str = Body(...), id_paciente: int = Body(...)):
+    # Aquí puedes almacenar en un diccionario en memoria, BD, cache, etc. si lo deseas
+    print(f"🔧 Asociando UUID {uuid} con id_paciente {id_paciente}")
+    return JSONResponse(content={"mensaje": "ID de paciente recibido", "uuid": uuid, "id_paciente": id_paciente})

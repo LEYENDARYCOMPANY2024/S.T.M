@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", async function () {
     const deviceList = document.getElementById("device-list");
     const pacienteId = localStorage.getItem("id_paciente");
-    const sesionId = localStorage.getItem("id_sesion"); 
+    const sesionId = localStorage.getItem("id_sesion");
     const terapeutaId = localStorage.getItem("id_terapeuta");
 
     if (!pacienteId) {
@@ -11,8 +11,6 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
 
     async function fetchDevices() {
-        const pacienteId = localStorage.getItem("id_paciente");
-
         if (!pacienteId || !terapeutaId) {
             alert("No hay paciente o terapeuta seleccionado.");
             window.location.href = "/principal";
@@ -35,11 +33,23 @@ document.addEventListener("DOMContentLoaded", async function () {
         }
     }
 
+    async function enviarIdPacienteAlESP(uuid, id_paciente) {
+        try {
+            const response = await fetch("/esp/configurar_paciente", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ uuid, id_paciente })
+            });
+
+            const data = await response.json();
+            console.log("📡 ID del paciente enviado al ESP:", data);
+        } catch (error) {
+            console.error("❌ Error al enviar ID del paciente al ESP:", error);
+        }
+    }
 
     function addDeviceRow(device) {
         const row = document.createElement("tr");
-
-        // Si no hay sesión activa, deshabilitar el botón de activación
         const disabledAttr = sesionId ? "" : "disabled";
 
         row.innerHTML = `
@@ -52,8 +62,6 @@ document.addEventListener("DOMContentLoaded", async function () {
                     ${device.estado_dispositivo === "activado" ? "checked" : ""}
                     data-id="${device.id_dispositivo}"
                     ${disabledAttr}>
-
-
                     <span class="slider"></span>
                 </label>
             </td>
@@ -69,25 +77,35 @@ document.addEventListener("DOMContentLoaded", async function () {
             const deviceId = this.getAttribute("data-id");
 
             try {
-                const response = await fetch(`/dispositivos/${pacienteId}/${sesionId}/${deviceId}/toggle`, { method: "PUT" });
+                const response = await fetch(`/dispositivos/${pacienteId}/${sesionId}/${deviceId}/toggle`, {
+                    method: "PUT"
+                });
+
                 if (!response.ok) throw new Error("No se pudo cambiar el estado del dispositivo.");
 
                 const result = await response.json();
+                const uuid = result.uuid;  // <- debe venir en la respuesta del backend
+
                 if (result.estado === "activado") {
+                    // Guardar sesión_dispositivo_id
                     let ids = JSON.parse(localStorage.getItem("sesion_dispositivo_ids")) || [];
                     if (!ids.includes(result.sesion_dispositivo_id)) {
                         ids.push(result.sesion_dispositivo_id);
                         localStorage.setItem("sesion_dispositivo_ids", JSON.stringify(ids));
                     }
+
+                    // ✅ Enviar id_paciente al ESP
+                    await enviarIdPacienteAlESP(uuid, parseInt(pacienteId));
                 } else {
-                    // Si se desactiva, lo quitamos del array
+                    // Si se desactiva, quitarlo del array
                     let ids = JSON.parse(localStorage.getItem("sesion_dispositivo_ids")) || [];
                     ids = ids.filter(id => id !== result.sesion_dispositivo_id);
                     localStorage.setItem("sesion_dispositivo_ids", JSON.stringify(ids));
                 }
-                
+
                 console.log(`Estado actualizado: ${result.estado}`);
-                fetchDevices();  // Recargar lista después de cambiar estado
+                fetchDevices();
+
             } catch (error) {
                 console.error("Error al cambiar estado del dispositivo:", error.message);
             }
@@ -103,7 +121,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const homeButton = document.querySelector(".home-button");
     if (homeButton) {
         homeButton.addEventListener("click", async (e) => {
-            e.preventDefault(); // ✋ prevenir redirección inmediata
+            e.preventDefault();
 
             const sesionId = localStorage.getItem("id_sesion");
 
@@ -123,9 +141,7 @@ document.addEventListener("DOMContentLoaded", () => {
             localStorage.removeItem("nombre_sesion");
             localStorage.removeItem("sesion_dispositivo_ids");
 
-            // ✅ Redirigir luego de limpiar todo
             window.location.href = "/principal";
         });
     }
 });
-
