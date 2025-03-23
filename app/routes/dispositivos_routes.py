@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Body, HTTPException
+from fastapi import APIRouter, Depends, Body, HTTPException, Query
 from sqlalchemy.orm import Session
 from database import get_db
 from controllers.dispositivos_controller import obtener_dispositivos, cambiar_estado_dispositivo, registrar_dispositivo_por_correo, verificar_estado_dispositivo, asignar_lado_dispositivo, desactivar_dispositivos_por_sesion
@@ -101,32 +101,33 @@ def desactivar_dispositivos_por_sesion(id_sesion: int, db: Session = Depends(get
     return {"mensaje": f"{len(dispositivos)} dispositivos desactivados"}
 
 @router.get("/dispositivos/sesion_dispositivo/{uuid}")
-def obtener_sesion_dispositivo_activo(uuid: str, db: Session = Depends(get_db)):
+def obtener_sesion_dispositivo_activo(uuid: str, paciente_id: int = Query(...), db: Session = Depends(get_db)):
     dispositivo = db.query(DispositivoIOT).filter(DispositivoIOT.uuid == uuid).first()
     if not dispositivo:
         raise HTTPException(status_code=404, detail="Dispositivo no encontrado")
 
-    sesion_dispositivo = (
-        db.query(SesionDispositivo)
-        .join(PacienteDispositivo, SesionDispositivo.id_dispositivo_pd_fk == PacienteDispositivo.id_paciente_dispositivo)
-        .filter(
-            PacienteDispositivo.id_dispositivo_pd_fk == dispositivo.id_dispositivo,
-            SesionDispositivo.estado_activado == "activado"
-        )
-        .order_by(SesionDispositivo.id_sesion_dispositivo.desc())
-        .first()
-    )
+    pd = db.query(PacienteDispositivo).filter(
+        PacienteDispositivo.id_dispositivo_pd_fk == dispositivo.id_dispositivo,
+        PacienteDispositivo.id_paciente_pd_fk == paciente_id
+    ).first()
 
-    if not sesion_dispositivo:
+    if not pd:
+        raise HTTPException(status_code=404, detail="Relación paciente-dispositivo no encontrada")
+
+    sd = db.query(SesionDispositivo).filter(
+        SesionDispositivo.id_dispositivo_pd_fk == pd.id_paciente_dispositivo,
+        SesionDispositivo.estado_activado == "activado"
+    ).first()
+
+    if not sd:
         raise HTTPException(status_code=404, detail="No hay sesión activa para este dispositivo")
 
-    # Buscar lado de pierna (opcional)
     graf = db.query(GraficaDispositivo).filter(
-        GraficaDispositivo.id_sesion_dispositivo_fk == sesion_dispositivo.id_sesion_dispositivo
+        GraficaDispositivo.id_sesion_dispositivo_fk == sd.id_sesion_dispositivo
     ).first()
 
     return {
-        "id_sesion_dispositivo": sesion_dispositivo.id_sesion_dispositivo,
+        "id_sesion_dispositivo": sd.id_sesion_dispositivo,
         "lado_pierna": graf.lado_pierna if graf else None
     }
 
