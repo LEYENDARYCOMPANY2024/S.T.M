@@ -1,5 +1,6 @@
 document.addEventListener("DOMContentLoaded", async function () {
     const deviceList = document.getElementById("device-list");
+    const homeButton = document.querySelector(".home-button");
     const pacienteId = localStorage.getItem("id_paciente");
     const sesionId = localStorage.getItem("id_sesion");
     const terapeutaId = localStorage.getItem("id_terapeuta");
@@ -8,6 +9,31 @@ document.addEventListener("DOMContentLoaded", async function () {
         alert("No hay paciente seleccionado.");
         window.location.href = "/principal";
         return;
+    }
+
+    // 🔄 Botón para regresar a principal y limpiar localStorage + desactivar dispositivos
+    if (homeButton) {
+        homeButton.addEventListener("click", async (e) => {
+            e.preventDefault();
+
+            if (sesionId) {
+                try {
+                    await fetch(`/dispositivos/desactivar/${sesionId}`, {
+                        method: "PUT"
+                    });
+                    console.log("🔌 Dispositivos desactivados correctamente.");
+                } catch (error) {
+                    console.error("❌ Error al desactivar dispositivos:", error);
+                }
+            }
+
+            console.log("🏠 Limpiando localStorage al volver a principal...");
+            localStorage.removeItem("id_sesion");
+            localStorage.removeItem("nombre_sesion");
+            localStorage.removeItem("sesion_dispositivo_ids");
+
+            window.location.href = "/principal";
+        });
     }
 
     async function fetchDevices() {
@@ -42,9 +68,13 @@ document.addEventListener("DOMContentLoaded", async function () {
             });
 
             const data = await response.json();
-            console.log("📡 ID del paciente enviado al ESP:", data);
+            if (response.ok) {
+                console.log("📡 ID del paciente enviado al ESP:", data);
+            } else {
+                console.error("❌ Error al enviar ID del paciente al ESP:", data);
+            }
         } catch (error) {
-            console.error("❌ Error al enviar ID del paciente al ESP:", error);
+            console.error("❌ Error de red al enviar ID del paciente:", error);
         }
     }
 
@@ -61,6 +91,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                     <input type="checkbox"
                     ${device.estado_dispositivo === "activado" ? "checked" : ""}
                     data-id="${device.id_dispositivo}"
+                    data-uuid="${device.uuid || ""}" 
                     ${disabledAttr}>
                     <span class="slider"></span>
                 </label>
@@ -75,6 +106,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             }
 
             const deviceId = this.getAttribute("data-id");
+            const uuidAttr = this.getAttribute("data-uuid");
 
             try {
                 const response = await fetch(`/dispositivos/${pacienteId}/${sesionId}/${deviceId}/toggle`, {
@@ -84,20 +116,22 @@ document.addEventListener("DOMContentLoaded", async function () {
                 if (!response.ok) throw new Error("No se pudo cambiar el estado del dispositivo.");
 
                 const result = await response.json();
-                const uuid = result.uuid;  // <- debe venir en la respuesta del backend
+                const uuid = result.uuid || uuidAttr;
 
                 if (result.estado === "activado") {
-                    // Guardar sesión_dispositivo_id
                     let ids = JSON.parse(localStorage.getItem("sesion_dispositivo_ids")) || [];
                     if (!ids.includes(result.sesion_dispositivo_id)) {
                         ids.push(result.sesion_dispositivo_id);
                         localStorage.setItem("sesion_dispositivo_ids", JSON.stringify(ids));
                     }
 
-                    // ✅ Enviar id_paciente al ESP
-                    await enviarIdPacienteAlESP(uuid, parseInt(pacienteId));
+                    // ✅ Enviar ID del paciente al ESP (si hay uuid)
+                    if (uuid) {
+                        await enviarIdPacienteAlESP(uuid, parseInt(pacienteId));
+                    } else {
+                        console.warn("⚠️ UUID no disponible para enviar al ESP");
+                    }
                 } else {
-                    // Si se desactiva, quitarlo del array
                     let ids = JSON.parse(localStorage.getItem("sesion_dispositivo_ids")) || [];
                     ids = ids.filter(id => id !== result.sesion_dispositivo_id);
                     localStorage.setItem("sesion_dispositivo_ids", JSON.stringify(ids));
@@ -115,33 +149,4 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
 
     fetchDevices();
-});
-
-document.addEventListener("DOMContentLoaded", () => {
-    const homeButton = document.querySelector(".home-button");
-    if (homeButton) {
-        homeButton.addEventListener("click", async (e) => {
-            e.preventDefault();
-
-            const sesionId = localStorage.getItem("id_sesion");
-
-            if (sesionId) {
-                try {
-                    await fetch(`/dispositivos/desactivar/${sesionId}`, {
-                        method: "PUT"
-                    });
-                    console.log("🔌 Dispositivos desactivados correctamente.");
-                } catch (error) {
-                    console.error("❌ Error al desactivar dispositivos:", error);
-                }
-            }
-
-            console.log("🏠 Limpiando localStorage al volver a principal...");
-            localStorage.removeItem("id_sesion");
-            localStorage.removeItem("nombre_sesion");
-            localStorage.removeItem("sesion_dispositivo_ids");
-
-            window.location.href = "/principal";
-        });
-    }
 });
