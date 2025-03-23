@@ -202,4 +202,16 @@ def obtener_id_paciente_por_uuid(uuid: str, db: Session = Depends(get_db)):
     if not pd:
         raise HTTPException(status_code=404, detail="Dispositivo no vinculado a un paciente")
 
-    return {"id_paciente": pd.id_paciente_pd_fk}
+    sd = db.query(SesionDispositivo).filter(
+        SesionDispositivo.id_dispositivo_pd_fk == pd.id_paciente_dispositivo,
+        SesionDispositivo.estado_activado == "activado"
+    ).first()
+
+    if not sd:
+        raise HTTPException(status_code=404, detail="No hay sesión activa para este dispositivo")
+
+    return {
+        "id_paciente": pd.id_paciente_pd_fk,
+        "id_sesion_dispositivo": sd.id_sesion_dispositivo
+    }
+
