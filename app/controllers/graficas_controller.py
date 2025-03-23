@@ -18,6 +18,7 @@ def guardar_datos_sensor(db: Session, datos: dict):
         if not uuid or not id_sesion_dispositivo or not lado_pierna:
             raise HTTPException(status_code=400, detail="Faltan datos obligatorios")
 
+        # Verificar que la sesión esté activa
         sesion_dispositivo = db.query(SesionDispositivo).filter(
             SesionDispositivo.id_sesion_dispositivo == id_sesion_dispositivo,
             SesionDispositivo.estado_activado == "activado"
@@ -26,6 +27,7 @@ def guardar_datos_sensor(db: Session, datos: dict):
         if not sesion_dispositivo:
             raise HTTPException(status_code=404, detail="Sesión del dispositivo no activa")
 
+        # Buscar si ya existe una relación para esta sesión y pierna
         relacion = db.query(GraficaDispositivo).filter(
             GraficaDispositivo.id_sesion_dispositivo_fk == id_sesion_dispositivo,
             GraficaDispositivo.lado_pierna == lado_pierna
@@ -44,7 +46,7 @@ def guardar_datos_sensor(db: Session, datos: dict):
         if relacion:
             grafica = db.query(Grafica).filter(Grafica.id_grafica == relacion.id_grafica_fk).first()
             if not grafica:
-                raise HTTPException(status_code=404, detail="La gráfica asociada no existe (inconsistencia).")
+                raise HTTPException(status_code=404, detail="La gráfica asociada no existe.")
 
             historial = grafica.datos_extra or []
             historial.append(nueva_entrada)
@@ -56,13 +58,17 @@ def guardar_datos_sensor(db: Session, datos: dict):
             grafica.rotacion_x = datos.get("rotacion_x", 0.0)
             grafica.rotacion_y = datos.get("rotacion_y", 0.0)
             grafica.rotacion_z = datos.get("rotacion_z", 0.0)
-            grafica.lado_pierna_gf = lado_pierna  # ✅ NUEVO
+            grafica.lado_pierna_gf = lado_pierna
 
             db.commit()
             return {"mensaje": "Datos actualizados correctamente", "id_grafica": grafica.id_grafica}
 
+        # Crear nombre automático como "grafica_1", "grafica_2", etc.
+        total_graficas = db.query(Grafica).count()
+        nombre_grafica = f"grafica_{total_graficas + 1}"
+
         nueva_grafica = Grafica(
-            nombre_grafica=f"grafica_{id_sesion_dispositivo}_{lado_pierna}",
+            nombre_grafica=nombre_grafica,
             datos_extra=[nueva_entrada],
             aceleracion_x=datos.get("aceleracion_x", 0.0),
             aceleracion_y=datos.get("aceleracion_y", 0.0),
@@ -70,7 +76,7 @@ def guardar_datos_sensor(db: Session, datos: dict):
             rotacion_x=datos.get("rotacion_x", 0.0),
             rotacion_y=datos.get("rotacion_y", 0.0),
             rotacion_z=datos.get("rotacion_z", 0.0),
-            lado_pierna_gf=lado_pierna  # ✅ NUEVO
+            lado_pierna_gf=lado_pierna
         )
         db.add(nueva_grafica)
         db.commit()
@@ -84,7 +90,10 @@ def guardar_datos_sensor(db: Session, datos: dict):
         db.add(nueva_relacion)
         db.commit()
 
-        return {"mensaje": "Dato insertado correctamente", "id_grafica": nueva_grafica.id_grafica}
+        return {
+            "mensaje": f"Gráfica {nombre_grafica} creada y datos insertados",
+            "id_grafica": nueva_grafica.id_grafica
+        }
 
     except HTTPException:
         raise
