@@ -14,11 +14,30 @@ from controllers.dispositivos_controller import (
 )
 
 # Schemas y modelos
-from models.dispositivos_schemas import DispositivoResponse, LadoRequest
+from models.dispositivos_schemas import DispositivoResponse, LadoRequest, PermisoEnvio
 from models.graficas_models import GraficaDispositivo
 from models.dispositivos_models import SesionDispositivo, PacienteDispositivo, DispositivoIOT
 
 router = APIRouter()
+
+@router.get("/dispositivos/permiso_envio/{uuid}")
+def permiso_envio(uuid: str, db: Session = Depends(get_db)):
+    dispositivo = db.query(DispositivoIOT).filter(DispositivoIOT.uuid == uuid).first()
+    if not dispositivo:
+        raise HTTPException(status_code=404, detail="Dispositivo no encontrado")
+
+    return {"permite": dispositivo.permite_envio}
+
+# routes/dispositivos_routes.py
+@router.put("/dispositivos/permiso_envio/{uuid}")
+def actualizar_permiso_envio(uuid: str, permiso: PermisoEnvio, db: Session = Depends(get_db)):
+    dispositivo = db.query(DispositivoIOT).filter(DispositivoIOT.uuid == uuid).first()
+    if not dispositivo:
+        raise HTTPException(status_code=404, detail="Dispositivo no encontrado")
+
+    dispositivo.permite_envio = permiso.estado
+    db.commit()
+    return {"mensaje": f"Permiso actualizado a {permiso.estado}"}
 
 @router.get("/dispositivos/estado/{uuid}")
 def obtener_estado_dispositivo_route(uuid: str, db: Session = Depends(get_db)):
@@ -288,22 +307,7 @@ def obtener_info_por_uuid(uuid: str, db: Session = Depends(get_db)):
         "lado_pierna": graf.lado_pierna if graf else None
     }
 
-# routes/dispositivos_routes.py
-@router.put("/dispositivos/permiso_envio/{uuid}")
-def actualizar_permiso_envio(uuid: str, estado: bool = Body(...), db: Session = Depends(get_db)):
-    dispositivo = db.query(DispositivoIOT).filter(DispositivoIOT.uuid == uuid).first()
-    if not dispositivo:
-        raise HTTPException(status_code=404, detail="Dispositivo no encontrado")
 
-    dispositivo.permite_envio = estado
-    db.commit()
-    return {"mensaje": f"Permiso de envío {'activado' if estado else 'desactivado'}"}
 
-@router.get("/dispositivos/permiso_envio/{uuid}")
-def permiso_envio(uuid: str, db: Session = Depends(get_db)):
-    dispositivo = db.query(DispositivoIOT).filter(DispositivoIOT.uuid == uuid).first()
-    if not dispositivo:
-        raise HTTPException(status_code=404, detail="Dispositivo no encontrado")
 
-    return {"permite": dispositivo.permite_envio}
 

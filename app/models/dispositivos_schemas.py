@@ -36,3 +36,5 @@ class DatosSensor(BaseModel):
     rotacion_y: Optional[float] = None
     rotacion_z: Optional[float] = None
 
+class PermisoEnvio(BaseModel):
+    estado: bool

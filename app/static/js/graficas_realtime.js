@@ -177,10 +177,10 @@ const supabase = window.supabase.createClient(
         for (const dispositivo of dispositivos) {
             const uuid = dispositivo.uuid;
             await fetch(`/dispositivos/permiso_envio/${uuid}`, {
-                method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ estado: !realtimePaused })
-            });
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ estado: !realtimePaused })
+          });          
             console.log(`🎮 Permiso de envío actualizado para ${uuid}: ${!realtimePaused}`);
         }
     } catch (err) {
