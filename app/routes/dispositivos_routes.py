@@ -246,3 +246,44 @@ def configurar_paciente_route(payload: dict = Body(...)):
         "id_sesion_dispositivo": id_sesion_dispositivo,
         "lado_pierna": lado_pierna
     }
+
+@router.get("/esp/id_paciente_por_uuid/{uuid}")
+def obtener_info_por_uuid(uuid: str, db: Session = Depends(get_db)):
+    """
+    Dado un UUID, retorna el paciente, sesión activa y lado_pierna asociados.
+    Este endpoint lo usa el ESP32 para configurarse automáticamente.
+    """
+    dispositivo = db.query(DispositivoIOT).filter(DispositivoIOT.uuid == uuid).first()
+    if not dispositivo:
+        raise HTTPException(status_code=404, detail="Dispositivo no encontrado")
+
+    # Buscar relación con paciente
+    pd = db.query(PacienteDispositivo).filter(
+        PacienteDispositivo.id_dispositivo_pd_fk == dispositivo.id_dispositivo
+    ).first()
+
+    if not pd:
+        raise HTTPException(status_code=404, detail="Relación paciente-dispositivo no encontrada")
+
+    # Buscar sesión activa
+    sd = db.query(SesionDispositivo).filter(
+        SesionDispositivo.id_dispositivo_pd_fk == pd.id_paciente_dispositivo,
+        SesionDispositivo.estado_activado == "activado"
+    ).first()
+
+    if not sd:
+        raise HTTPException(status_code=404, detail="No hay sesión activa para este dispositivo")
+
+    # Buscar lado pierna si existe
+    graf = db.query(GraficaDispositivo).filter(
+        GraficaDispositivo.id_sesion_dispositivo_fk == sd.id_sesion_dispositivo
+    ).first()
+
+    paciente = pd.paciente
+
+    return {
+        "id_paciente": paciente.id_paciente,
+        "codigo_paciente": paciente.codigo,
+        "id_sesion_dispositivo": sd.id_sesion_dispositivo,
+        "lado_pierna": graf.lado_pierna if graf else None
+    }
