@@ -2,63 +2,60 @@ const supabase = window.supabase.createClient(
     'https://hxjmzijhcmhfcrjcptge.supabase.co',
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh4am16aWpoY21oZmNyamNwdGdlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDAwODMxODgsImV4cCI6MjA1NTY1OTE4OH0.fZ1QaYkFTfJTdupOUkV7V9a7kIIVHCt_XusnNWxkyqw'
 );
-
+// Estructura con múltiples datasets (uno por tipo de dato por pierna)
 let chartData = {
     labels: [],
-    derecha: [],
-    izquierda: []
+    datasets: {
+        izquierda: {
+            ax: [], ay: [], az: [], rx: [], ry: [], rz: []
+        },
+        derecha: {
+            ax: [], ay: [], az: [], rx: [], ry: [], rz: []
+        }
+    }
 };
 
 let chart = null;
 let realtimePaused = false;
 const MAX_DATA_POINTS = 30;
 
-function mostrarMensaje(mensaje, tipo = "success") {
-    const alertBox = document.createElement("div");
-    alertBox.classList.add("alert", tipo === "success" ? "success" : "error");
-    alertBox.innerHTML = `<span class="alert-icon">${tipo === "success" ? "✅" : "❌"}</span> ${mensaje}`;
-    document.body.appendChild(alertBox);
-    setTimeout(() => alertBox.classList.add("show"), 100);
-    setTimeout(() => {
-        alertBox.classList.remove("show");
-        setTimeout(() => alertBox.remove(), 300);
-    }, 3000);
-}
-
-function limitData() {
-    if (chartData.labels.length > MAX_DATA_POINTS) {
-        chartData.labels.shift();
-        chartData.derecha.shift();
-        chartData.izquierda.shift();
-    }
-}
-
 document.addEventListener("DOMContentLoaded", () => {
-    const chartCanvas = document.getElementById("grafica_realtime");
-    chart = new Chart(chartCanvas, {
+    const ctx = document.getElementById("grafica_realtime").getContext("2d");
+
+    chart = new Chart(ctx, {
         type: 'line',
         data: {
             labels: chartData.labels,
             datasets: [
-                {
-                    label: 'Pierna Derecha',
-                    borderColor: 'red',
-                    data: chartData.derecha,
-                    fill: false
-                },
-                {
-                    label: 'Pierna Izquierda',
-                    borderColor: 'blue',
-                    data: chartData.izquierda,
-                    fill: false
-                }
+                // Izquierda
+                { label: "Izq - Acel X", borderColor: "navy", data: chartData.datasets.izquierda.ax, fill: false },
+                { label: "Izq - Acel Y", borderColor: "blue", data: chartData.datasets.izquierda.ay, fill: false },
+                { label: "Izq - Acel Z", borderColor: "lightblue", data: chartData.datasets.izquierda.az, fill: false },
+                { label: "Izq - Rot X", borderColor: "purple", data: chartData.datasets.izquierda.rx, fill: false },
+                { label: "Izq - Rot Y", borderColor: "violet", data: chartData.datasets.izquierda.ry, fill: false },
+                { label: "Izq - Rot Z", borderColor: "magenta", data: chartData.datasets.izquierda.rz, fill: false },
+
+                // Derecha
+                { label: "Der - Acel X", borderColor: "darkred", data: chartData.datasets.derecha.ax, fill: false },
+                { label: "Der - Acel Y", borderColor: "red", data: chartData.datasets.derecha.ay, fill: false },
+                { label: "Der - Acel Z", borderColor: "salmon", data: chartData.datasets.derecha.az, fill: false },
+                { label: "Der - Rot X", borderColor: "orange", data: chartData.datasets.derecha.rx, fill: false },
+                { label: "Der - Rot Y", borderColor: "gold", data: chartData.datasets.derecha.ry, fill: false },
+                { label: "Der - Rot Z", borderColor: "yellow", data: chartData.datasets.derecha.rz, fill: false }
             ]
         },
         options: {
             animation: false,
+            responsive: true,
             scales: {
-                y: {
-                    beginAtZero: true
+                y: { beginAtZero: true },
+                x: { display: true }
+            },
+            plugins: {
+                legend: {
+                    labels: {
+                        color: 'white'
+                    }
                 }
             }
         }
@@ -67,36 +64,13 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("importInput").addEventListener("change", importarCSV);
 });
 
-async function exportarGraficaCSV() {
-    const ids = JSON.parse(localStorage.getItem("sesion_dispositivo_ids"));
-    if (!ids || ids.length === 0) {
-        mostrarMensaje("⚠️ No hay sesión/dispositivo activo para exportar.", "error");
-        return;
-    }
 
-    // Por ahora exportamos solo el primero (podrías hacer selección múltiple si quieres)
-    const id = ids[0];
-
-    try {
-        const response = await fetch(`/graficas/exportar_historial/${id}`);
-        if (!response.ok) {
-            throw new Error("No se pudo exportar el historial.");
-        }
-
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = `historial_grafica_${id}.csv`;
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-
-        mostrarMensaje("✅ CSV exportado correctamente desde historial.");
-
-    } catch (error) {
-        console.error("❌ Error exportando CSV:", error);
-        mostrarMensaje("❌ No se pudo exportar el historial", "error");
+function limitData() {
+    if (chartData.labels.length > MAX_DATA_POINTS) {
+        chartData.labels.shift();
+        Object.values(chartData.datasets).forEach(dataset => {
+            Object.keys(dataset).forEach(key => dataset[key].shift());
+        });
     }
 }
 
@@ -114,19 +88,23 @@ function suscribirseAGraficasRealtime() {
             if (realtimePaused) return;
 
             const data = payload.new;
-            if (!ids.includes(data.id_sesion_dispositivo_fk)) return;
+            const idSesion = data.id_sesion_dispositivo_fk;
+            const lado = data.lado_pierna;
 
-            const timestamp = new Date(data.fecha_hora).toLocaleTimeString(); // HH:MM:SS
+            if (!idSesion || !lado || !ids.includes(idSesion)) return;
 
-            chartData.labels.push(timestamp);
+            const t = new Date(data.fecha_hora).toLocaleTimeString();
+            chartData.labels.push(t);
 
-            if (data.lado_pierna === 'derecha') {
-                chartData.derecha.push(data.aceleracion_y);
-                chartData.izquierda.push(0);
-            } else {
-                chartData.izquierda.push(data.aceleracion_y);
-                chartData.derecha.push(0);
-            }
+            const grupo = chartData.datasets[lado];
+            if (!grupo) return;
+
+            grupo.ax.push(data.aceleracion_x ?? 0);
+            grupo.ay.push(data.aceleracion_y ?? 0);
+            grupo.az.push(data.aceleracion_z ?? 0);
+            grupo.rx.push(data.rotacion_x ?? 0);
+            grupo.ry.push(data.rotacion_y ?? 0);
+            grupo.rz.push(data.rotacion_z ?? 0);
 
             limitData();
             chart.update();
@@ -134,6 +112,14 @@ function suscribirseAGraficasRealtime() {
         .subscribe();
 }
 
+function reiniciarGrafica() {
+    chartData.labels = [];
+    Object.values(chartData.datasets).forEach(dataset => {
+        Object.keys(dataset).forEach(key => dataset[key] = []);
+    });
+    chart.update();
+    mostrarMensaje("🔄 Gráfica reiniciada");
+}
 
 function togglePause() {
     realtimePaused = !realtimePaused;
@@ -141,12 +127,16 @@ function togglePause() {
     mostrarMensaje(realtimePaused ? "⏸️ Pausado" : "▶️ Reanudado");
 }
 
-function reiniciarGrafica() {
-    chartData.labels = [];
-    chartData.derecha = [];
-    chartData.izquierda = [];
-    chart.update();
-    mostrarMensaje("🔄 Gráfica reiniciada");
+function mostrarMensaje(mensaje, tipo = "success") {
+    const alertBox = document.createElement("div");
+    alertBox.classList.add("alert", tipo === "success" ? "success" : "error");
+    alertBox.innerHTML = `<span class="alert-icon">${tipo === "success" ? "✅" : "❌"}</span> ${mensaje}`;
+    document.body.appendChild(alertBox);
+    setTimeout(() => alertBox.classList.add("show"), 100);
+    setTimeout(() => {
+        alertBox.classList.remove("show");
+        setTimeout(() => alertBox.remove(), 300);
+    }, 3000);
 }
 
 async function importarCSV(event) {

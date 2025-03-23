@@ -18,6 +18,8 @@ class Grafica(Base):
     rotacion_y = Column(Numeric(10, 2))
     rotacion_z = Column(Numeric(10, 2))
     fecha_hora = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    id_sesion_dispositivo_fk = Column(Integer, nullable=True)  # Agregar esta
+    lado_pierna = Column(String, nullable=True)  # Agregar esta
 
     dispositivos = relationship("GraficaDispositivo", back_populates="grafica")
 
