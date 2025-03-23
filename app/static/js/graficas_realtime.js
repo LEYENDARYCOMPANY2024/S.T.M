@@ -67,28 +67,37 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("importInput").addEventListener("change", importarCSV);
 });
 
-function exportarGraficaCSV() {
-    if (!chartData.labels.length) {
-        mostrarMensaje("❌ No hay datos para exportar.", "error");
+async function exportarGraficaCSV() {
+    const ids = JSON.parse(localStorage.getItem("sesion_dispositivo_ids"));
+    if (!ids || ids.length === 0) {
+        mostrarMensaje("⚠️ No hay sesión/dispositivo activo para exportar.", "error");
         return;
     }
 
-    let csvContent = "data:text/csv;charset=utf-8,Hora Exacta,Pierna Derecha,Pierna Izquierda\n";
-    chartData.labels.forEach((label, index) => {
-        let derecha = chartData.derecha[index] || 0;
-        let izquierda = chartData.izquierda[index] || 0;
-        csvContent += `${label},${derecha},${izquierda}\n`;
-    });
+    // Por ahora exportamos solo el primero (podrías hacer selección múltiple si quieres)
+    const id = ids[0];
 
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", "datos_grafica.csv");
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    try {
+        const response = await fetch(`/graficas/exportar_historial/${id}`);
+        if (!response.ok) {
+            throw new Error("No se pudo exportar el historial.");
+        }
 
-    mostrarMensaje("✅ CSV exportado con hora exacta.", "success");
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `historial_grafica_${id}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+
+        mostrarMensaje("✅ CSV exportado correctamente desde historial.");
+
+    } catch (error) {
+        console.error("❌ Error exportando CSV:", error);
+        mostrarMensaje("❌ No se pudo exportar el historial", "error");
+    }
 }
 
 function suscribirseAGraficasRealtime() {
@@ -98,7 +107,7 @@ function suscribirseAGraficasRealtime() {
     supabase
         .channel('graficas_realtime')
         .on('postgres_changes', {
-            event: 'INSERT',
+            event: 'UPDATE',
             schema: 'public',
             table: 'graficas'
         }, payload => {
@@ -124,6 +133,7 @@ function suscribirseAGraficasRealtime() {
         })
         .subscribe();
 }
+
 
 function togglePause() {
     realtimePaused = !realtimePaused;
