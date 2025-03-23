@@ -21,6 +21,7 @@ class Grafica(Base):
     rotacion_z = Column(Float)
 
     fecha_hora = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    lado_pierna_gf = Column(String, nullable=True)
 
     dispositivos = relationship("GraficaDispositivo", back_populates="grafica")
 

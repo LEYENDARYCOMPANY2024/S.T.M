@@ -18,7 +18,6 @@ def guardar_datos_sensor(db: Session, datos: dict):
         if not uuid or not id_sesion_dispositivo or not lado_pierna:
             raise HTTPException(status_code=400, detail="Faltan datos obligatorios")
 
-        # Verificar que la sesión esté activa
         sesion_dispositivo = db.query(SesionDispositivo).filter(
             SesionDispositivo.id_sesion_dispositivo == id_sesion_dispositivo,
             SesionDispositivo.estado_activado == "activado"
@@ -27,13 +26,11 @@ def guardar_datos_sensor(db: Session, datos: dict):
         if not sesion_dispositivo:
             raise HTTPException(status_code=404, detail="Sesión del dispositivo no activa")
 
-        # Buscar si ya existe la relación graficas_dispositivos para esta sesión y pierna
         relacion = db.query(GraficaDispositivo).filter(
             GraficaDispositivo.id_sesion_dispositivo_fk == id_sesion_dispositivo,
             GraficaDispositivo.lado_pierna == lado_pierna
         ).first()
 
-        # Datos “históricos” de sensor en un array
         nueva_entrada = {
             "fecha_hora": datetime.now(timezone.utc).isoformat(),
             "aceleracion_x": datos.get("aceleracion_x", 0.0),
@@ -45,28 +42,25 @@ def guardar_datos_sensor(db: Session, datos: dict):
         }
 
         if relacion:
-            # Ya existe la relación => actualizar la gráfica asociada
             grafica = db.query(Grafica).filter(Grafica.id_grafica == relacion.id_grafica_fk).first()
             if not grafica:
                 raise HTTPException(status_code=404, detail="La gráfica asociada no existe (inconsistencia).")
 
-            # Guardar en datos_extra
             historial = grafica.datos_extra or []
             historial.append(nueva_entrada)
             grafica.datos_extra = historial
 
-            # Actualiza campos “en vivo”
             grafica.aceleracion_x = datos.get("aceleracion_x", 0.0)
             grafica.aceleracion_y = datos.get("aceleracion_y", 0.0)
             grafica.aceleracion_z = datos.get("aceleracion_z", 0.0)
             grafica.rotacion_x = datos.get("rotacion_x", 0.0)
             grafica.rotacion_y = datos.get("rotacion_y", 0.0)
             grafica.rotacion_z = datos.get("rotacion_z", 0.0)
+            grafica.lado_pierna_gf = lado_pierna  # ✅ NUEVO
 
             db.commit()
             return {"mensaje": "Datos actualizados correctamente", "id_grafica": grafica.id_grafica}
 
-        # Si no existe la relación => crear una nueva Grafica y la relación
         nueva_grafica = Grafica(
             nombre_grafica=f"grafica_{id_sesion_dispositivo}_{lado_pierna}",
             datos_extra=[nueva_entrada],
@@ -75,13 +69,13 @@ def guardar_datos_sensor(db: Session, datos: dict):
             aceleracion_z=datos.get("aceleracion_z", 0.0),
             rotacion_x=datos.get("rotacion_x", 0.0),
             rotacion_y=datos.get("rotacion_y", 0.0),
-            rotacion_z=datos.get("rotacion_z", 0.0)
+            rotacion_z=datos.get("rotacion_z", 0.0),
+            lado_pierna_gf=lado_pierna  # ✅ NUEVO
         )
         db.add(nueva_grafica)
         db.commit()
         db.refresh(nueva_grafica)
 
-        # Crear la fila en graficas_dispositivos con la referencia
         nueva_relacion = GraficaDispositivo(
             id_grafica_fk=nueva_grafica.id_grafica,
             id_sesion_dispositivo_fk=id_sesion_dispositivo,
@@ -97,6 +91,7 @@ def guardar_datos_sensor(db: Session, datos: dict):
     except Exception as e:
         db.rollback()
         raise HTTPException(status_code=500, detail=f"Error al guardar/actualizar datos: {str(e)}")
+
 
 
 def exportar_datos_csv(db: Session, id_sesion_dispositivo: int):

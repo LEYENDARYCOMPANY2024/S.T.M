@@ -75,11 +75,6 @@ function limitData() {
 }
 
 function suscribirseAGraficasRealtime() {
-    const ids = JSON.parse(localStorage.getItem("sesion_dispositivo_ids"));
-    if (!ids || ids.length === 0) {
-        console.warn("⚠️ No hay IDs de sesión_dispositivo activos en localStorage");
-        return;
-    }
 
     console.log("🎧 Subscribiéndose a Supabase Realtime para 'graficas'...");
 
@@ -98,16 +93,9 @@ function suscribirseAGraficasRealtime() {
             }
 
             const data = payload.new;
-            const idSesion = data.id_sesion_dispositivo_fk;
-            const lado = data.lado_pierna;
+            const lado = data.lado_pierna_gf;
 
-            if (!idSesion) console.warn("⚠️ No se recibió id_sesion_dispositivo_fk");
             if (!lado) console.warn("⚠️ No se recibió lado_pierna");
-
-            if (!idSesion || !lado || !ids.includes(idSesion)) {
-                console.log(`❌ Datos ignorados. idSesion: ${idSesion}, lado: ${lado}, ids en localStorage:`, ids);
-                return;
-            }
 
             const t = new Date(data.fecha_hora).toLocaleTimeString();
             chartData.labels.push(t);
