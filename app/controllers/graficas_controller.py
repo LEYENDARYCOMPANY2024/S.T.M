@@ -10,128 +10,93 @@ from models.dispositivos_models import SesionDispositivo
 from datetime import datetime, timezone
 
 
-def guardar_datos_sensor(db: Session, datos: dict):
-    try:
-        uuid = datos.get("uuid")
-        id_sesion_dispositivo = datos.get("id_sesion_dispositivo")
-        lado_pierna = datos.get("lado_pierna")
+def guardar_datos_sensor_minimal(db: Session, datos: dict):
+    uuid = datos.get("uuid")
+    id_sesion_dispositivo = datos.get("id_sesion_dispositivo")
+    lado_pierna = datos.get("lado_pierna")
 
-        if not uuid or not id_sesion_dispositivo or not lado_pierna:
-            raise HTTPException(status_code=400, detail="Faltan datos obligatorios")
+    if not uuid or not id_sesion_dispositivo or not lado_pierna:
+        raise HTTPException(status_code=400, detail="Faltan datos obligatorios")
 
-        # Verificar que la sesión esté activa
-        sesion_dispositivo = db.query(SesionDispositivo).filter(
-            SesionDispositivo.id_sesion_dispositivo == id_sesion_dispositivo,
-            SesionDispositivo.estado_activado == "activado"
-        ).first()
+    sesion_dispositivo = db.query(SesionDispositivo).filter(
+        SesionDispositivo.id_sesion_dispositivo == id_sesion_dispositivo,
+        SesionDispositivo.estado_activado == "activado"
+    ).first()
 
-        if not sesion_dispositivo:
-            raise HTTPException(status_code=404, detail="Sesión del dispositivo no activa")
+    if not sesion_dispositivo:
+        raise HTTPException(status_code=404, detail="Sesión del dispositivo no activa")
 
-        # Buscar si ya existe una relación para esta sesión y pierna
-        relacion = db.query(GraficaDispositivo).filter(
-            GraficaDispositivo.id_sesion_dispositivo_fk == id_sesion_dispositivo,
-            GraficaDispositivo.lado_pierna == lado_pierna
-        ).first()
+    relacion = db.query(GraficaDispositivo).filter(
+        GraficaDispositivo.id_sesion_dispositivo_fk == id_sesion_dispositivo,
+        GraficaDispositivo.lado_pierna == lado_pierna
+    ).first()
 
-        nueva_entrada = {
-            "fecha_hora": datetime.now(timezone.utc).isoformat(),
-            "aceleracion_x": datos.get("aceleracion_x", 0.0),
-            "aceleracion_y": datos.get("aceleracion_y", 0.0),
-            "aceleracion_z": datos.get("aceleracion_z", 0.0),
-            "rotacion_x": datos.get("rotacion_x", 0.0),
-            "rotacion_y": datos.get("rotacion_y", 0.0),
-            "rotacion_z": datos.get("rotacion_z", 0.0)
-        }
+    nueva_entrada = {
+        "fecha_hora": datetime.now(timezone.utc).isoformat(),
+        "aceleracion_x": datos.get("aceleracion_x", 0.0),
+        "aceleracion_y": datos.get("aceleracion_y", 0.0)
+    }
 
-        if relacion:
-            grafica = db.query(Grafica).filter(Grafica.id_grafica == relacion.id_grafica_fk).first()
-            if not grafica:
-                raise HTTPException(status_code=404, detail="La gráfica asociada no existe.")
+    if relacion:
+        grafica = db.query(Grafica).filter(Grafica.id_grafica == relacion.id_grafica_fk).first()
+        if not grafica:
+            raise HTTPException(status_code=404, detail="Gráfica no encontrada.")
 
-            historial = grafica.datos_extra or []
-            historial.append(nueva_entrada)
-            grafica.datos_extra = historial
+        historial = grafica.datos_extra or []
+        historial.append(nueva_entrada)
+        grafica.datos_extra = historial
+        grafica.aceleracion_x = nueva_entrada["aceleracion_x"]
+        grafica.aceleracion_y = nueva_entrada["aceleracion_y"]
+        grafica.lado_pierna_gf = lado_pierna
 
-            grafica.aceleracion_x = datos.get("aceleracion_x", 0.0)
-            grafica.aceleracion_y = datos.get("aceleracion_y", 0.0)
-            grafica.aceleracion_z = datos.get("aceleracion_z", 0.0)
-            grafica.rotacion_x = datos.get("rotacion_x", 0.0)
-            grafica.rotacion_y = datos.get("rotacion_y", 0.0)
-            grafica.rotacion_z = datos.get("rotacion_z", 0.0)
-            grafica.lado_pierna_gf = lado_pierna
-
-            db.commit()
-            return {"mensaje": "Datos actualizados correctamente", "id_grafica": grafica.id_grafica}
-
-        # Si no existe, crear gráfica nueva
-        total_graficas = db.query(Grafica).count()
-        nombre_grafica = f"grafica_{total_graficas + 1}"
-
-        nueva_grafica = Grafica(
-            nombre_grafica=nombre_grafica,
-            datos_extra=[nueva_entrada],
-            aceleracion_x=datos.get("aceleracion_x", 0.0),
-            aceleracion_y=datos.get("aceleracion_y", 0.0),
-            aceleracion_z=datos.get("aceleracion_z", 0.0),
-            rotacion_x=datos.get("rotacion_x", 0.0),
-            rotacion_y=datos.get("rotacion_y", 0.0),
-            rotacion_z=datos.get("rotacion_z", 0.0),
-            lado_pierna_gf=lado_pierna
-        )
-        db.add(nueva_grafica)
         db.commit()
-        db.refresh(nueva_grafica)
+        return {"mensaje": "Datos actualizados correctamente", "id_grafica": grafica.id_grafica}
 
-        nueva_relacion = GraficaDispositivo(
-            id_grafica_fk=nueva_grafica.id_grafica,
-            id_sesion_dispositivo_fk=id_sesion_dispositivo,
-            lado_pierna=lado_pierna
-        )
-        db.add(nueva_relacion)
-        db.commit()
-
-        return {
-            "mensaje": f"Gráfica {nombre_grafica} creada y datos insertados",
-            "id_grafica": nueva_grafica.id_grafica
-        }
-
-    except HTTPException:
-        raise
-    except Exception as e:
-        db.rollback()
-        raise HTTPException(status_code=500, detail=f"Error al guardar/actualizar datos: {str(e)}")
-
-
-
-def exportar_datos_csv(db: Session, id_sesion_dispositivo: int):
-    registros = (
-        db.query(Grafica)
-        .join(GraficaDispositivo, Grafica.id_grafica == GraficaDispositivo.id_grafica_fk)
-        .filter(GraficaDispositivo.id_sesion_dispositivo_fk == id_sesion_dispositivo)
-        .all()
+    # Nueva gráfica
+    total = db.query(Grafica).count()
+    nueva_grafica = Grafica(
+        nombre_grafica=f"grafica_{total+1}",
+        datos_extra=[nueva_entrada],
+        aceleracion_x=nueva_entrada["aceleracion_x"],
+        aceleracion_y=nueva_entrada["aceleracion_y"],
+        lado_pierna_gf=lado_pierna
     )
+    db.add(nueva_grafica)
+    db.commit()
+    db.refresh(nueva_grafica)
+
+    nueva_relacion = GraficaDispositivo(
+        id_grafica_fk=nueva_grafica.id_grafica,
+        id_sesion_dispositivo_fk=id_sesion_dispositivo,
+        lado_pierna=lado_pierna
+    )
+    db.add(nueva_relacion)
+    db.commit()
+
+    return {"mensaje": "Gráfica creada y datos insertados", "id_grafica": nueva_grafica.id_grafica}
+
+
+
+
+def exportar_grafica_solo_xy(db: Session, id_grafica: int):
+    grafica = db.query(Grafica).filter(Grafica.id_grafica == id_grafica).first()
+    if not grafica or not grafica.datos_extra:
+        raise HTTPException(status_code=404, detail="No hay datos para exportar")
 
     output = StringIO()
     writer = csv.writer(output)
-    writer.writerow(["fecha_hora", "acel_x", "acel_y", "acel_z", "rot_x", "rot_y", "rot_z"])
+    writer.writerow(["fecha_hora", "aceleracion_x", "aceleracion_y"])
 
-    for grafica in registros:
-        historial = grafica.datos_extra or []
-        for entrada in historial:
-            writer.writerow([
-                entrada.get("fecha_hora", ""),
-                entrada.get("aceleracion_x", 0.0),
-                entrada.get("aceleracion_y", 0.0),
-                entrada.get("aceleracion_z", 0.0),
-                entrada.get("rotacion_x", 0.0),
-                entrada.get("rotacion_y", 0.0),
-                entrada.get("rotacion_z", 0.0)
-            ])
+    for item in grafica.datos_extra:
+        writer.writerow([
+            item.get("fecha_hora", ""),
+            item.get("aceleracion_x", 0.0),
+            item.get("aceleracion_y", 0.0)
+        ])
 
     output.seek(0)
     return StreamingResponse(output, media_type="text/csv", headers={
-        "Content-Disposition": "attachment; filename=datos_grafica.csv"
+        "Content-Disposition": f"attachment; filename=grafica_{id_grafica}.csv"
     })
 
 
