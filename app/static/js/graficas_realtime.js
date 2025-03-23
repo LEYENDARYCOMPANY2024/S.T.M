@@ -100,41 +100,56 @@ const supabase = window.supabase.createClient(
   
   function suscribirseAGraficasRealtime() {
     console.log("🎧 Subscribiéndose a Supabase Realtime...");
-  
+
     supabase
-      .channel('graficas_realtime')
-      .on('postgres_changes', {
-        event: 'UPDATE',
-        schema: 'public',
-        table: 'graficas'
-      }, payload => {
-        if (realtimePaused) return;
-  
-        const data = payload.new;
-        const lado = data.lado_pierna_gf;
-  
-        if (!lado || !chartData.datasets[lado]) {
-          console.warn("⚠️ Lado inválido o desconocido:", lado);
-          return;
-        }
-  
-        const t = new Date(data.fecha_hora).toLocaleTimeString();
-        chartData.labels.push(t);
-  
-        chartData.datasets[lado].ay.push(data.aceleracion_y ?? 0);
-  
-        limitData();
-        chart.update();
-        console.log(`✅ Gráfica actualizada (${lado})`);
-      })
-      .subscribe(status => {
-        if (status === "SUBSCRIBED") {
-          console.log("✅ Canal conectado a Supabase Realtime");
-        } else {
-          console.warn("⚠️ Estado de conexión:", status);
-        }
-      });
-  }
+        .channel('graficas_realtime')
+        .on('postgres_changes', {
+            event: 'UPDATE',
+            schema: 'public',
+            table: 'graficas'
+        }, payload => {
+            if (realtimePaused) return;
+
+            const data = payload.new;
+            const lado = data.lado_pierna_gf;
+
+            if (!lado || !chartData.datasets[lado]) {
+                console.warn("⚠️ Lado inválido o desconocido:", lado);
+                return;
+            }
+
+            const idGrafica = data.id_grafica;
+            if (idGrafica) {
+                let ids = JSON.parse(localStorage.getItem("graficas_ids") || "[]");
+                if (!ids.includes(idGrafica)) {
+                    ids.push(idGrafica);
+                    localStorage.setItem("graficas_ids", JSON.stringify(ids));
+                    console.log(`📌 id_grafica ${idGrafica} guardado`);
+                }
+            }
+
+
+            // ⏱️ Timestamp como etiqueta
+            const t = new Date(data.fecha_hora).toLocaleTimeString();
+            chartData.labels.push(t);
+
+            // 🟦 Agregar datos
+            chartData.datasets[lado].ay.push(data.aceleracion_y ?? 0);
+            chartData.datasets[lado].ax?.push(data.aceleracion_x ?? 0); // si estás usando X también
+
+            limitData();
+            chart.update();
+            console.log(`✅ Gráfica actualizada (${lado})`);
+        })
+        .subscribe(status => {
+            if (status === "SUBSCRIBED") {
+                console.log("✅ Canal conectado a Supabase Realtime");
+            } else {
+                console.warn("⚠️ Estado de conexión:", status);
+            }
+        });
+}
+
   
   function reiniciarGrafica() {
     chartData.labels = [];
@@ -162,6 +177,40 @@ const supabase = window.supabase.createClient(
       setTimeout(() => alertBox.remove(), 300);
     }, 3000);
   }
+
+  async function exportarGraficaCSV() {
+    const ids = JSON.parse(localStorage.getItem("graficas_ids") || "[]");
+    if (!ids || ids.length === 0) {
+        mostrarMensaje("⚠️ No hay gráficas para exportar", "error");
+        return;
+    }
+
+    for (const id of ids) {
+        try {
+            const response = await fetch(`/graficas/exportar_por_id/${id}`);
+            if (!response.ok) {
+                const err = await response.json();
+                console.error("❌ Error exportando gráfica:", err);
+                mostrarMensaje(`❌ Error al exportar gráfica ${id}`, "error");
+                continue;
+            }
+
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `grafica_${id}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            mostrarMensaje(`✅ Gráfica ${id} exportada`, "success");
+        } catch (err) {
+            console.error("❌ Error:", err);
+            mostrarMensaje("❌ Falló la exportación", "error");
+        }
+    }
+}
+
   
   async function importarCSV(event) {
     const file = event.target.files[0];
