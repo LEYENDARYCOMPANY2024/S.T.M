@@ -9,15 +9,12 @@ from models.dispositivos_models import SesionDispositivo
 
 def guardar_datos_sensor(db: Session, datos: dict):
     try:
-        # ✅ Validar campos esenciales
         uuid = datos.get("uuid")
         id_sesion_dispositivo = datos.get("id_sesion_dispositivo")
-        lado_pierna = datos.get("lado_pierna")
 
-        if not uuid or not id_sesion_dispositivo or not lado_pierna:
+        if not uuid or not id_sesion_dispositivo:
             raise HTTPException(status_code=400, detail="Faltan datos obligatorios")
 
-        # Validar que exista la sesión_dispositivo
         sesion_dispositivo = db.query(SesionDispositivo).filter(
             SesionDispositivo.id_sesion_dispositivo == id_sesion_dispositivo,
             SesionDispositivo.estado_activado == "activado"
@@ -26,15 +23,13 @@ def guardar_datos_sensor(db: Session, datos: dict):
         if not sesion_dispositivo:
             raise HTTPException(status_code=404, detail="Sesión del dispositivo no encontrada o no activa")
 
-        # Validar que exista la relación en graficas_dispositivo
         grafica_dispositivo = db.query(GraficaDispositivo).filter(
             GraficaDispositivo.id_sesion_dispositivo_fk == id_sesion_dispositivo
         ).first()
 
-        if not grafica_dispositivo or grafica_dispositivo.lado_pierna != lado_pierna:
-            raise HTTPException(status_code=403, detail="El dispositivo no tiene lado asignado o no coincide")
+        if not grafica_dispositivo:
+            raise HTTPException(status_code=403, detail="El dispositivo no tiene lado asignado aún")
 
-        # ✅ Guardar los datos en la tabla gráfica
         grafica = Grafica(
             nombre_grafica=datos.get("nombre_grafica", "grafica_desconocida"),
             datos_extra=datos.get("datos_extra", {}),
@@ -52,7 +47,7 @@ def guardar_datos_sensor(db: Session, datos: dict):
         nueva_relacion = GraficaDispositivo(
             id_grafica_fk=grafica.id_grafica,
             id_sesion_dispositivo_fk=id_sesion_dispositivo,
-            lado_pierna=lado_pierna
+            lado_pierna=grafica_dispositivo.lado_pierna
         )
         db.add(nueva_relacion)
         db.commit()
@@ -60,10 +55,11 @@ def guardar_datos_sensor(db: Session, datos: dict):
         return {"mensaje": "Dato guardado correctamente", "id_grafica": grafica.id_grafica}
 
     except HTTPException:
-        raise  # Reenviar errores HTTP personalizados
+        raise
     except Exception as e:
         db.rollback()
         raise HTTPException(status_code=500, detail=f"Error al guardar datos: {str(e)}")
+
 
 
 def exportar_datos_csv(db: Session, id_sesion_dispositivo: int):

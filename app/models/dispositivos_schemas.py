@@ -29,3 +29,13 @@ class LadoPiernaEnum(Enum):
     
 class LadoRequest(BaseModel):
     lado: str
+
+class DatosSensor(BaseModel):
+    uuid: str
+    id_sesion_dispositivo: int
+    aceleracion_x: float
+    aceleracion_y: float
+    aceleracion_z: float
+    rotacion_x: float
+    rotacion_y: float
+    rotacion_z: float
