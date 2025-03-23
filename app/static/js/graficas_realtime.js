@@ -1,183 +1,191 @@
 const supabase = window.supabase.createClient(
     'https://hxjmzijhcmhfcrjcptge.supabase.co',
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh4am16aWpoY21oZmNyamNwdGdlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDAwODMxODgsImV4cCI6MjA1NTY1OTE4OH0.fZ1QaYkFTfJTdupOUkV7V9a7kIIVHCt_XusnNWxkyqw'
-);
-// Estructura con múltiples datasets (uno por tipo de dato por pierna)
-let chartData = {
+  );
+  
+  let chartData = {
     labels: [],
     datasets: {
-        izquierda: {
-            ax: [], ay: [], az: [], rx: [], ry: [], rz: []
-        },
-        derecha: {
-            ax: [], ay: [], az: [], rx: [], ry: [], rz: []
-        }
+      izquierda: { ay: [] },
+      derecha: { ay: [] }
     }
-};
-
-let chart = null;
-let realtimePaused = false;
-const MAX_DATA_POINTS = 30;
-
-document.addEventListener("DOMContentLoaded", () => {
+  };
+  
+  let chart = null;
+  let realtimePaused = false;
+  const MAX_DATA_POINTS = 30;
+  
+  document.addEventListener("DOMContentLoaded", () => {
     const ctx = document.getElementById("grafica_realtime").getContext("2d");
-
+  
     chart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: chartData.labels,
-            datasets: [
-                // Izquierda
-                { label: "Izq - Acel X", borderColor: "navy", data: chartData.datasets.izquierda.ax, fill: false },
-                { label: "Izq - Acel Y", borderColor: "blue", data: chartData.datasets.izquierda.ay, fill: false },
-                { label: "Izq - Acel Z", borderColor: "lightblue", data: chartData.datasets.izquierda.az, fill: false },
-                { label: "Izq - Rot X", borderColor: "purple", data: chartData.datasets.izquierda.rx, fill: false },
-                { label: "Izq - Rot Y", borderColor: "violet", data: chartData.datasets.izquierda.ry, fill: false },
-                { label: "Izq - Rot Z", borderColor: "magenta", data: chartData.datasets.izquierda.rz, fill: false },
-
-                // Derecha
-                { label: "Der - Acel X", borderColor: "darkred", data: chartData.datasets.derecha.ax, fill: false },
-                { label: "Der - Acel Y", borderColor: "red", data: chartData.datasets.derecha.ay, fill: false },
-                { label: "Der - Acel Z", borderColor: "salmon", data: chartData.datasets.derecha.az, fill: false },
-                { label: "Der - Rot X", borderColor: "orange", data: chartData.datasets.derecha.rx, fill: false },
-                { label: "Der - Rot Y", borderColor: "gold", data: chartData.datasets.derecha.ry, fill: false },
-                { label: "Der - Rot Z", borderColor: "yellow", data: chartData.datasets.derecha.rz, fill: false }
-            ]
+      type: 'line',
+      data: {
+        labels: chartData.labels,
+        datasets: [
+          {
+            label: "Pierna Izquierda",
+            borderColor: "green",
+            data: chartData.datasets.izquierda.ay,
+            fill: false
+          },
+          {
+            label: "Pierna Derecha",
+            borderColor: "red",
+            data: chartData.datasets.derecha.ay,
+            fill: false
+          }
+        ]
+      },
+      options: {
+        animation: false,
+        responsive: true,
+        scales: {
+          y: {
+            beginAtZero: true,
+            title: {
+              display: true,
+              text: 'Aceleración Y'
+            }
+          },
+          x: {
+            display: true,
+            title: {
+              display: true,
+              text: 'Hora'
+            }
+          }
         },
-        options: {
-            animation: false,
-            responsive: true,
-            scales: {
-                y: { beginAtZero: true },
-                x: { display: true }
-            },
-            plugins: {
-                legend: {
-                    labels: {
-                        color: 'white'
-                    }
-                }
+        plugins: {
+          legend: {
+            labels: {
+              color: 'white',
+              font: { size: 14, weight: 'bold' }
             }
+          }
         }
+      }
     });
-
+  
+    renderLeyendaPiernas();
     document.getElementById("importInput").addEventListener("change", importarCSV);
-});
-
-
-function limitData() {
+  });
+  
+  function renderLeyendaPiernas() {
+    const contenedor = document.createElement("div");
+    contenedor.classList.add("leyenda-piernas");
+  
+    contenedor.innerHTML = `
+      <div class="item-leyenda">
+        <span class="cuadro-color" style="background-color: green;"></span>
+        Pierna Izquierda
+      </div>
+      <div class="item-leyenda">
+        <span class="cuadro-color" style="background-color: red;"></span>
+        Pierna Derecha
+      </div>
+    `;
+  
+    document.querySelector(".charts").prepend(contenedor);
+  }
+  
+  function limitData() {
     if (chartData.labels.length > MAX_DATA_POINTS) {
-        chartData.labels.shift();
-        Object.values(chartData.datasets).forEach(dataset => {
-            Object.keys(dataset).forEach(key => dataset[key].shift());
-        });
+      chartData.labels.shift();
+      Object.values(chartData.datasets).forEach(dataset => {
+        dataset.ay.shift();
+      });
     }
-}
-
-function suscribirseAGraficasRealtime() {
-
-    console.log("🎧 Subscribiéndose a Supabase Realtime para 'graficas'...");
-
+  }
+  
+  function suscribirseAGraficasRealtime() {
+    console.log("🎧 Subscribiéndose a Supabase Realtime...");
+  
     supabase
-        .channel('graficas_realtime')
-        .on('postgres_changes', {
-            event: 'UPDATE',
-            schema: 'public',
-            table: 'graficas'
-        }, payload => {
-            console.log("📥 Datos recibidos desde Supabase:", payload);
-
-            if (realtimePaused) {
-                console.log("⏸️ Ignorado porque está pausado");
-                return;
-            }
-
-            const data = payload.new;
-            const lado = data.lado_pierna_gf;
-
-            if (!lado) console.warn("⚠️ No se recibió lado_pierna");
-
-            const t = new Date(data.fecha_hora).toLocaleTimeString();
-            chartData.labels.push(t);
-
-            const grupo = chartData.datasets[lado];
-            if (!grupo) {
-                console.error("❌ Lado inválido:", lado);
-                return;
-            }
-
-            grupo.ax.push(data.aceleracion_x ?? 0);
-            grupo.ay.push(data.aceleracion_y ?? 0);
-            grupo.az.push(data.aceleracion_z ?? 0);
-            grupo.rx.push(data.rotacion_x ?? 0);
-            grupo.ry.push(data.rotacion_y ?? 0);
-            grupo.rz.push(data.rotacion_z ?? 0);
-
-            limitData();
-            chart.update();
-            console.log(`✅ Gráfica actualizada para ${lado} | Sesión ${idSesion}`);
-        })
-        .subscribe(status => {
-            if (status === "SUBSCRIBED") {
-                console.log("✅ Suscripción activa a Supabase Realtime");
-            } else {
-                console.warn("⚠️ Estado de suscripción:", status);
-            }
-        });
-}
-
-
-function reiniciarGrafica() {
+      .channel('graficas_realtime')
+      .on('postgres_changes', {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'graficas'
+      }, payload => {
+        if (realtimePaused) return;
+  
+        const data = payload.new;
+        const lado = data.lado_pierna_gf;
+  
+        if (!lado || !chartData.datasets[lado]) {
+          console.warn("⚠️ Lado inválido o desconocido:", lado);
+          return;
+        }
+  
+        const t = new Date(data.fecha_hora).toLocaleTimeString();
+        chartData.labels.push(t);
+  
+        chartData.datasets[lado].ay.push(data.aceleracion_y ?? 0);
+  
+        limitData();
+        chart.update();
+        console.log(`✅ Gráfica actualizada (${lado})`);
+      })
+      .subscribe(status => {
+        if (status === "SUBSCRIBED") {
+          console.log("✅ Canal conectado a Supabase Realtime");
+        } else {
+          console.warn("⚠️ Estado de conexión:", status);
+        }
+      });
+  }
+  
+  function reiniciarGrafica() {
     chartData.labels = [];
     Object.values(chartData.datasets).forEach(dataset => {
-        Object.keys(dataset).forEach(key => dataset[key] = []);
+      dataset.ay = [];
     });
     chart.update();
     mostrarMensaje("🔄 Gráfica reiniciada");
-}
-
-function togglePause() {
+  }
+  
+  function togglePause() {
     realtimePaused = !realtimePaused;
     document.getElementById("pauseButton").textContent = realtimePaused ? "Reanudar" : "Pausar";
     mostrarMensaje(realtimePaused ? "⏸️ Pausado" : "▶️ Reanudado");
-}
-
-function mostrarMensaje(mensaje, tipo = "success") {
+  }
+  
+  function mostrarMensaje(mensaje, tipo = "success") {
     const alertBox = document.createElement("div");
     alertBox.classList.add("alert", tipo === "success" ? "success" : "error");
     alertBox.innerHTML = `<span class="alert-icon">${tipo === "success" ? "✅" : "❌"}</span> ${mensaje}`;
     document.body.appendChild(alertBox);
     setTimeout(() => alertBox.classList.add("show"), 100);
     setTimeout(() => {
-        alertBox.classList.remove("show");
-        setTimeout(() => alertBox.remove(), 300);
+      alertBox.classList.remove("show");
+      setTimeout(() => alertBox.remove(), 300);
     }, 3000);
-}
-
-async function importarCSV(event) {
+  }
+  
+  async function importarCSV(event) {
     const file = event.target.files[0];
     if (!file) return;
-
+  
     const formData = new FormData();
     formData.append("file", file);
-
+  
     const etiqueta = prompt("Etiqueta para los datos importados:", "importacion_manual");
     if (etiqueta) formData.append("etiqueta", etiqueta);
-
+  
     try {
-        const response = await fetch("/graficas/importar", {
-            method: "POST",
-            body: formData
-        });
-
-        const result = await response.json();
-        mostrarMensaje(result.mensaje, "success");
-
+      const response = await fetch("/graficas/importar", {
+        method: "POST",
+        body: formData
+      });
+      const result = await response.json();
+      mostrarMensaje(result.mensaje, "success");
     } catch (error) {
-        mostrarMensaje("Error al importar CSV", "error");
-        console.error("Error al importar CSV:", error);
+      mostrarMensaje("Error al importar CSV", "error");
+      console.error("Error al importar CSV:", error);
     }
-}
+  }
+  
 
 async function enviarDatosAlESP(uuid, id_paciente, id_sesion_dispositivo, lado_pierna) {
     // Verifica en la consola que no sean undefined ni null

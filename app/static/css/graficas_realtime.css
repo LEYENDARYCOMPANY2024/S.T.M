@@ -76,3 +76,27 @@
     flex-wrap: wrap; /* Si hay muchos botones, se acomodan en otra línea */
     margin-top: 10px;
 }
+
+
+.leyenda-piernas {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-bottom: 1rem;
+  }
+  
+  .item-leyenda {
+    color: white;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .cuadro-color {
+    width: 20px;
+    height: 20px;
+    display: inline-block;
+    border-radius: 4px;
+  }
+  
