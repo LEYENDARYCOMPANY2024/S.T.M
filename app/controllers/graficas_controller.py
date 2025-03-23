@@ -48,6 +48,8 @@ def guardar_datos_sensor_minimal(db: Session, datos: dict):
         grafica.aceleracion_x = nueva_entrada["aceleracion_x"]
         grafica.aceleracion_y = nueva_entrada["aceleracion_y"]
         grafica.lado_pierna_gf = lado_pierna
+        grafica.fecha_hora = datetime.now(timezone.utc)  # 🔥 Forzar cambio para Supabase Realtime
+
 
         db.commit()
         return {"mensaje": "Datos actualizados correctamente", "id_grafica": grafica.id_grafica}
