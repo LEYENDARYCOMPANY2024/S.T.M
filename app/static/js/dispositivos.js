@@ -59,24 +59,25 @@ document.addEventListener("DOMContentLoaded", async function () {
         }
     }
 
-    async function enviarIdPacienteAlESP(uuid, id_paciente) {
+    async function enviarDatosAlESP(uuid, id_paciente, id_sesion_dispositivo) {
         try {
             const response = await fetch("/esp/configurar_paciente", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ uuid, id_paciente })
+                body: JSON.stringify({ uuid, id_paciente, id_sesion_dispositivo })
             });
-
+    
             const data = await response.json();
             if (response.ok) {
-                console.log("📡 ID del paciente enviado al ESP:", data);
+                console.log("📡 Datos enviados al ESP:", data);
             } else {
-                console.error("❌ Error al enviar ID del paciente al ESP:", data);
+                console.error("❌ Error al enviar datos al ESP:", data);
             }
         } catch (error) {
-            console.error("❌ Error de red al enviar ID del paciente:", error);
+            console.error("❌ Error de red al enviar datos al ESP:", error);
         }
     }
+    
 
     function addDeviceRow(device) {
         const row = document.createElement("tr");
@@ -119,19 +120,20 @@ document.addEventListener("DOMContentLoaded", async function () {
                 const uuid = result.uuid || uuidAttr;
 
                 if (result.estado === "activado") {
+                    // Guardar sesión_dispositivo_id
                     let ids = JSON.parse(localStorage.getItem("sesion_dispositivo_ids")) || [];
                     if (!ids.includes(result.sesion_dispositivo_id)) {
                         ids.push(result.sesion_dispositivo_id);
                         localStorage.setItem("sesion_dispositivo_ids", JSON.stringify(ids));
                     }
-
-                    // ✅ Enviar ID del paciente al ESP (si hay uuid)
+                
                     if (uuid) {
-                        await enviarIdPacienteAlESP(uuid, parseInt(pacienteId));
+                        await enviarDatosAlESP(uuid, parseInt(pacienteId), result.sesion_dispositivo_id);  // 👈 Nuevo parámetro
                     } else {
                         console.warn("⚠️ UUID no disponible para enviar al ESP");
                     }
-                } else {
+                }
+                 else {
                     let ids = JSON.parse(localStorage.getItem("sesion_dispositivo_ids")) || [];
                     ids = ids.filter(id => id !== result.sesion_dispositivo_id);
                     localStorage.setItem("sesion_dispositivo_ids", JSON.stringify(ids));
