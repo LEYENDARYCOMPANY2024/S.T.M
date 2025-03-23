@@ -14,7 +14,7 @@ router = APIRouter()
 
 @router.post("/graficas/datos")
 def recibir_dato_sensor(datos: DatosSensor, db: Session = Depends(get_db)):
-    return guardar_datos_sensor(db, datos.dict())
+    return guardar_datos_sensor(db, datos.model_dump())
 
 @router.get("/graficas/exportar/{id_sesion_dispositivo}")
 def exportar_csv(id_sesion_dispositivo: int, db: Session = Depends(get_db)):

@@ -174,6 +174,31 @@ async function importarCSV(event) {
     }
 }
 
+async function enviarDatosAlESP(uuid, id_paciente, id_sesion_dispositivo, lado_pierna) {
+    try {
+        const response = await fetch("/esp/configurar_paciente", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                uuid,
+                id_paciente,
+                id_sesion_dispositivo,
+                lado_pierna
+            })
+        });
+
+        const data = await response.json();
+        if (response.ok) {
+            console.log("📡 Config enviado al ESP:", data);
+        } else {
+            console.error("❌ Error al enviar config al ESP:", data);
+        }
+    } catch (error) {
+        console.error("❌ Error de red al enviar config al ESP:", error);
+    }
+}
+
+
 async function cargarDispositivosActivos() {
     const response = await fetch("/dispositivos/activos");
     const dispositivos = await response.json();
