@@ -113,6 +113,7 @@ const supabase = window.supabase.createClient(
             schema: 'public',
             table: 'graficas'
         }, payload => {
+            console.log("📦 Payload recibido desde Supabase:", payload);  // 🧪 NUEVO LOG
             if (realtimePaused) return;
 
             const data = payload.new;
