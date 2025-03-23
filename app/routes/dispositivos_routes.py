@@ -174,18 +174,21 @@ def configurar_paciente(payload: dict = Body(...)):
     uuid = payload.get("uuid")
     id_paciente = payload.get("id_paciente")
     id_sesion_dispositivo = payload.get("id_sesion_dispositivo")
+    lado_pierna = payload.get("lado_pierna")  # <- opcional
 
     if not uuid or not id_paciente or not id_sesion_dispositivo:
-        raise HTTPException(status_code=400, detail="Faltan datos uuid, id_paciente o id_sesion_dispositivo")
+        raise HTTPException(status_code=400, detail="Faltan datos")
 
-    print(f"✅ Recibido del frontend:\n  uuid = {uuid}\n  id_paciente = {id_paciente}\n  id_sesion_dispositivo = {id_sesion_dispositivo}")
-
+    print(f"✅ Configuración recibida: uuid={uuid}, id_paciente={id_paciente}, id_sesion_dispositivo={id_sesion_dispositivo}, lado_pierna={lado_pierna}")
+    
     return {
-        "mensaje": "Datos de paciente y sesión recibidos correctamente",
+        "mensaje": "Configuración enviada correctamente",
         "uuid": uuid,
         "id_paciente": id_paciente,
-        "id_sesion_dispositivo": id_sesion_dispositivo
+        "id_sesion_dispositivo": id_sesion_dispositivo,
+        "lado_pierna": lado_pierna
     }
+
 
 
 
@@ -208,10 +211,16 @@ def obtener_id_paciente_por_uuid(uuid: str, db: Session = Depends(get_db)):
     ).first()
 
     if not sd:
-        raise HTTPException(status_code=404, detail="No hay sesión activa para este dispositivo")
+        raise HTTPException(status_code=404, detail="No hay sesión activa")
+
+    grafica_dispositivo = db.query(GraficaDispositivo).filter(
+        GraficaDispositivo.id_sesion_dispositivo_fk == sd.id_sesion_dispositivo
+    ).first()
 
     return {
         "id_paciente": pd.id_paciente_pd_fk,
-        "id_sesion_dispositivo": sd.id_sesion_dispositivo
+        "id_sesion_dispositivo": sd.id_sesion_dispositivo,
+        "lado_pierna": grafica_dispositivo.lado_pierna if grafica_dispositivo else None
     }
+
 
