@@ -179,3 +179,19 @@ def configurar_paciente(payload: dict = Body(...)):
 
     print(f"✅ Recibido del frontend: uuid={uuid}, id_paciente={id_paciente}")
     return {"mensaje": "ID de paciente recibido correctamente", "uuid": uuid, "id_paciente": id_paciente}
+
+
+@router.get("/esp/id_paciente_por_uuid/{uuid}")
+def obtener_id_paciente_por_uuid(uuid: str, db: Session = Depends(get_db)):
+    dispositivo = db.query(DispositivoIOT).filter(DispositivoIOT.uuid == uuid).first()
+    if not dispositivo:
+        raise HTTPException(status_code=404, detail="Dispositivo no registrado")
+
+    pd = db.query(PacienteDispositivo).filter(
+        PacienteDispositivo.id_dispositivo_pd_fk == dispositivo.id_dispositivo
+    ).first()
+
+    if not pd:
+        raise HTTPException(status_code=404, detail="Dispositivo no vinculado a un paciente")
+
+    return {"id_paciente": pd.id_paciente_pd_fk}
