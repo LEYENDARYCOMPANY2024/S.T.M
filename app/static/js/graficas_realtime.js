@@ -136,14 +136,25 @@ const supabase = window.supabase.createClient(
 
             // ⏱️ Timestamp como etiqueta
             const t = new Date(data.fecha_hora).toLocaleTimeString();
-            chartData.labels.push(t);
 
-            // 🟦 Agregar datos
-            chartData.datasets[lado].ay.push(data.aceleracion_y ?? 0);
-            chartData.datasets[lado].ax?.push(data.aceleracion_x ?? 0); // si estás usando X también
+            chart.data.labels.push(t);
 
-            limitData();
-            chart.update();
+            // Encuentra el dataset correcto
+            const datasetLabel = lado === "izquierda" ? "Pierna Izquierda" : "Pierna Derecha";
+            const dataset = chart.data.datasets.find(ds => ds.label === datasetLabel);
+            if (dataset) {
+              dataset.data.push(data.aceleracion_y ?? 0);
+            }
+
+            // Limita puntos para mantener rendimiento
+            if (chart.data.labels.length > MAX_DATA_POINTS) {
+              chart.data.labels.shift();
+              chart.data.datasets.forEach(ds => ds.data.shift());
+            }
+
+            // 🚀 Actualización más ligera
+            chart.update('none');
+
             console.log(`✅ Gráfica actualizada (${lado})`);
         })
         .subscribe(status => {
