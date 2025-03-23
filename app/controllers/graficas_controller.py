@@ -9,6 +9,7 @@ from fastapi.responses import StreamingResponse
 from models.dispositivos_models import SesionDispositivo
 from datetime import datetime, timezone
 
+
 def guardar_datos_sensor(db: Session, datos: dict):
     try:
         uuid = datos.get("uuid")
@@ -63,7 +64,7 @@ def guardar_datos_sensor(db: Session, datos: dict):
             db.commit()
             return {"mensaje": "Datos actualizados correctamente", "id_grafica": grafica.id_grafica}
 
-        # Crear nombre automático como "grafica_1", "grafica_2", etc.
+        # Si no existe, crear gráfica nueva
         total_graficas = db.query(Grafica).count()
         nombre_grafica = f"grafica_{total_graficas + 1}"
 

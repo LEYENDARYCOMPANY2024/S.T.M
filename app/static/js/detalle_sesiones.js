@@ -98,29 +98,61 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         // 📌 Evento para salir del detalle de sesión y volver a la lista de sesiones
         const salirDetalleBtn = document.getElementById("salir-detalle");
+
         if (salirDetalleBtn) {
-            salirDetalleBtn.addEventListener("click", async () => {
-                const sesionId = localStorage.getItem("id_sesion");
+            salirDetalleBtn.addEventListener("click", () => {
+                // Crear overlay oscuro
+                const overlay = document.createElement("div");
+                overlay.className = "modal-overlay";
 
-                if (sesionId) {
-                    try {
-                        await fetch(`/dispositivos/desactivar/${sesionId}`, {
-                            method: "PUT"
-                        });
-                        console.log("🔌 Dispositivos desactivados al salir de la sesión.");
-                    } catch (error) {
-                        console.error("❌ Error al desactivar dispositivos:", error);
+                // Crear modal
+                const modal = document.createElement("div");
+                modal.className = "modal-confirm";
+
+                modal.innerHTML = `
+                    <h2>¿Salir de la sesión?</h2>
+                    <p>⚠️ Si sales ahora, podrías perder los datos en tiempo real.<br>
+                    💾 Se recomienda exportar tu gráfica antes de salir.</p>
+                    <div class="modal-buttons">
+                        <button class="btn-secondary" id="cancelarSalir">Cancelar</button>
+                        <button class="btn-danger" id="confirmarSalir">Salir</button>
+                    </div>
+                `;
+
+                overlay.appendChild(modal);
+                document.body.appendChild(overlay);
+
+                // Eventos botones
+                document.getElementById("cancelarSalir").onclick = () => {
+                    overlay.remove();
+                };
+
+                document.getElementById("confirmarSalir").onclick = async () => {
+                    const sesionId = localStorage.getItem("id_sesion");
+
+                    if (sesionId) {
+                        try {
+                            await fetch(`/dispositivos/desactivar/${sesionId}`, {
+                                method: "PUT"
+                            });
+                            console.log("🔌 Dispositivos desactivados al salir de la sesión.");
+                        } catch (error) {
+                            console.error("❌ Error al desactivar dispositivos:", error);
+                        }
                     }
-                }
 
-                // Limpiar localStorage
-                localStorage.removeItem("id_sesion");
-                localStorage.removeItem("nombre_sesion");
-                localStorage.removeItem("sesion_dispositivo_ids");
+                    localStorage.removeItem("id_sesion");
+                    localStorage.removeItem("nombre_sesion");
+                    localStorage.removeItem("sesion_dispositivo_ids");
+                    localStorage.removeItem("graficas_ids");
 
-                window.location.href = "/sesiones";
+                    window.location.href = "/sesiones";
+                };
             });
         }
+
+
+
 
 
     } catch (error) {
@@ -1530,31 +1562,56 @@ tableBody.addEventListener('mouseout', function(event) {
 
 
 document.addEventListener("DOMContentLoaded", () => {
-    const homeButton = document.querySelector(".home-button");
-    if (homeButton) {
-        homeButton.addEventListener("click", async (e) => {
-            e.preventDefault(); // ✋ prevenir redirección inmediata
+    // 📌 Evento para ir al INICIO pero con confirmación
+    const irInicioBtn = document.querySelector(".home-button");
 
-            const sesionId = localStorage.getItem("id_sesion");
+    if (irInicioBtn) {
+        irInicioBtn.addEventListener("click", (e) => {
+            e.preventDefault(); // Cancelar navegación automática
 
-            if (sesionId) {
-                try {
-                    await fetch(`/dispositivos/desactivar/${sesionId}`, {
-                        method: "PUT"
-                    });
-                    console.log("🔌 Dispositivos desactivados correctamente.");
-                } catch (error) {
-                    console.error("❌ Error al desactivar dispositivos:", error);
+            const overlay = document.createElement("div");
+            overlay.className = "modal-overlay";
+
+            const modal = document.createElement("div");
+            modal.className = "modal-confirm";
+
+            modal.innerHTML = `
+                <h2>¿Ir al inicio?</h2>
+                <p>⚠️ Si vuelves al inicio podrías perder datos no guardados.<br>
+                💾 Te recomendamos exportar tus gráficas antes de continuar.</p>
+                <div class="modal-buttons">
+                    <button class="btn-secondary" id="cancelarInicio">Cancelar</button>
+                    <button class="btn-danger" id="confirmarInicio">Ir al inicio</button>
+                </div>
+            `;
+
+            overlay.appendChild(modal);
+            document.body.appendChild(overlay);
+
+            document.getElementById("cancelarInicio").onclick = () => {
+                overlay.remove();
+            };
+
+            document.getElementById("confirmarInicio").onclick = async () => {
+                const sesionId = localStorage.getItem("id_sesion");
+
+                if (sesionId) {
+                    try {
+                        await fetch(`/dispositivos/desactivar/${sesionId}`, { method: "PUT" });
+                        console.log("🔌 Dispositivos desactivados al ir al inicio.");
+                    } catch (error) {
+                        console.error("❌ Error al desactivar dispositivos:", error);
+                    }
                 }
-            }
 
-            console.log("🏠 Limpiando localStorage al volver a principal...");
-            localStorage.removeItem("id_sesion");
-            localStorage.removeItem("nombre_sesion");
-            localStorage.removeItem("sesion_dispositivo_ids");
+                localStorage.removeItem("id_sesion");
+                localStorage.removeItem("nombre_sesion");
+                localStorage.removeItem("sesion_dispositivo_ids");
+                localStorage.removeItem("graficas_ids");
 
-            // ✅ Redirigir luego de limpiar todo
-            window.location.href = "/principal";
+                window.location.href = "/principal";
+            };
         });
     }
+
 });

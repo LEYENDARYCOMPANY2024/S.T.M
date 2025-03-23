@@ -42,33 +42,17 @@ def importar_csv_route(
     return importar_csv(file, etiqueta, db)
 
 
-@router.get("/graficas/exportar_historial/{id_sesion_dispositivo}")
-def exportar_historial_csv(id_sesion_dispositivo: int, db: Session = Depends(get_db)):
-    """
-    Exporta solo la parte de 'datos_extra' (historial) de la gráfica
-    asociada a la sesión dada.
-    """
-    relacion = db.query(GraficaDispositivo).filter(
-        GraficaDispositivo.id_sesion_dispositivo_fk == id_sesion_dispositivo
-    ).first()
-
-    if not relacion:
-        raise HTTPException(status_code=404, detail="No se encontró la relación con la gráfica")
-
-    grafica = db.query(Grafica).filter(Grafica.id_grafica == relacion.id_grafica_fk).first()
-
+@router.get("/graficas/exportar_por_id/{id_grafica}")
+def exportar_por_id(id_grafica: int, db: Session = Depends(get_db)):
+    grafica = db.query(Grafica).filter(Grafica.id_grafica == id_grafica).first()
     if not grafica or not grafica.datos_extra:
-        raise HTTPException(status_code=404, detail="No hay datos en el historial")
-
-    historial = grafica.datos_extra
+        raise HTTPException(status_code=404, detail="No hay datos para exportar")
 
     output = StringIO()
     writer = csv.writer(output)
-
-    # Encabezado
     writer.writerow(["fecha_hora", "acel_x", "acel_y", "acel_z", "rot_x", "rot_y", "rot_z"])
 
-    for item in historial:
+    for item in grafica.datos_extra:
         writer.writerow([
             item.get("fecha_hora", ""),
             item.get("aceleracion_x", 0.0),
@@ -81,8 +65,9 @@ def exportar_historial_csv(id_sesion_dispositivo: int, db: Session = Depends(get
 
     output.seek(0)
     return StreamingResponse(output, media_type="text/csv", headers={
-        "Content-Disposition": "attachment; filename=historial_datos_extra.csv"
+        "Content-Disposition": f"attachment; filename=grafica_{id_grafica}.csv"
     })
+
 
 
 @router.get("/graficas/historial/{id_sesion_dispositivo}")
