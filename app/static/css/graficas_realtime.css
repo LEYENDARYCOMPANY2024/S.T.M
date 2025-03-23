@@ -100,3 +100,22 @@
     border-radius: 4px;
   }
   
+
+  .estado-envio {
+    font-weight: bold;
+    margin-left: 10px;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 14px;
+  }
+  
+  .estado-envio.status-true {
+    background-color: #4CAF50;
+    color: white;
+  }
+  
+  .estado-envio.status-false {
+    background-color: #f44336;
+    color: white;
+  }
+  

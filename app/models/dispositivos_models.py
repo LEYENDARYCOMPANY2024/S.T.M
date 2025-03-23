@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Date, ForeignKey
+from sqlalchemy import Column, Integer, String, Date, ForeignKey, Boolean
 from sqlalchemy.orm import relationship
 from database import Base
 
@@ -10,6 +10,9 @@ class DispositivoIOT(Base):
     tipo_de_dispositivo = Column(String, nullable=False)
     uuid = Column(String, unique=True, nullable=False)
     id_terapeuta_fk = Column(Integer, ForeignKey("terapeutas.id_terapeuta"), nullable=False)
+    # models/dispositivos_models.py
+    permite_envio = Column(Boolean, default=False)
+
 
     terapeuta = relationship("Terapeuta", back_populates="dispositivos")
     paciente_dispositivos = relationship("PacienteDispositivo", back_populates="dispositivo")

@@ -40,6 +40,11 @@ const supabase = window.supabase.createClient(
       options: {
         animation: false,
         responsive: true,
+        elements: {
+          line: {
+            tension: 0 // ✅ Mejora rendimiento visual quitando suavizado
+          }
+        },
         scales: {
           y: {
             beginAtZero: true,
@@ -64,7 +69,7 @@ const supabase = window.supabase.createClient(
             }
           }
         }
-      }
+      }      
     });
   
     renderLeyendaPiernas();
@@ -160,11 +165,31 @@ const supabase = window.supabase.createClient(
     mostrarMensaje("🔄 Gráfica reiniciada");
   }
   
-  function togglePause() {
+  async function togglePause() {
     realtimePaused = !realtimePaused;
-    document.getElementById("pauseButton").textContent = realtimePaused ? "Reanudar" : "Pausar";
+    const boton = document.getElementById("pauseButton");
+    boton.textContent = realtimePaused ? "Iniciar" : "Pausar";
     mostrarMensaje(realtimePaused ? "⏸️ Pausado" : "▶️ Reanudado");
-  }
+
+    try {
+        const dispositivos = await fetch("/dispositivos/activos").then(res => res.json());
+
+        for (const dispositivo of dispositivos) {
+            const uuid = dispositivo.uuid;
+            await fetch(`/dispositivos/permiso_envio/${uuid}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ estado: !realtimePaused })
+            });
+            console.log(`🎮 Permiso de envío actualizado para ${uuid}: ${!realtimePaused}`);
+        }
+    } catch (err) {
+        console.error("❌ Error al actualizar permisos de envío:", err);
+        mostrarMensaje("Error al controlar permisos de dispositivos", "error");
+    }
+}
+
+
   
   function mostrarMensaje(mensaje, tipo = "success") {
     const alertBox = document.createElement("div");
@@ -277,41 +302,58 @@ async function cargarDispositivosActivos() {
         return;
     }
 
-    dispositivos.forEach(dispositivo => {
-        const select = document.createElement("select");
-        select.innerHTML = `
-            <option value="">Selecciona pierna</option>
-            <option value="izquierda" ${dispositivo.pierna === "izquierda" ? "selected" : ""}>Izquierda</option>
-            <option value="derecha" ${dispositivo.pierna === "derecha" ? "selected" : ""}>Derecha</option>
-        `;
-        select.onchange = async () => {
-            const nuevoLado = select.value;
-        
-            await fetch(`/dispositivos/lado_pierna/${dispositivo.id}`, {
-                method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ lado: nuevoLado })
-            });
-        
-            // 🔄 Guardar el lado localmente
-            localStorage.setItem(`lado_pierna_${dispositivo.id}`, nuevoLado);
-        
-            // 📡 Volver a enviar al ESP si ya está activo
-            const ids = JSON.parse(localStorage.getItem("sesion_dispositivo_ids")) || [];
-            if (ids.includes(dispositivo.id)) {
-                const uuid = dispositivo.uuid;
-                const id_paciente = localStorage.getItem("id_paciente");
-                await enviarDatosAlESP(uuid, parseInt(id_paciente), dispositivo.id, nuevoLado);
-            }
-        
-            mostrarMensaje("Lado actualizado correctamente", "success");
-        };        
-
-        let row = document.createElement("div");
-        row.innerHTML = `<strong>${dispositivo.nombre}</strong>`;
-        row.appendChild(select);
-        contenedor.appendChild(row);
-    });
+    dispositivos.forEach(async (dispositivo) => {
+      const select = document.createElement("select");
+      select.innerHTML = `
+          <option value="">Selecciona pierna</option>
+          <option value="izquierda" ${dispositivo.pierna === "izquierda" ? "selected" : ""}>Izquierda</option>
+          <option value="derecha" ${dispositivo.pierna === "derecha" ? "selected" : ""}>Derecha</option>
+      `;
+  
+      // 🟢 Estado de permiso visual
+      const estadoSpan = document.createElement("span");
+      estadoSpan.className = "estado-envio";
+      estadoSpan.textContent = "Cargando...";
+  
+      try {
+          const permiso = await fetch(`/dispositivos/permiso_envio/${dispositivo.uuid}`).then(r => r.json());
+          const activo = permiso.permite;
+          estadoSpan.classList.add(activo ? "status-true" : "status-false");
+          estadoSpan.textContent = activo ? "Envío activo" : "Pausado";
+      } catch (err) {
+          console.error("Error al consultar permiso_envio:", err);
+          estadoSpan.classList.add("status-false");
+          estadoSpan.textContent = "Error";
+      }
+  
+      select.onchange = async () => {
+          const nuevoLado = select.value;
+  
+          await fetch(`/dispositivos/lado_pierna/${dispositivo.id}`, {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ lado: nuevoLado })
+          });
+  
+          localStorage.setItem(`lado_pierna_${dispositivo.id}`, nuevoLado);
+  
+          const ids = JSON.parse(localStorage.getItem("sesion_dispositivo_ids")) || [];
+          if (ids.includes(dispositivo.id)) {
+              const uuid = dispositivo.uuid;
+              const id_paciente = localStorage.getItem("id_paciente");
+              await enviarDatosAlESP(uuid, parseInt(id_paciente), dispositivo.id, nuevoLado);
+          }
+  
+          mostrarMensaje("Lado actualizado correctamente", "success");
+      };
+  
+      const row = document.createElement("div");
+      row.innerHTML = `<strong>${dispositivo.nombre}</strong>`;
+      row.appendChild(select);
+      row.appendChild(estadoSpan);  // ✅ Añadimos visualmente
+      contenedor.appendChild(row);
+  });
+  
 }
 
 suscribirseAGraficasRealtime();
