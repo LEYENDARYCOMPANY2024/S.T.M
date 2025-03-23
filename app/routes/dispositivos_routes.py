@@ -170,7 +170,12 @@ def obtener_paciente_activo(uuid: str, db: Session = Depends(get_db)):
 
 
 @router.post("/esp/configurar_paciente")
-def configurar_paciente(uuid: str = Body(...), id_paciente: int = Body(...)):
-    # Aquí puedes almacenar en un diccionario en memoria, BD, cache, etc. si lo deseas
-    print(f"🔧 Asociando UUID {uuid} con id_paciente {id_paciente}")
-    return JSONResponse(content={"mensaje": "ID de paciente recibido", "uuid": uuid, "id_paciente": id_paciente})
+def configurar_paciente(payload: dict = Body(...)):
+    uuid = payload.get("uuid")
+    id_paciente = payload.get("id_paciente")
+
+    if not uuid or not id_paciente:
+        raise HTTPException(status_code=400, detail="Faltan datos uuid o id_paciente")
+
+    print(f"✅ Recibido del frontend: uuid={uuid}, id_paciente={id_paciente}")
+    return {"mensaje": "ID de paciente recibido correctamente", "uuid": uuid, "id_paciente": id_paciente}
