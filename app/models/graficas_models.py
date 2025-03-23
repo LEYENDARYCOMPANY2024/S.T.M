@@ -1,5 +1,6 @@
 # models/graficas_models.py
-from sqlalchemy import Column, Integer, String, Numeric, ForeignKey, JSON, DateTime
+from sqlalchemy import Column, Integer, String, Float, ForeignKey, JSON, DateTime
+
 from sqlalchemy.orm import relationship
 from database import Base
 from datetime import datetime, timezone
@@ -11,17 +12,18 @@ class Grafica(Base):
     nombre_grafica = Column(String, nullable=False)
     datos_extra = Column(JSON, nullable=True)
     etiqueta = Column(String(255), nullable=True)
-    aceleracion_x = Column(Numeric(10, 2))
-    aceleracion_y = Column(Numeric(10, 2))
-    aceleracion_z = Column(Numeric(10, 2))
-    rotacion_x = Column(Numeric(10, 2))
-    rotacion_y = Column(Numeric(10, 2))
-    rotacion_z = Column(Numeric(10, 2))
+
+    aceleracion_x = Column(Float)
+    aceleracion_y = Column(Float)
+    aceleracion_z = Column(Float)
+    rotacion_x = Column(Float)
+    rotacion_y = Column(Float)
+    rotacion_z = Column(Float)
+
     fecha_hora = Column(DateTime, default=lambda: datetime.now(timezone.utc))
-    id_sesion_dispositivo_fk = Column(Integer, nullable=True)  # Agregar esta
-    lado_pierna = Column(String, nullable=True)  # Agregar esta
 
     dispositivos = relationship("GraficaDispositivo", back_populates="grafica")
+
 
 
 class GraficaDispositivo(Base):

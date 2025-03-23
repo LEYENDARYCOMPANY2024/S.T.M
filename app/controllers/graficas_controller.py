@@ -1,4 +1,5 @@
 # controllers/graficas_controller.py
+
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from models.graficas_models import Grafica, GraficaDispositivo
@@ -17,7 +18,7 @@ def guardar_datos_sensor(db: Session, datos: dict):
         if not uuid or not id_sesion_dispositivo or not lado_pierna:
             raise HTTPException(status_code=400, detail="Faltan datos obligatorios")
 
-        # ✅ Verificar que la sesión esté activa
+        # Verificar que la sesión esté activa
         sesion_dispositivo = db.query(SesionDispositivo).filter(
             SesionDispositivo.id_sesion_dispositivo == id_sesion_dispositivo,
             SesionDispositivo.estado_activado == "activado"
@@ -26,69 +27,61 @@ def guardar_datos_sensor(db: Session, datos: dict):
         if not sesion_dispositivo:
             raise HTTPException(status_code=404, detail="Sesión del dispositivo no activa")
 
-        # ✅ Buscar si ya existe una gráfica asociada a esta sesión y pierna
+        # Buscar si ya existe la relación graficas_dispositivos para esta sesión y pierna
         relacion = db.query(GraficaDispositivo).filter(
             GraficaDispositivo.id_sesion_dispositivo_fk == id_sesion_dispositivo,
             GraficaDispositivo.lado_pierna == lado_pierna
         ).first()
 
+        # Datos “históricos” de sensor en un array
+        nueva_entrada = {
+            "fecha_hora": datetime.now(timezone.utc).isoformat(),
+            "aceleracion_x": datos.get("aceleracion_x", 0.0),
+            "aceleracion_y": datos.get("aceleracion_y", 0.0),
+            "aceleracion_z": datos.get("aceleracion_z", 0.0),
+            "rotacion_x": datos.get("rotacion_x", 0.0),
+            "rotacion_y": datos.get("rotacion_y", 0.0),
+            "rotacion_z": datos.get("rotacion_z", 0.0)
+        }
+
         if relacion:
+            # Ya existe la relación => actualizar la gráfica asociada
             grafica = db.query(Grafica).filter(Grafica.id_grafica == relacion.id_grafica_fk).first()
-            if grafica:
-                # 🔄 Agregar al historial
-                historial = grafica.datos_extra or []
-                historial.append({
-                    "fecha_hora": datetime.now(timezone.utc).isoformat(),
-                    "aceleracion_x": datos.get("aceleracion_x", 0.0),
-                    "aceleracion_y": datos.get("aceleracion_y", 0.0),
-                    "aceleracion_z": datos.get("aceleracion_z", 0.0),
-                    "rotacion_x": datos.get("rotacion_x", 0.0),
-                    "rotacion_y": datos.get("rotacion_y", 0.0),
-                    "rotacion_z": datos.get("rotacion_z", 0.0)
-                })
+            if not grafica:
+                raise HTTPException(status_code=404, detail="La gráfica asociada no existe (inconsistencia).")
 
-                grafica.datos_extra = historial
+            # Guardar en datos_extra
+            historial = grafica.datos_extra or []
+            historial.append(nueva_entrada)
+            grafica.datos_extra = historial
 
-                # 🔄 Actualizar últimos datos visibles
-                grafica.aceleracion_x = datos.get("aceleracion_x", 0.0)
-                grafica.aceleracion_y = datos.get("aceleracion_y", 0.0)
-                grafica.aceleracion_z = datos.get("aceleracion_z", 0.0)
-                grafica.rotacion_x = datos.get("rotacion_x", 0.0)
-                grafica.rotacion_y = datos.get("rotacion_y", 0.0)
-                grafica.rotacion_z = datos.get("rotacion_z", 0.0)
+            # Actualiza campos “en vivo”
+            grafica.aceleracion_x = datos.get("aceleracion_x", 0.0)
+            grafica.aceleracion_y = datos.get("aceleracion_y", 0.0)
+            grafica.aceleracion_z = datos.get("aceleracion_z", 0.0)
+            grafica.rotacion_x = datos.get("rotacion_x", 0.0)
+            grafica.rotacion_y = datos.get("rotacion_y", 0.0)
+            grafica.rotacion_z = datos.get("rotacion_z", 0.0)
 
-                # ✅ Actualizar campos nuevos para realtime
-                grafica.id_sesion_dispositivo_fk = id_sesion_dispositivo
-                grafica.lado_pierna = lado_pierna
+            db.commit()
+            return {"mensaje": "Datos actualizados correctamente", "id_grafica": grafica.id_grafica}
 
-                db.commit()
-                return {"mensaje": "Datos actualizados correctamente", "id_grafica": grafica.id_grafica}
-
-        # 📌 Si no existe, crear gráfica nueva
+        # Si no existe la relación => crear una nueva Grafica y la relación
         nueva_grafica = Grafica(
             nombre_grafica=f"grafica_{id_sesion_dispositivo}_{lado_pierna}",
-            datos_extra=[{
-                "fecha_hora": datetime.now(timezone.utc).isoformat(),
-                "aceleracion_x": datos.get("aceleracion_x", 0.0),
-                "aceleracion_y": datos.get("aceleracion_y", 0.0),
-                "aceleracion_z": datos.get("aceleracion_z", 0.0),
-                "rotacion_x": datos.get("rotacion_x", 0.0),
-                "rotacion_y": datos.get("rotacion_y", 0.0),
-                "rotacion_z": datos.get("rotacion_z", 0.0)
-            }],
+            datos_extra=[nueva_entrada],
             aceleracion_x=datos.get("aceleracion_x", 0.0),
             aceleracion_y=datos.get("aceleracion_y", 0.0),
             aceleracion_z=datos.get("aceleracion_z", 0.0),
             rotacion_x=datos.get("rotacion_x", 0.0),
             rotacion_y=datos.get("rotacion_y", 0.0),
-            rotacion_z=datos.get("rotacion_z", 0.0),
-            id_sesion_dispositivo_fk=id_sesion_dispositivo,  # ✅ para realtime
-            lado_pierna=lado_pierna  # ✅ para realtime
+            rotacion_z=datos.get("rotacion_z", 0.0)
         )
         db.add(nueva_grafica)
         db.commit()
         db.refresh(nueva_grafica)
 
+        # Crear la fila en graficas_dispositivos con la referencia
         nueva_relacion = GraficaDispositivo(
             id_grafica_fk=nueva_grafica.id_grafica,
             id_sesion_dispositivo_fk=id_sesion_dispositivo,
@@ -104,7 +97,6 @@ def guardar_datos_sensor(db: Session, datos: dict):
     except Exception as e:
         db.rollback()
         raise HTTPException(status_code=500, detail=f"Error al guardar/actualizar datos: {str(e)}")
-
 
 
 def exportar_datos_csv(db: Session, id_sesion_dispositivo: int):
@@ -138,9 +130,7 @@ def exportar_datos_csv(db: Session, id_sesion_dispositivo: int):
     })
 
 
-
 def importar_csv(file, etiqueta: str, db: Session):
-
     content = file.file.read().decode("utf-8").splitlines()
     reader = csv.DictReader(content)
 

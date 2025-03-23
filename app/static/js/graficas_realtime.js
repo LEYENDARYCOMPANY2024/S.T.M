@@ -165,28 +165,32 @@ async function importarCSV(event) {
 }
 
 async function enviarDatosAlESP(uuid, id_paciente, id_sesion_dispositivo, lado_pierna) {
-    try {
-        const response = await fetch("/esp/configurar_paciente", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                uuid,
-                id_paciente,
-                id_sesion_dispositivo,
-                lado_pierna
-            })
-        });
-
-        const data = await response.json();
-        if (response.ok) {
-            console.log("📡 Config enviado al ESP:", data);
-        } else {
-            console.error("❌ Error al enviar config al ESP:", data);
-        }
-    } catch (error) {
-        console.error("❌ Error de red al enviar config al ESP:", error);
+    // Verifica en la consola que no sean undefined ni null
+    console.log("Preparando POST /esp/configurar_paciente =>", {
+      uuid,
+      id_paciente,
+      id_sesion_dispositivo,
+      lado_pierna
+    });
+  
+    const response = await fetch("/esp/configurar_paciente", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        uuid,
+        id_paciente,
+        id_sesion_dispositivo,
+        lado_pierna
+      })
+    });
+    const data = await response.json();
+    if (!response.ok) {
+      console.error("❌ Error al enviar config al ESP:", data);
+      return;
     }
-}
+    console.log("📡 Config enviado al ESP:", data);
+  }
+  
 
 
 async function cargarDispositivosActivos() {
