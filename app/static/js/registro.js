@@ -66,3 +66,24 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
+
+$(document).ready(function () {
+    // Mostrar/ocultar términos y condiciones
+    $('#toggleTerms').on('click', function () {
+        $('#termsBox').slideToggle();
+        $(this).text($(this).text() === 'Ver Términos y Condiciones' ? 'Ocultar Términos y Condiciones' : 'Ver Términos y Condiciones');
+    });
+
+    // Habilitar/deshabilitar botón de registro al aceptar los términos
+    $('#termsCheckbox').on('change', function () {
+        $('#registerButton').prop('disabled', !this.checked);
+    });
+
+    // Mostrar/ocultar contraseña
+    $('#togglePassword').on('click', function () {
+        let passwordField = $('#contrasena');
+        let type = passwordField.attr('type') === 'password' ? 'text' : 'password';
+        passwordField.attr('type', type);
+        $(this).toggleClass('fa-eye fa-eye-slash');
+    });
+});
