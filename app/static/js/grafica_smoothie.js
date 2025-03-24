@@ -1,5 +1,6 @@
 let smoothie_realtimePaused = true;
 let reinicioPendiente = false; // 🔄 Mismo control que en Chart.js
+let smoothie_channel = null; // 🔁 Global para poder cerrar el canal anterior
 
 const smoothie_izquierdaTS = new TimeSeries();
 const smoothie_derechaTS = new TimeSeries();
@@ -51,10 +52,17 @@ function smoothie_renderLeyenda() {
   document.querySelector(".charts").prepend(leyendaContainer);
 }
 
+
+
 function smoothie_suscribirseRealtime() {
   console.log("🎧 Subscribiendo SMOOTHIE a Supabase Realtime...");
 
-  supabase
+  if (smoothie_channel) {
+    supabase.removeChannel(smoothie_channel);
+    console.log("🚫 Canal Smoothie anterior cerrado");
+  }
+
+  smoothie_channel = supabase
     .channel('grafica_smoothie')
     .on('postgres_changes', {
       event: '*',
@@ -63,13 +71,12 @@ function smoothie_suscribirseRealtime() {
     }, payload => {
       console.log("📡 Evento recibido en Smoothie");
 
-      const data = payload.new;
-
       if (smoothie_realtimePaused) {
         console.warn("⏸️ Smoothie pausado, no procesa datos.");
         return;
       }
 
+      const data = payload.new;
       const lado = data.lado_pierna_gf;
       const valor = data.aceleracion_y ?? 0;
       const timestamp = new Date(data.fecha_hora).getTime();
@@ -88,9 +95,12 @@ function smoothie_suscribirseRealtime() {
       console.log(`✅ SMOOTHIE - ${lado} => ${valor} @ ${new Date(timestamp).toLocaleTimeString()}`);
     })
     .subscribe(s => {
-      if (s === 'SUBSCRIBED') console.log("✅ Smoothie conectado a Realtime");
+      if (s === 'SUBSCRIBED') {
+        console.log("✅ Smoothie conectado a Realtime");
+      }
     });
 }
+
 
 
 window.smoothie_reiniciarGrafica = async function () {

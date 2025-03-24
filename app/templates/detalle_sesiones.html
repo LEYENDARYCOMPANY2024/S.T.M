@@ -192,17 +192,25 @@
         chartjsCanvas.style.display = "block";
         currentChart = 'chartjs';
         toggleBtn.textContent = "Cambiar a Smoothie";
-        if (window.smoothie_togglePause) window.smoothie_realtimePaused = true;
-        if (window.chartjs_togglePause) window.chartjs_realtimePaused = false;
+        smoothie_realtimePaused = true;
+        chartjs_realtimePaused = false;
+    
+        // 🟢 Agrega esto si no lo tienes
+        if (window.chartjs_suscribirRealtime) chartjs_suscribirRealtime();
+    
       } else {
         chartjsCanvas.style.display = "none";
         smoothieCanvas.style.display = "block";
         currentChart = 'smoothie';
         toggleBtn.textContent = "Cambiar a Chart.js";
-        if (window.chartjs_togglePause) window.chartjs_realtimePaused = true;
-        if (window.smoothie_togglePause) window.smoothie_realtimePaused = false;
+        chartjs_realtimePaused = true;
+        smoothie_realtimePaused = false;
+    
+        // 🟢 Agrega esto si no lo tienes
+        if (window.smoothie_suscribirseRealtime) smoothie_suscribirseRealtime();
       }
     });
+    
     
 
     function marcarCambioChart() {

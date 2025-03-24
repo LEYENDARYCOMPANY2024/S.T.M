@@ -14,6 +14,7 @@ let chartjs_data = {
 
 let chartjs_chart = null;
 let chartjs_realtimePaused = true;
+let chartjs_channel = null; // 🔁 Para gestionar el canal y cerrarlo si existe
 const chartjs_MAX_DATA = 30;
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -80,16 +81,21 @@ function chartjs_limitData() {
 }
 
 function chartjs_suscribirRealtime() {
-  console.log("🎧 Subscribiendo CHART.JS a Supabase Realtime...");
+  console.log("🎿 Subscribiendo CHART.JS a Supabase Realtime...");
 
-  supabase
-    .channel('grafica_chartjs')  // nombre del canal, puede ser el mismo para ambas si gustas
+  if (chartjs_channel) {
+    supabase.removeChannel(chartjs_channel);
+    console.log("🚩 Canal Chart.js anterior cerrado");
+  }
+
+  chartjs_channel = supabase
+    .channel('grafica_chartjs')
     .on('postgres_changes', {
-      event: '*',  // O 'INSERT' si estás seguro que solo insertas
+      event: '*',
       schema: 'public',
       table: 'graficas'
     }, payload => {
-      console.log("📡 Evento recibido en Chart.js");
+      console.log("📱 Evento recibido en Chart.js");
 
       if (chartjs_realtimePaused) {
         console.warn("⏸️ Chart.js pausado, no procesa datos.");
@@ -97,11 +103,9 @@ function chartjs_suscribirRealtime() {
       }
 
       const data = payload.new;
-
       const lado = data.lado_pierna_gf;
       const valor = data.aceleracion_y ?? 0;
       const fecha = new Date(data.fecha_hora);
-      const ahora = new Date();
 
       if (!lado || !chartjs_data.datasets[lado]) {
         console.warn("⚠️ Lado inválido:", lado);
