@@ -61,7 +61,14 @@ function suscribirseAGraficasRealtime() {
 
       const data = payload.new;
       const lado = data.lado_pierna_gf;
-      const timestamp = new Date(data.fecha_hora).getTime();
+      // Ajustar la fecha_hora recibida a CDMX
+      const fechaUTC = new Date(data.fecha_hora);
+
+      // Convertir a zona horaria de CDMX
+      const fechaLocal = new Date(fechaUTC.toLocaleString("en-US", { timeZone: "America/Mexico_City" }));
+
+      const timestamp = fechaLocal.getTime();
+
       const valor = data.aceleracion_y ?? 0;
 
       console.log("📥 Payload recibido:", payload);
