@@ -108,11 +108,6 @@ function chartjs_suscribirRealtime() {
         return;
       }
 
-      if (fecha > ahora) {
-        console.warn("🕒 Futuro ignorado:", fecha.toLocaleTimeString());
-        return;
-      }
-
       console.log(`✅ CHART - ${lado} => ${valor} @ ${fecha.toLocaleTimeString()}`);
       chartjs_data.labels.push(fecha.toLocaleTimeString());
       chartjs_data.datasets[lado].ay.push(valor);
