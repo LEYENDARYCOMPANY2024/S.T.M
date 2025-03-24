@@ -61,7 +61,15 @@ function suscribirseAGraficasRealtime() {
 
       const data = payload.new;
       const lado = data.lado_pierna_gf;
-      const timestamp = new Date(data.fecha_hora).getTime();
+      // Ajuste visual: convertir a hora local y agregar pequeño delay para que se vea "en presente"
+      const utcDate = new Date(data.fecha_hora);
+
+      // Conversión a hora local de CDMX
+      const localDate = new Date(utcDate.toLocaleString("en-US", { timeZone: "America/Mexico_City" }));
+
+      // Le agregamos un pequeño margen visual (500 ms) para que no se adelante
+      const timestamp = localDate.getTime() + 500;
+
 
       const valor = data.aceleracion_y ?? 0;
 
@@ -95,7 +103,7 @@ function reiniciarGrafica() {
 
 document.addEventListener("DOMContentLoaded", () => {
   const canvas = document.getElementById("grafica_realtime");
-  chart.streamTo(canvas, 100);
+  chart.streamTo(canvas, 1000);
   chart.addTimeSeries(izquierdaTS, { strokeStyle: '#00ff00', lineWidth: 2 });
   chart.addTimeSeries(derechaTS, { strokeStyle: '#ff3333', lineWidth: 2 });
 
