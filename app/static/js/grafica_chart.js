@@ -82,40 +82,53 @@ function chartjs_limitData() {
 function chartjs_suscribirRealtime() {
   console.log("🎧 Subscribiendo CHART.JS a Supabase Realtime...");
 
-  supabase.channel('grafica_chartjs')
-    .on('postgres_changes', {
-      event: 'INSERT', // ✅ ESCUCHA INSERTS en lugar de UPDATE
-      schema: 'public',
-      table: 'graficas'
-    }, payload => {
-      if (chartjs_realtimePaused) return;
+  supabase
+  .channel('grafica_chartjs')
+  .on('postgres_changes', {
+    event: 'INSERT',
+    schema: 'public',
+    table: 'graficas'
+  }, payload => {
+    console.log("📡 Evento recibido en Chart.js");
 
-      const data = payload.new;
-      const lado = data.lado_pierna_gf;
+    const data = payload.new;
 
-      if (!lado || !chartjs_data.datasets[lado]) {
-        console.warn("⚠️ Lado inválido recibido:", lado);
-        return;
-      }
+    // 🔎 Filtrar por nombre de gráfica
+    if (data.nombre_grafica !== 'grafica_chartjs') {
+      console.warn("📛 Ignorado: no es grafica_chartjs:", data.nombre_grafica);
+      return;
+    }
 
-      const fecha = new Date(data.fecha_hora);
-      const ahora = new Date();
-      if (fecha > ahora) {
-        console.warn("🕒 Punto ignorado por estar en el futuro:", fecha.toLocaleTimeString());
-        return;
-      }
+    if (chartjs_realtimePaused) {
+      console.warn("⏸️ Chart.js pausado, no procesa datos.");
+      return;
+    }
 
-      console.log("📥 Payload recibido:", data);
-      console.log(`🦿 ${lado} => ${data.aceleracion_y} @ ${fecha.toLocaleTimeString()}`);
+    const lado = data.lado_pierna_gf;
+    const valor = data.aceleracion_y ?? 0;
+    const fecha = new Date(data.fecha_hora);
+    const ahora = new Date();
 
-      chartjs_data.labels.push(fecha.toLocaleTimeString());
-      chartjs_data.datasets[lado].ay.push(data.aceleracion_y ?? 0);
-      chartjs_limitData();
-      chartjs_chart.update('none');
-    })
-    .subscribe(s => {
-      if (s === "SUBSCRIBED") console.log("✅ Chart.js conectado a Realtime");
-    });
+    if (!lado || !chartjs_data.datasets[lado]) {
+      console.warn("⚠️ Lado inválido:", lado);
+      return;
+    }
+
+    if (fecha > ahora) {
+      console.warn("🕒 Futuro ignorado:", fecha.toLocaleTimeString());
+      return;
+    }
+
+    console.log(`✅ CHART - ${lado} => ${valor} @ ${fecha.toLocaleTimeString()}`);
+    chartjs_data.labels.push(fecha.toLocaleTimeString());
+    chartjs_data.datasets[lado].ay.push(valor);
+    chartjs_limitData();
+    chartjs_chart.update('none');
+  })
+  .subscribe(s => {
+    if (s === 'SUBSCRIBED') console.log("✅ Chart.js conectado a Realtime");
+  });
+
 }
 
 function chartjs_reiniciar() {
