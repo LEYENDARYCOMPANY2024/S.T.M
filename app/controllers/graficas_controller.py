@@ -7,11 +7,10 @@ import csv
 from io import StringIO
 from fastapi.responses import StreamingResponse
 from models.dispositivos_models import SesionDispositivo
-from datetime import datetime, timezone
+from datetime import datetime
 from pytz import timezone
 
 zona_mx = timezone("America/Mexico_City")
-datetime.now(zona_mx)
 
 def guardar_datos_sensor_minimal(db: Session, datos: dict):
     uuid = datos.get("uuid")
@@ -21,7 +20,6 @@ def guardar_datos_sensor_minimal(db: Session, datos: dict):
     if not uuid or not id_sesion_dispositivo or not lado_pierna:
         raise HTTPException(status_code=400, detail="Faltan datos obligatorios")
 
-    # Verificar si la sesión está activa
     sesion_dispositivo = db.query(SesionDispositivo).filter(
         SesionDispositivo.id_sesion_dispositivo == id_sesion_dispositivo,
         SesionDispositivo.estado_activado == "activado"
@@ -30,51 +28,47 @@ def guardar_datos_sensor_minimal(db: Session, datos: dict):
     if not sesion_dispositivo:
         raise HTTPException(status_code=404, detail="Sesión del dispositivo no activa")
 
-    # Verificar si ya hay una relación para este lado de pierna
     relacion = db.query(GraficaDispositivo).filter(
         GraficaDispositivo.id_sesion_dispositivo_fk == id_sesion_dispositivo,
         GraficaDispositivo.lado_pierna == lado_pierna
     ).first()
 
-    # Crear el diccionario de nueva entrada
+    now_local = datetime.now(zona_mx).replace(tzinfo=None)  # ⏱️ Hora local sin tzinfo
+
     nueva_entrada = {
-        "fecha_hora": datetime.now(zona_mx).isoformat(),
+        "fecha_hora": now_local.isoformat(),
         "aceleracion_x": datos.get("aceleracion_x", 0.0),
         "aceleracion_y": datos.get("aceleracion_y", 0.0)
     }
 
-    # Si ya existe la relación, actualiza los datos
     if relacion:
         grafica = db.query(Grafica).filter(Grafica.id_grafica == relacion.id_grafica_fk).first()
         if not grafica:
             raise HTTPException(status_code=404, detail="Gráfica no encontrada.")
-
+        
         grafica.aceleracion_x = nueva_entrada["aceleracion_x"]
         grafica.aceleracion_y = nueva_entrada["aceleracion_y"]
         grafica.lado_pierna_gf = lado_pierna
-        grafica.fecha_hora = datetime.now(zona_mx)  # Actualiza trigger de hora
+        grafica.fecha_hora = now_local  # 🕒 Local sin tz
 
         db.commit()
         return {"mensaje": "Datos actualizados correctamente", "id_grafica": grafica.id_grafica}
 
-    # ⚠️ Evitar crear gráfica si los datos no tienen movimiento
     if nueva_entrada["aceleracion_x"] == 0.0 and nueva_entrada["aceleracion_y"] == 0.0:
         return {"mensaje": "No se creó gráfica porque los datos están vacíos"}
 
-    # Crear nueva gráfica si no hay relación previa
     total = db.query(Grafica).count()
     nueva_grafica = Grafica(
         nombre_grafica=f"grafica_{total+1}",
         aceleracion_x=nueva_entrada["aceleracion_x"],
         aceleracion_y=nueva_entrada["aceleracion_y"],
         lado_pierna_gf=lado_pierna,
-        fecha_hora=datetime.now(zona_mx)
+        fecha_hora=now_local
     )
     db.add(nueva_grafica)
     db.commit()
     db.refresh(nueva_grafica)
 
-    # Crear la relación con sesión-dispositivo
     nueva_relacion = GraficaDispositivo(
         id_grafica_fk=nueva_grafica.id_grafica,
         id_sesion_dispositivo_fk=id_sesion_dispositivo,

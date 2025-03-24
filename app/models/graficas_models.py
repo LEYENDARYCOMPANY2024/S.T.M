@@ -3,7 +3,7 @@ from sqlalchemy import Column, Integer, String, Float, ForeignKey, JSON, DateTim
 
 from sqlalchemy.orm import relationship
 from database import Base
-from datetime import datetime, timezone
+from datetime import datetime
 
 class Grafica(Base):
     __tablename__ = "graficas"
@@ -12,7 +12,7 @@ class Grafica(Base):
     nombre_grafica = Column(String, nullable=False)
     aceleracion_x = Column(Float)
     aceleracion_y = Column(Float)
-    fecha_hora = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    fecha_hora = Column(DateTime, default=lambda: datetime.now())  # 🕒 Usa hora local naive
     lado_pierna_gf = Column(String, nullable=True)
 
     dispositivos = relationship("GraficaDispositivo", back_populates="grafica")
