@@ -253,4 +253,9 @@ const supabase = window.supabase.createClient(
     chartjs_suscribirRealtime();
     cargarDispositivosActivos();
   }
+
+  window.chartjs_togglePause = chartjs_togglePause;
+  window.chartjs_reiniciarChartJS = chartjs_reiniciar;
+  window.chartjs_exportarCSV = chartjs_exportarCSV;
+
 });

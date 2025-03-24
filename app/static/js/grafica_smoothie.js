@@ -242,4 +242,6 @@ document.addEventListener("DOMContentLoaded", () => {
     smoothie_cargarDispositivosActivos();
   }
 
+
+
 });

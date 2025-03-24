@@ -138,7 +138,7 @@
         <canvas id="grafica_smoothie" width="800" height="300"></canvas>
         <canvas id="grafica_chartjs"></canvas>
         <div class="chart-buttons">
-          <button id="pauseButton" onclick="togglePause()">▶️ Iniciar</button>
+          <button id="pauseButton" onclick="pausarGraficaActual()">▶️ Iniciar</button>
           <button onclick="reiniciarGrafica()">🔄 Reiniciar</button>
           <button onclick="exportarGraficaActual()">💾 Guardar CSV</button>
           <button onclick="document.getElementById('importInput').click()">📥 Importar CSV</button>
@@ -218,6 +218,14 @@
           alert("⚠️ No se puede exportar en este momento.");
         }
       }
+      function pausarGraficaActual() {
+        if (currentChart === "chartjs" && typeof chartjs_togglePause === "function") {
+          chartjs_togglePause();
+        } else if (currentChart === "smoothie" && typeof smoothie_togglePause === "function") {
+          smoothie_togglePause();
+        }
+      }
+      
       
 
     // Asegura que el botón empiece con texto correcto
