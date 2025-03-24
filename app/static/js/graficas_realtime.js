@@ -21,6 +21,27 @@ const chart = new SmoothieChart({
   minValueScale: 1.2
 });
 
+function renderLeyendaPiernas() {
+  const contenedor = document.getElementById("dispositivos-activos");
+
+  const leyenda = document.createElement("div");
+  leyenda.classList.add("leyenda-piernas");
+
+  leyenda.innerHTML = `
+    <div class="item-leyenda">
+      <span class="cuadro-color" style="background-color: green;"></span>
+      Pierna Izquierda
+    </div>
+    <div class="item-leyenda">
+      <span class="cuadro-color" style="background-color: red;"></span>
+      Pierna Derecha
+    </div>
+  `;
+
+  contenedor.appendChild(leyenda);
+}
+
+
 document.addEventListener("DOMContentLoaded", () => {
   const canvas = document.getElementById("grafica_realtime");
   chart.streamTo(canvas, 100);
@@ -41,14 +62,15 @@ function suscribirseAGraficasRealtime() {
       schema: 'public',
       table: 'graficas'
     }, payload => {
-      console.log("📥 Payload recibido:", payload);
-      console.log(`🦿 ${lado} => ${valor} @ ${new Date(timestamp).toLocaleTimeString()}`);
       if (realtimePaused) return;
 
       const data = payload.new;
       const lado = data.lado_pierna_gf;
       const timestamp = new Date(data.fecha_hora).getTime();
       const valor = data.aceleracion_y ?? 0;
+
+      console.log("📥 Payload recibido:", payload);
+      console.log(`🦿 ${lado} => ${valor} @ ${new Date(timestamp).toLocaleTimeString()}`);
 
       if (lado === 'izquierda') {
         izquierdaTS.append(timestamp, valor);
@@ -249,6 +271,8 @@ async function cargarDispositivosActivos() {
     contenedor.appendChild(row);
   });
 }
+
+
 
 suscribirseAGraficasRealtime();
 cargarDispositivosActivos();
