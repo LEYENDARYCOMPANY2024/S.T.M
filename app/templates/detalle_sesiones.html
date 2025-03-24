@@ -12,11 +12,12 @@
 
   <!-- Librerías -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/smoothie/1.34.0/smoothie.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
 </head>
 <body>
+
   <!-- Top bar -->
   <div class="top-bar">
     <div class="user-icon">
@@ -24,7 +25,7 @@
     </div>
   </div>
 
-  <!-- Sidebar navegación -->
+  <!-- Navegación lateral -->
   <nav class="navigation">
     <div class="menu-icon">
       <a href="/principal" class="home-button"><i class="bi bi-house-fill"></i></a>
@@ -46,10 +47,10 @@
     </div>
   </header>
 
-  <!-- Contenido principal -->
+  <!-- Contenedor principal -->
   <div class="main-container">
     <div class="content-grid">
-      <!-- Panel de MediaPipe -->
+      <!-- Panel izquierdo (MediaPipe) -->
       <div class="panel">
         <div class="panel-header">Visualización</div>
         <div class="panel-content">
@@ -95,7 +96,7 @@
         </div>
       </div>
 
-      <!-- Tabla de puntos -->
+      <!-- Panel derecho (tabla) -->
       <div class="panel">
         <div class="panel-header">Datos de Puntos de Pose</div>
         <div class="panel-content">
@@ -128,7 +129,7 @@
     </div>
   </div>
 
-  <!-- Panel de gráfica y controles -->
+  <!-- Gráfica y nota -->
   <div class="container">
     <div class="left-panel">
       <div class="charts">
@@ -146,29 +147,26 @@
       </div>
     </div>
 
-    <!-- Columna derecha -->
-<div class="right-column">
-    <!-- Descripción editable -->
-    <div class="description-box">
+    <div class="right-column">
+      <div class="description-box">
         <div class="black-header">Descripción</div>
         <div class="description-lines">
-            <textarea id="session-description" class="line" placeholder="Escribe la descripción aquí..." rows="3"></textarea>
+          <textarea id="session-description" class="line" placeholder="Escribe la descripción aquí..." rows="3"></textarea>
         </div>
-    </div>
-    
-    <!-- Nota Evolutiva -->
-    <div class="evolution-box">
+      </div>
+      <div class="evolution-box">
         <div class="black-header">Nota Evolutiva</div>
         <div class="evolution-lines">
-            <textarea id="nota-evolutiva" class="line" placeholder="Escribe aquí..." rows="10" cols="50"></textarea>
+          <textarea id="nota-evolutiva" class="line" placeholder="Escribe aquí..." rows="10" cols="50" style="resize: none;"></textarea>
         </div>
+      </div>
     </div>
-</div>
-
+  </div>
 
   <div id="message-container"></div>
 
   <!-- Scripts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/smoothie/1.36/smoothie.min.js"></script>
   <script src="/static/js/graficas_realtime.js"></script>
   <script src="/static/js/detalle_sesiones.js"></script>
 </body>
