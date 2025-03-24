@@ -42,26 +42,22 @@ def guardar_datos_sensor_minimal(db: Session, datos: dict):
         if not grafica:
             raise HTTPException(status_code=404, detail="Gráfica no encontrada.")
 
-        historial = grafica.datos_extra or []
-        historial.append(nueva_entrada)
-        grafica.datos_extra = historial
         grafica.aceleracion_x = nueva_entrada["aceleracion_x"]
         grafica.aceleracion_y = nueva_entrada["aceleracion_y"]
         grafica.lado_pierna_gf = lado_pierna
-        grafica.fecha_hora = datetime.now(timezone.utc)  # 🔥 Forzar cambio para Supabase Realtime
-
+        grafica.fecha_hora = datetime.now(timezone.utc)  # ⏱️ Trigger para Supabase
 
         db.commit()
         return {"mensaje": "Datos actualizados correctamente", "id_grafica": grafica.id_grafica}
 
-    # Nueva gráfica
+    # Crear nueva gráfica
     total = db.query(Grafica).count()
     nueva_grafica = Grafica(
         nombre_grafica=f"grafica_{total+1}",
-        datos_extra=[nueva_entrada],
         aceleracion_x=nueva_entrada["aceleracion_x"],
         aceleracion_y=nueva_entrada["aceleracion_y"],
-        lado_pierna_gf=lado_pierna
+        lado_pierna_gf=lado_pierna,
+        fecha_hora=datetime.now(timezone.utc)
     )
     db.add(nueva_grafica)
     db.commit()
@@ -76,6 +72,8 @@ def guardar_datos_sensor_minimal(db: Session, datos: dict):
     db.commit()
 
     return {"mensaje": "Gráfica creada y datos insertados", "id_grafica": nueva_grafica.id_grafica}
+
+
 
 
 
