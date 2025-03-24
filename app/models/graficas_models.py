@@ -10,16 +10,8 @@ class Grafica(Base):
 
     id_grafica = Column(Integer, primary_key=True, index=True)
     nombre_grafica = Column(String, nullable=False)
-    datos_extra = Column(JSON, nullable=True)
-    etiqueta = Column(String(255), nullable=True)
-
     aceleracion_x = Column(Float)
     aceleracion_y = Column(Float)
-    aceleracion_z = Column(Float)
-    rotacion_x = Column(Float)
-    rotacion_y = Column(Float)
-    rotacion_z = Column(Float)
-
     fecha_hora = Column(DateTime, default=lambda: datetime.now(timezone.utc))
     lado_pierna_gf = Column(String, nullable=True)
 
