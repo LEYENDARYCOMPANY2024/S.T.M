@@ -1,80 +1,112 @@
 # controllers/graficas_controller.py
+
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from models.graficas_models import Grafica, GraficaDispositivo
 import csv
 from io import StringIO
 from fastapi.responses import StreamingResponse
+from models.dispositivos_models import SesionDispositivo
+from datetime import datetime
+from pytz import timezone
 
-def guardar_datos_sensor(db: Session, datos: dict):
-    try:
-        grafica = Grafica(
-            nombre_grafica=datos["nombre_grafica"],
-            datos_extra=datos.get("datos_extra"),
-            aceleracion_x=datos["aceleracion_x"],
-            aceleracion_y=datos["aceleracion_y"],
-            aceleracion_z=datos["aceleracion_z"],
-            rotacion_x=datos["rotacion_x"],
-            rotacion_y=datos["rotacion_y"],
-            rotacion_z=datos["rotacion_z"]
-        )
-        db.add(grafica)
+zona_mx = timezone("America/Mexico_City")
+
+def guardar_datos_sensor_minimal(db: Session, datos: dict):
+    uuid = datos.get("uuid")
+    id_sesion_dispositivo = datos.get("id_sesion_dispositivo")
+    lado_pierna = datos.get("lado_pierna")
+
+    if not uuid or not id_sesion_dispositivo or not lado_pierna:
+        raise HTTPException(status_code=400, detail="Faltan datos obligatorios")
+
+    sesion_dispositivo = db.query(SesionDispositivo).filter(
+        SesionDispositivo.id_sesion_dispositivo == id_sesion_dispositivo,
+        SesionDispositivo.estado_activado == "activado"
+    ).first()
+
+    if not sesion_dispositivo:
+        raise HTTPException(status_code=404, detail="Sesión del dispositivo no activa")
+
+    relacion = db.query(GraficaDispositivo).filter(
+        GraficaDispositivo.id_sesion_dispositivo_fk == id_sesion_dispositivo,
+        GraficaDispositivo.lado_pierna == lado_pierna
+    ).first()
+
+    now_local = datetime.now(zona_mx).replace(tzinfo=None)  # ⏱️ Hora local sin tzinfo
+
+    nueva_entrada = {
+        "fecha_hora": now_local.isoformat(),
+        "aceleracion_x": datos.get("aceleracion_x", 0.0),
+        "aceleracion_y": datos.get("aceleracion_y", 0.0)
+    }
+
+    if relacion:
+        grafica = db.query(Grafica).filter(Grafica.id_grafica == relacion.id_grafica_fk).first()
+        if not grafica:
+            raise HTTPException(status_code=404, detail="Gráfica no encontrada.")
+        
+        grafica.aceleracion_x = nueva_entrada["aceleracion_x"]
+        grafica.aceleracion_y = nueva_entrada["aceleracion_y"]
+        grafica.lado_pierna_gf = lado_pierna
+        grafica.fecha_hora = now_local  # 🕒 Local sin tz
+
         db.commit()
-        db.refresh(grafica)
+        return {"mensaje": "Datos actualizados correctamente", "id_grafica": grafica.id_grafica}
 
-        grafica_dispositivo = GraficaDispositivo(
-            id_grafica_fk=grafica.id_grafica,
-            id_sesion_dispositivo_fk=datos["id_sesion_dispositivo"],
-            lado_pierna=datos["lado_pierna"]
-        )
-        db.add(grafica_dispositivo)
-        db.commit()
+    if nueva_entrada["aceleracion_x"] == 0.0 and nueva_entrada["aceleracion_y"] == 0.0:
+        return {"mensaje": "No se creó gráfica porque los datos están vacíos"}
 
-        return {"mensaje": "Dato guardado correctamente", "id_grafica": grafica.id_grafica}
-
-    except Exception as e:
-        db.rollback()
-        raise HTTPException(status_code=500, detail=f"Error al guardar datos: {str(e)}")
-
-def etiquetar_datos(db: Session, id_sesion_dispositivo: int, etiqueta: str):
-    registros = (
-        db.query(Grafica)
-        .join(GraficaDispositivo, Grafica.id_grafica == GraficaDispositivo.id_grafica_fk)
-        .filter(GraficaDispositivo.id_sesion_dispositivo_fk == id_sesion_dispositivo)
-        .all()
+    total = db.query(Grafica).count()
+    nueva_grafica = Grafica(
+        nombre_grafica=f"grafica_{total+1}",
+        aceleracion_x=nueva_entrada["aceleracion_x"],
+        aceleracion_y=nueva_entrada["aceleracion_y"],
+        lado_pierna_gf=lado_pierna,
+        fecha_hora=now_local
     )
-
-    for grafica in registros:
-        grafica.etiqueta = etiqueta
-
+    db.add(nueva_grafica)
     db.commit()
-    return {"mensaje": f"Datos etiquetados como '{etiqueta}'"}
+    db.refresh(nueva_grafica)
 
-def exportar_datos_csv(db: Session, id_sesion_dispositivo: int):
-    registros = (
-        db.query(Grafica)
-        .join(GraficaDispositivo, Grafica.id_grafica == GraficaDispositivo.id_grafica_fk)
-        .filter(GraficaDispositivo.id_sesion_dispositivo_fk == id_sesion_dispositivo)
-        .order_by(Grafica.id_grafica)
-        .all()
+    nueva_relacion = GraficaDispositivo(
+        id_grafica_fk=nueva_grafica.id_grafica,
+        id_sesion_dispositivo_fk=id_sesion_dispositivo,
+        lado_pierna=lado_pierna
     )
+    db.add(nueva_relacion)
+    db.commit()
+
+    return {"mensaje": "Gráfica creada y datos insertados", "id_grafica": nueva_grafica.id_grafica}
+
+
+
+
+
+
+def exportar_grafica_solo_xy(db: Session, id_grafica: int):
+    grafica = db.query(Grafica).filter(Grafica.id_grafica == id_grafica).first()
+    if not grafica or not grafica.datos_extra:
+        raise HTTPException(status_code=404, detail="No hay datos para exportar")
 
     output = StringIO()
     writer = csv.writer(output)
-    writer.writerow(["id", "acel_x", "acel_y", "acel_z", "rot_x", "rot_y", "rot_z", "etiqueta"])
-    for g in registros:
+    writer.writerow(["fecha_hora", "aceleracion_x", "aceleracion_y"])
+
+    for item in grafica.datos_extra:
         writer.writerow([
-            g.id_grafica, g.aceleracion_x, g.aceleracion_y, g.aceleracion_z,
-            g.rotacion_x, g.rotacion_y, g.rotacion_z, g.etiqueta or ""
+            item.get("fecha_hora", ""),
+            item.get("aceleracion_x", 0.0),
+            item.get("aceleracion_y", 0.0)
         ])
 
     output.seek(0)
     return StreamingResponse(output, media_type="text/csv", headers={
-        "Content-Disposition": "attachment; filename=datos_grafica.csv"
+        "Content-Disposition": f"attachment; filename=grafica_{id_grafica}.csv"
     })
 
-def importar_csv(file, etiqueta: str, db: Session):
 
+def importar_csv(file, etiqueta: str, db: Session):
     content = file.file.read().decode("utf-8").splitlines()
     reader = csv.DictReader(content)
 

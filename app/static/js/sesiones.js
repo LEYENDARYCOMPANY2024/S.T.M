@@ -330,3 +330,34 @@ function changeMonth(step) {
 // 📌 Cargar calendario y sesiones al inicio
 renderCalendar();
 fetchSesiones(currentPage);
+
+
+document.addEventListener("DOMContentLoaded", () => {
+    const homeButton = document.querySelector(".home-button");
+    if (homeButton) {
+        homeButton.addEventListener("click", async (e) => {
+            e.preventDefault(); // ✋ prevenir redirección inmediata
+
+            const sesionId = localStorage.getItem("id_sesion");
+
+            if (sesionId) {
+                try {
+                    await fetch(`/dispositivos/desactivar/${sesionId}`, {
+                        method: "PUT"
+                    });
+                    console.log("🔌 Dispositivos desactivados correctamente.");
+                } catch (error) {
+                    console.error("❌ Error al desactivar dispositivos:", error);
+                }
+            }
+
+            console.log("🏠 Limpiando localStorage al volver a principal...");
+            localStorage.removeItem("id_sesion");
+            localStorage.removeItem("nombre_sesion");
+            localStorage.removeItem("sesion_dispositivo_ids");
+
+            // ✅ Redirigir luego de limpiar todo
+            window.location.href = "/principal";
+        });
+    }
+});

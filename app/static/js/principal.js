@@ -386,6 +386,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             // Guardar el ID del paciente en localStorage
             localStorage.setItem("id_paciente", id_paciente);
 
+
             // 🔹 Redirigir a la página de historial clínico
             window.location.href = "/historial_clinico";
             

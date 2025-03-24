@@ -781,3 +781,46 @@ button:disabled {
 
 
 
+
+
+
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.85);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.modal-confirm {
+    background-color: #0a2a3d;
+    border: 2px solid #1565C0;
+    border-radius: 12px;
+    padding: 25px 30px;
+    color: white;
+    max-width: 400px;
+    text-align: center;
+    box-shadow: 0 0 20px black;
+}
+
+.modal-confirm h2 {
+    margin-bottom: 10px;
+    font-size: 20px;
+    color: #ffffff;
+}
+
+.modal-confirm p {
+    font-size: 14px;
+    color: #ddd;
+    margin-bottom: 20px;
+}
+
+.modal-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
