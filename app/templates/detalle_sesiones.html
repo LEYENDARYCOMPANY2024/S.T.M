@@ -15,6 +15,7 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/smoothie/1.34.0/smoothie.min.js"></script>
 </head>
 <body>
 
@@ -133,11 +134,13 @@
   <div class="container">
     <div class="left-panel">
       <div class="charts">
-        <canvas id="grafica_realtime"></canvas>
+        <button id="toggleChart" class="btn-switch">Cambiar a Chart.js</button>
+        <canvas id="grafica_smoothie" width="800" height="300"></canvas>
+        <canvas id="grafica_chartjs"></canvas>
         <div class="chart-buttons">
-          <button id="pauseButton" onclick="togglePause()">⏸️ Pausar</button>
+          <button id="pauseButton" onclick="togglePause()">▶️ Iniciar</button>
           <button onclick="reiniciarGrafica()">🔄 Reiniciar</button>
-          <button onclick="exportarGraficaCSV()">💾 Guardar CSV</button>
+          <button onclick="exportarGraficaActual()">💾 Guardar CSV</button>
           <button onclick="document.getElementById('importInput').click()">📥 Importar CSV</button>
           <input type="file" id="importInput" accept=".csv" style="display:none" onchange="importarCSV(event)">
         </div>
@@ -166,8 +169,66 @@
   <div id="message-container"></div>
 
   <!-- Scripts -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/smoothie/1.36/smoothie.min.js"></script>
-  <script src="/static/js/graficas_realtime.js"></script>
+  <script>
+    let currentChart = 'chartjs';
+    let reinicioPendiente = false;
+
+    document.getElementById("toggleChart").addEventListener("click", () => {
+      if (reinicioPendiente) {
+        alert("🔄 Reinicia la gráfica antes de cambiar de tipo.");
+        return;
+      }
+
+      const smoothieCanvas = document.getElementById("grafica_smoothie");
+      const chartjsCanvas = document.getElementById("grafica_chartjs");
+      const toggleBtn = document.getElementById("toggleChart");
+
+      if (currentChart === 'smoothie') {
+        smoothieCanvas.style.display = "none";
+        chartjsCanvas.style.display = "block";
+        currentChart = 'chartjs';
+        toggleBtn.textContent = "Cambiar a Smoothie";
+      } else {
+        chartjsCanvas.style.display = "none";
+        smoothieCanvas.style.display = "block";
+        currentChart = 'smoothie';
+        toggleBtn.textContent = "Cambiar a Chart.js";
+      }
+    });
+
+    function marcarCambioChart() {
+      reinicioPendiente = true;
+    }
+
+    function reiniciarGrafica() {
+      reinicioPendiente = false;
+      // Aquí llamas al reinicio según el tipo actual de gráfica
+      if (currentChart === 'smoothie') {
+        if (window.reiniciarSmoothie) reiniciarSmoothie();
+      } else {
+        if (window.reiniciarChartJS) reiniciarChartJS();
+      }
+    }
+    function exportarGraficaActual() {
+        if (currentChart === "chartjs" && typeof chartjs_exportarCSV === "function") {
+          chartjs_exportarCSV();
+        } else if (currentChart === "smoothie" && typeof smoothie_exportarCSV === "function") {
+          smoothie_exportarCSV();
+        } else {
+          alert("⚠️ No se puede exportar en este momento.");
+        }
+      }
+      
+
+    // Asegura que el botón empiece con texto correcto
+    window.addEventListener('DOMContentLoaded', () => {
+        document.getElementById("grafica_smoothie").style.display = "none";
+        document.getElementById("grafica_chartjs").style.display = "block";
+        document.getElementById("pauseButton").textContent = "▶️ Iniciar";
+      });
+  </script>
+  <script src="/static/js/grafica_chart.js" defer></script>
+  <script src="/static/js/grafica_smoothie.js" defer></script>
   <script src="/static/js/detalle_sesiones.js"></script>
 </body>
 </html>
