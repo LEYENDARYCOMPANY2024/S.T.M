@@ -12,7 +12,7 @@ derechaTS.maxDataLength = 30;
 const chart = new SmoothieChart({
   grid: {
     strokeStyle: 'rgba(255,255,255,0.1)',
-    millisPerLine: 1000,
+    millisPerLine: 500,
     verticalSections: 4
   },
   labels: {
@@ -95,7 +95,7 @@ function reiniciarGrafica() {
 
 document.addEventListener("DOMContentLoaded", () => {
   const canvas = document.getElementById("grafica_realtime");
-  chart.streamTo(canvas, 100);
+  chart.streamTo(canvas, /* delay */ 0);
   chart.addTimeSeries(izquierdaTS, { strokeStyle: '#00ff00', lineWidth: 2 });
   chart.addTimeSeries(derechaTS, { strokeStyle: '#ff3333', lineWidth: 2 });
 
