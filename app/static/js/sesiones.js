@@ -117,7 +117,9 @@ function renderSesionesPorTerapeuta(terapeutas) {
         const terapeutaDiv = document.createElement("div");
         terapeutaDiv.classList.add("terapeuta-container");
 
-        terapeutaDiv.innerHTML = `<h3>Terapeuta: ${terapeuta.terapeuta}</h3>`;
+        const terapeutaTitle = document.createElement("h3");
+        terapeutaTitle.textContent = `Terapeuta: ${terapeuta.terapeuta}`;
+        terapeutaDiv.appendChild(terapeutaTitle);
 
         terapeuta.sesiones.forEach((sesion, index) => {
             const sessionDiv = document.createElement("button");
@@ -141,7 +143,6 @@ function renderSesionesPorTerapeuta(terapeutas) {
         sessionContainer.appendChild(terapeutaDiv);
     });
 }
-
 
 // 📌 Verificar si hay sesión activa al cargar sesiones
 document.addEventListener("DOMContentLoaded", () => {
@@ -220,12 +221,11 @@ function updatePagination(totalPages, currentPage) {
     }
 }
 
-
 async function crearSesion() {
     const desc = document.getElementById("session-desc").value;
     let date = document.getElementById("session-date").value;
     const time = document.getElementById("session-time").value;
-    const idTerapeuta = localStorage.getItem("id_terapeuta"); // 🔥 importante
+    const idTerapeuta = localStorage.getItem("id_terapeuta");
 
     if (!desc || !date || !time || !idTerapeuta) {
         mostrarMensaje("Completa todos los campos.", "error");
@@ -251,12 +251,12 @@ async function crearSesion() {
         }
 
         mostrarMensaje("Sesión creada exitosamente", "success");
+        // Refetch and render sessions to update the container
         fetchSesiones(currentPage);
     } catch (error) {
         mostrarMensaje("Error al crear sesión: " + error.message, "error");
     }
 }
-
 
 
 
@@ -361,3 +361,76 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 });
+
+
+async function fetchSesiones(page = 1) {
+    try {
+        let idTerapeuta = localStorage.getItem("id_terapeuta");
+
+        if (!idTerapeuta) {
+            console.error("❌ No se encontró id_terapeuta en localStorage.");
+            mostrarMensaje("Error: No se encontró el terapeuta actual.", "error");
+            return;
+        }
+
+        const response = await fetch(`/sesiones/?id_paciente=${idPaciente}&id_terapeuta_actual=${idTerapeuta}&page=${page}&per_page=${sessionsPerPage}`);
+
+        if (!response.ok) throw new Error("No se pudieron obtener las sesiones");
+
+        const data = await response.json();
+        renderSesionesPorTerapeuta(data.terapeutas);
+        updatePagination(data.total_pages, page);
+    } catch (error) {
+        mostrarMensaje("Error al obtener sesiones", "error");
+        console.error(error);
+    }
+}
+
+function renderSesionesPorTerapeuta(terapeutas) {
+    const sessionContainer = document.getElementById("sessions-container");
+    sessionContainer.innerHTML = "";
+
+    if (terapeutas.length === 0) {
+        sessionContainer.innerHTML = "<p>No hay sesiones registradas.</p>";
+        return;
+    }
+
+    terapeutas.forEach((terapeuta) => {
+        // Crear contenedor para cada terapeuta
+        const terapeutaSection = document.createElement("div");
+        terapeutaSection.classList.add("terapeuta-section");
+
+        // Título del terapeuta
+        const terapeutaTitle = document.createElement("h3");
+        terapeutaTitle.textContent = `Terapeuta: ${terapeuta.terapeuta}`;
+        terapeutaSection.appendChild(terapeutaTitle);
+
+        // Contenedor de sesiones para este terapeuta
+        const sesionesContainer = document.createElement("div");
+        sesionesContainer.classList.add("terapeuta-sessions");
+
+        terapeuta.sesiones.forEach((sesion, index) => {
+            const sessionDiv = document.createElement("div");
+            sessionDiv.classList.add("session-grid-item");
+
+            sessionDiv.innerHTML = `
+                <div class="session-content">
+                    <h4>Sesión ${index + 1}</h4>
+                    <p>Fecha: ${sesion.fecha_inicio}</p>
+                    <p>Hora: ${sesion.hora_inicio}</p>
+                </div>
+            `;
+
+            sessionDiv.addEventListener("click", () => {
+                localStorage.setItem("id_sesion", sesion.id_sesion);
+                localStorage.setItem("nombre_sesion", `Sesión ${index + 1}`);
+                window.location.href = "/detalle_sesiones";
+            });
+
+            sesionesContainer.appendChild(sessionDiv);
+        });
+
+        terapeutaSection.appendChild(sesionesContainer);
+        sessionContainer.appendChild(terapeutaSection);
+    });
+}
