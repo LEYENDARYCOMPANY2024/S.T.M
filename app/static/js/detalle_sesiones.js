@@ -159,7 +159,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         console.error(error);
         mostrarMensaje("Error cargando la sesión", "error");
     }
-
+});
     document.getElementById("btn-grafica").addEventListener("click", () => {
         cargarGrafica(); // 📌 Llamará a la función de grafica.js
     });
@@ -168,7 +168,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         cargarTablaMediapipe(); // 📌 Llamará a la función de tabla_mediapipe.js
     });
     
-});
+
 
 
 
@@ -1559,6 +1559,10 @@ tableBody.addEventListener('mouseout', function(event) {
         row.style.backgroundColor = '';
     }
 });
+
+
+
+
 
 
 document.addEventListener("DOMContentLoaded", () => {

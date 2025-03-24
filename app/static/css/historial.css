@@ -204,7 +204,6 @@ body {
     fill: #ffffff; /* Color del icono */
 }
 
-
 /* CSS Variables */
 :root {
     --background-light: #c0c6f0;
@@ -519,3 +518,5 @@ select:focus {
 .home-button:hover {
     color: #007bff; /* Cambia de color al pasar el mouse */
 }
+
+     
