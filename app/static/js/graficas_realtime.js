@@ -1,159 +1,173 @@
 const supabase = window.supabase.createClient(
-    'https://hxjmzijhcmhfcrjcptge.supabase.co',
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh4am16aWpoY21oZmNyamNwdGdlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDAwODMxODgsImV4cCI6MjA1NTY1OTE4OH0.fZ1QaYkFTfJTdupOUkV7V9a7kIIVHCt_XusnNWxkyqw'
-  );
-  
-  let chartData = {
-    labels: [],
-    datasets: {
-      izquierda: { ay: [] },
-      derecha: { ay: [] }
-    }
-  };
-  
-  let chart = null;
-  let realtimePaused = false;
-  const MAX_DATA_POINTS = 30;
-  
-  document.addEventListener("DOMContentLoaded", () => {
-    const ctx = document.getElementById("grafica_realtime").getContext("2d");
-  
-    chart = new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels: chartData.labels,
-        datasets: [
-          {
-            label: "Pierna Izquierda",
-            borderColor: "green",
-            data: chartData.datasets.izquierda.ay,
-            fill: false
-          },
-          {
-            label: "Pierna Derecha",
-            borderColor: "red",
-            data: chartData.datasets.derecha.ay,
-            fill: false
-          }
-        ]
+  'https://hxjmzijhcmhfcrjcptge.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh4am16aWpoY21oZmNyamNwdGdlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDAwODMxODgsImV4cCI6MjA1NTY1OTE4OH0.fZ1QaYkFTfJTdupOUkV7V9a7kIIVHCt_XusnNWxkyqw'
+);
+
+// Estructura de datos
+let chartData = {
+  labels: [],
+  datasets: {
+    izquierda: { ay: [] },
+    derecha: { ay: [] }
+  }
+};
+
+let chart = null;
+let realtimePaused = false;
+const MAX_DATA_POINTS = 30;
+
+document.addEventListener("DOMContentLoaded", () => {
+  const ctx = document.getElementById("grafica_realtime").getContext("2d");
+
+  chart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: chartData.labels,
+      datasets: [
+        {
+          label: "Pierna Izquierda",
+          borderColor: "green",
+          data: chartData.datasets.izquierda.ay,
+          fill: false,
+          pointRadius: 2,      // ⬅️ Puntos más pequeños
+          spanGaps: true,      // ⬅️ Evita huecos
+          parsing: false       // ⬅️ Evita parseos extra
+        },
+        {
+          label: "Pierna Derecha",
+          borderColor: "red",
+          data: chartData.datasets.derecha.ay,
+          fill: false,
+          pointRadius: 2,
+          spanGaps: true,
+          parsing: false
+        }
+      ]
+    },
+    options: {
+      animation: false,
+      responsive: true,
+      maintainAspectRatio: false,  // ⬅️ Evita recalcular tamaños
+      elements: {
+        line: {
+          tension: 0 // ✅ Quita suavizado (mejora rendimiento)
+        }
       },
-      options: {
-        animation: false,
-        responsive: true,
-        elements: {
-          line: {
-            tension: 0 // ✅ Mejora rendimiento visual quitando suavizado
-          }
-        },
-        scales: {
-          y: {
-            beginAtZero: true,
-            title: {
-              display: true,
-              text: 'Aceleración Y'
-            }
-          },
-          x: {
+      scales: {
+        y: {
+          beginAtZero: true,
+          title: {
             display: true,
-            title: {
-              display: true,
-              text: 'Hora'
-            }
+            text: 'Aceleración Y'
           }
         },
-        plugins: {
-          legend: {
-            labels: {
-              color: 'white',
-              font: { size: 14, weight: 'bold' }
-            }
+        x: {
+          display: true,
+          title: {
+            display: true,
+            text: 'Hora'
           }
         }
-      }      
-    });
-  
-    renderLeyendaPiernas();
-    document.getElementById("importInput").addEventListener("change", importarCSV);
-  });
-  
-  function renderLeyendaPiernas() {
-    const contenedor = document.createElement("div");
-    contenedor.classList.add("leyenda-piernas");
-  
-    contenedor.innerHTML = `
-      <div class="item-leyenda">
-        <span class="cuadro-color" style="background-color: green;"></span>
-        Pierna Izquierda
-      </div>
-      <div class="item-leyenda">
-        <span class="cuadro-color" style="background-color: red;"></span>
-        Pierna Derecha
-      </div>
-    `;
-  
-    document.querySelector(".charts").prepend(contenedor);
-  }
-  
-  function limitData() {
-    if (chartData.labels.length > MAX_DATA_POINTS) {
-      chartData.labels.shift();
-      Object.values(chartData.datasets).forEach(dataset => {
-        dataset.ay.shift();
-      });
+      },
+      plugins: {
+        // Decimation para tramos con muchos puntos
+        decimation: {
+          enabled: true,
+          algorithm: 'lttb',
+          samples: 30
+        },
+        legend: {
+          labels: {
+            color: 'white',
+            font: { size: 14, weight: 'bold' }
+          }
+        }
+      }
     }
+  });
+
+  renderLeyendaPiernas();
+  document.getElementById("importInput")?.addEventListener("change", importarCSV);
+});
+
+// Render de la leyenda (igual)
+function renderLeyendaPiernas() {
+  const contenedor = document.createElement("div");
+  contenedor.classList.add("leyenda-piernas");
+
+  contenedor.innerHTML = `
+    <div class="item-leyenda">
+      <span class="cuadro-color" style="background-color: green;"></span>
+      Pierna Izquierda
+    </div>
+    <div class="item-leyenda">
+      <span class="cuadro-color" style="background-color: red;"></span>
+      Pierna Derecha
+    </div>
+  `;
+  document.querySelector(".charts").prepend(contenedor);
+}
+
+// Limitar puntos a 30 (o los que desees)
+function limitData() {
+  if (chartData.labels.length > MAX_DATA_POINTS) {
+    chartData.labels.shift();
+    Object.values(chartData.datasets).forEach(dataset => {
+      dataset.ay.shift();
+    });
   }
+}
+
+// Suscripción a Realtime
+function suscribirseAGraficasRealtime() {
+  console.log("🎧 Subscribiéndose a Supabase Realtime...");
+
+  supabase
+    .channel('graficas_realtime')
+    .on('postgres_changes', {
+      event: 'UPDATE',
+      schema: 'public',
+      table: 'graficas'
+    }, payload => {
+      if (realtimePaused) return;
+
+      const data = payload.new;
+      const lado = data.lado_pierna_gf;
+
+      if (!lado || !chartData.datasets[lado]) {
+        console.warn("⚠️ Lado inválido o desconocido:", lado);
+        return;
+      }
+
+      // ⏱️ Timestamp como etiqueta
+      const t = new Date(data.fecha_hora).toLocaleTimeString();
+      chartData.labels.push(t);
+
+      // 🟦 Agregar datos
+      chartData.datasets[lado].ay.push(data.aceleracion_y ?? 0);
+
+      // Si usas X también
+      // chartData.datasets[lado].ax?.push(data.aceleracion_x ?? 0);
+
+      // Limitar para no saturar
+      limitData();
+
+      // 🚀 Actualización más ligera
+      chart.update('none');
+
+      // Logs informativos
+      console.log(`📊 Total puntos (${lado}): ${chartData.datasets[lado].ay.length}`);
+      console.log(`✅ Gráfica actualizada (${lado})`);
+    })
+    .subscribe(status => {
+      if (status === "SUBSCRIBED") {
+        console.log("✅ Canal conectado a Supabase Realtime");
+      } else {
+        console.warn("⚠️ Estado de conexión:", status);
+      }
+    });
+}
   
-  function suscribirseAGraficasRealtime() {
-    console.log("🎧 Subscribiéndose a Supabase Realtime...");
-  
-    supabase
-      .channel('graficas_realtime')
-      .on('postgres_changes', {
-        event: 'UPDATE',
-        schema: 'public',
-        table: 'graficas'
-      }, payload => {
-        if (realtimePaused) return;
-  
-        const data = payload.new;
-  
-        // ✅ Solo extraemos lo necesario
-        const { id_grafica, fecha_hora, lado_pierna_gf, aceleracion_y } = data;
-  
-        if (!lado_pierna_gf || aceleracion_y === undefined) {
-          console.warn("⚠️ Datos incompletos recibidos");
-          return;
-        }
-  
-        const t = new Date(fecha_hora).toLocaleTimeString();
-        chart.data.labels.push(t);
-  
-        const datasetLabel = lado_pierna_gf === "izquierda" ? "Pierna Izquierda" : "Pierna Derecha";
-        const dataset = chart.data.datasets.find(ds => ds.label === datasetLabel);
-  
-        if (dataset) {
-          dataset.data.push(aceleracion_y);
-        }
-  
-        // ⛔ No usamos más campos como aceleracion_x, rotaciones, etc.
-  
-        // Limitar puntos para mantener rendimiento
-        if (chart.data.labels.length > MAX_DATA_POINTS) {
-          chart.data.labels.shift();
-          chart.data.datasets.forEach(ds => ds.data.shift());
-        }
-  
-        chart.update('none');  // ⚡ Ligero
-        console.log(`✅ Gráfica actualizada (${lado_pierna_gf})`);
-      })
-      .subscribe(status => {
-        if (status === "SUBSCRIBED") {
-          console.log("✅ Canal conectado a Supabase Realtime");
-        } else {
-          console.warn("⚠️ Estado de conexión:", status);
-        }
-      });
-  }
   
 
   
