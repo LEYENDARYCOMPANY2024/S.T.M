@@ -43,10 +43,7 @@
     margin: 15px 0;
 }
 
-#grafica_realtime {
-    position: static !important;
-    object-fit: initial !important;
-}
+
 
 
 .charts {
@@ -58,16 +55,20 @@
 }
 
 #grafica_realtime {
-    width: 100%;
-    max-width: 800px;
-    height: 300px;
-    margin: 10px auto; /* Reduce el margen para que no esté tan separado */
-    display: block;
-    border-radius: 10px;
-    border: 2px solid white;
-    background-color: #0b2a3d;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+  width: 100%;
+  max-width: 800px;
+  height: 300px;
+  margin: 10px auto;
+  display: block;
+  border-radius: 10px;
+  border: 2px solid white;
+  background-color: #0b2a3d;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+  position: static !important;
+  object-fit: initial !important;
+  padding-bottom: 30px;
 }
+
 
 .chart-buttons {
     display: flex;

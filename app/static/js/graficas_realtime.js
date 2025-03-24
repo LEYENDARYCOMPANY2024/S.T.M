@@ -6,6 +6,8 @@ const supabase = window.supabase.createClient(
 let realtimePaused = false;
 const izquierdaTS = new TimeSeries();
 const derechaTS = new TimeSeries();
+izquierdaTS.maxDataLength = 30;
+derechaTS.maxDataLength = 30;
 
 const chart = new SmoothieChart({
   grid: {
@@ -14,20 +16,23 @@ const chart = new SmoothieChart({
     verticalSections: 4
   },
   labels: {
-    fillStyle: 'white'
+    fillStyle: 'white',
+    precision: 2,
+    fontSize: 14,
+    fontFamily: 'Arial'
   },
-  timestampFormatter: date => new Date(date).toLocaleTimeString(),
-  maxValueScale: 1.2,
-  minValueScale: 1.2
+  timestampFormatter: date => date.toLocaleTimeString(),
+  minValue: -2,  // fuerza el eje Y a estar visible
+  maxValue: 2
 });
 
+
+
+// ✅ Renderiza la leyenda de colores
 function renderLeyendaPiernas() {
-  const contenedor = document.getElementById("dispositivos-activos");
-
-  const leyenda = document.createElement("div");
-  leyenda.classList.add("leyenda-piernas");
-
-  leyenda.innerHTML = `
+  const leyendaContainer = document.createElement("div");
+  leyendaContainer.classList.add("leyenda-piernas");
+  leyendaContainer.innerHTML = `
     <div class="item-leyenda">
       <span class="cuadro-color" style="background-color: green;"></span>
       Pierna Izquierda
@@ -37,20 +42,9 @@ function renderLeyendaPiernas() {
       Pierna Derecha
     </div>
   `;
-
-  contenedor.appendChild(leyenda);
+  const chartsContainer = document.querySelector(".charts");
+  chartsContainer.insertBefore(leyendaContainer, chartsContainer.children[1]); // Insertar antes de los botones
 }
-
-
-document.addEventListener("DOMContentLoaded", () => {
-  const canvas = document.getElementById("grafica_realtime");
-  chart.streamTo(canvas, 100);
-  chart.addTimeSeries(izquierdaTS, { strokeStyle: 'green', lineWidth: 2 });
-  chart.addTimeSeries(derechaTS, { strokeStyle: 'red', lineWidth: 2 });
-
-  renderLeyendaPiernas();
-  document.getElementById("importInput").addEventListener("change", importarCSV);
-});
 
 function suscribirseAGraficasRealtime() {
   console.log("🎧 Subscribiéndose a Supabase Realtime...");
@@ -94,6 +88,17 @@ function reiniciarGrafica() {
   derechaTS.clear();
   mostrarMensaje("🔄 Gráfica reiniciada");
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+  const canvas = document.getElementById("grafica_realtime");
+  chart.streamTo(canvas, 100);
+  chart.addTimeSeries(izquierdaTS, { strokeStyle: '#00ff00', lineWidth: 2 });
+  chart.addTimeSeries(derechaTS, { strokeStyle: '#ff3333', lineWidth: 2 });
+
+  renderLeyendaPiernas();
+  document.getElementById("importInput").addEventListener("change", importarCSV);
+});
+
 
 async function togglePause() {
   realtimePaused = !realtimePaused;
