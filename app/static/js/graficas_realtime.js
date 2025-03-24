@@ -47,7 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
     options: {
       animation: false,
       responsive: true,
-      maintainAspectRatio: false,  // ⬅️ Evita recalcular tamaños
+      maintainAspectRatio: true,  // ⬅️ Evita recalcular tamaños
       elements: {
         line: {
           tension: 0 // ✅ Quita suavizado (mejora rendimiento)
