@@ -47,8 +47,33 @@ document.addEventListener('DOMContentLoaded', function() {
             sendMessage();
         }
     });
+<<<<<<< HEAD
     
     function loadPreviousMessages() {
+=======
+});   
+
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    const messagesContainer = document.getElementById('messagesContainer');
+    const messageInput = document.getElementById('messageInput');
+    const sendButton = document.getElementById('sendButton');
+    const typingIndicator = document.getElementById('typingIndicator');
+    
+    // Cargar mensajes al iniciar
+    loadMessages();
+    
+    // Enviar mensaje al hacer clic en el botón o presionar Enter
+    sendButton.addEventListener('click', sendMessage);
+    messageInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            sendMessage();
+        }
+    });
+    
+    function loadMessages() {
+>>>>>>> pruebas2
         fetch('/api/messages')
             .then(response => response.json())
             .then(messages => {
@@ -62,19 +87,52 @@ document.addEventListener('DOMContentLoaded', function() {
     
     function sendMessage() {
         const messageText = messageInput.value.trim();
+<<<<<<< HEAD
         if (messageText === '' || socket.readyState !== WebSocket.OPEN) return;
         
         // Limpiar input
         messageInput.value = '';
+=======
+        if (messageText === '') return;
+        
+        // Agregar mensaje a la UI
+        addMessageToUI('user', messageText);
+        messageInput.value = '';
+        scrollToBottom();
+>>>>>>> pruebas2
         
         // Mostrar indicador de escritura
         typingIndicator.style.display = 'flex';
         
+<<<<<<< HEAD
         // Enviar mensaje a través de WebSocket
         socket.send(JSON.stringify({
             message: messageText,
             userId: userId
         }));
+=======
+        // Enviar mensaje al servidor
+        fetch('/api/messages', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ message: messageText }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Ocultar indicador de escritura
+            typingIndicator.style.display = 'none';
+            
+            // Mostrar respuesta
+            addMessageToUI('system', data.message);
+            scrollToBottom();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            typingIndicator.style.display = 'none';
+        });
+>>>>>>> pruebas2
     }
     
     function addMessageToUI(sender, text) {
@@ -93,10 +151,13 @@ document.addEventListener('DOMContentLoaded', function() {
     function scrollToBottom() {
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
     }
+<<<<<<< HEAD
     
     function getCookie(name) {
         const value = `; ${document.cookie}`;
         const parts = value.split(`; ${name}=`);
         if (parts.length === 2) return parts.pop().split(';').shift();
     }
+=======
+>>>>>>> pruebas2
 });

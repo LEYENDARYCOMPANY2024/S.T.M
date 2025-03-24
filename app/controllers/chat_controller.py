@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 from models.chat_models import ChatModel
+=======
+from models.chat_model import ChatModel
+>>>>>>> pruebas2
 from datetime import datetime
 
 class ChatController:
