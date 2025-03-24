@@ -12,7 +12,7 @@
 
   <!-- Librerías -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/smoothie/1.34.0/smoothie.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
 </head>
@@ -133,7 +133,7 @@
   <div class="container">
     <div class="left-panel">
       <div class="charts">
-        <canvas id="grafica_realtime" width="800" height="300"></canvas>
+        <canvas id="grafica_realtime"></canvas>
         <div class="chart-buttons">
           <button id="pauseButton" onclick="togglePause()">⏸️ Pausar</button>
           <button onclick="reiniciarGrafica()">🔄 Reiniciar</button>
