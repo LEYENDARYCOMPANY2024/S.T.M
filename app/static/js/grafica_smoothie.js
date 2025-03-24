@@ -60,6 +60,9 @@ document.addEventListener("DOMContentLoaded", () => {
         const timestamp = new Date(data.fecha_hora).getTime();
         const valor = data.aceleracion_y ?? 0;
 
+        console.log("📥 Payload recibido:", payload);
+        console.log(`🦿 ${lado} => ${valor} @ ${new Date(timestamp).toLocaleTimeString()}`);
+
         if (lado === 'izquierda') {
           smoothie_izquierdaTS.append(timestamp, valor);
         } else if (lado === 'derecha') {

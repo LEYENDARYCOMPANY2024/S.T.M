@@ -63,8 +63,6 @@ const supabase = window.supabase.createClient(
         }
       }
     });
-  
-    chartjs_renderLeyenda();
     document.getElementById("importInput").addEventListener("change", chartjs_importarCSV);
   
   
@@ -89,10 +87,27 @@ const supabase = window.supabase.createClient(
   
         const data = payload.new;
         const lado = data.lado_pierna_gf;
-        if (!lado || !chartjs_data.datasets[lado]) return;
   
-        const tiempo = new Date(data.fecha_hora).toLocaleTimeString();
-        chartjs_data.labels.push(tiempo);
+        // Validación básica
+        if (!lado || !chartjs_data.datasets[lado]) {
+          console.warn("⚠️ Lado inválido recibido:", lado);
+          return;
+        }
+  
+        // Validar fecha para evitar datos en el futuro
+        const fecha = new Date(data.fecha_hora);
+        const ahora = new Date();
+        if (fecha > ahora) {
+          console.warn("🕒 Punto ignorado por estar en el futuro:", fecha.toLocaleTimeString());
+          return;
+        }
+  
+        // Logs de depuración
+        console.log("📥 Payload recibido:", data);
+        console.log(`🦿 ${lado} => ${data.aceleracion_y} @ ${fecha.toLocaleTimeString()}`);
+  
+        // Agregar a la gráfica
+        chartjs_data.labels.push(fecha.toLocaleTimeString());
         chartjs_data.datasets[lado].ay.push(data.aceleracion_y ?? 0);
         chartjs_limitData();
         chartjs_chart.update('none');
@@ -101,6 +116,7 @@ const supabase = window.supabase.createClient(
         if (s === "SUBSCRIBED") console.log("✅ Chart.js conectado a Realtime");
       });
   }
+  
   
   function chartjs_reiniciar() {
     chartjs_data.labels = [];
