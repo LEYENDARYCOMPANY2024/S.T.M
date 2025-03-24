@@ -87,3 +87,33 @@ $(document).ready(function () {
         $(this).toggleClass('fa-eye fa-eye-slash');
     });
 });
+
+   // Modal de términos y condiciones
+   const modal = $('#termsModal');
+   const btn = $('#toggleTerms');
+   const span = $('.close-button');
+   const acceptBtn = $('#acceptTermsBtn');
+
+   // Abrir modal al hacer clic en el botón
+   btn.click(function() {
+       modal.css('display', 'block');
+   });
+
+   // Cerrar modal al hacer clic en X
+   span.click(function() {
+       modal.css('display', 'none');
+   });
+
+   // Cerrar modal al hacer clic fuera del contenido
+   $(window).click(function(event) {
+       if (event.target === modal[0]) {
+           modal.css('display', 'none');
+       }
+   });
+
+   // Aceptar términos desde el modal
+   acceptBtn.click(function() {
+       $('#termsCheckbox').prop('checked', true);
+       updateRegisterButton();
+       modal.css('display', 'none');
+   });
