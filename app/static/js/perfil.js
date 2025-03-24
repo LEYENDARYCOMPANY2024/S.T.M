@@ -69,7 +69,17 @@ document.addEventListener("DOMContentLoaded", async function () {
     localStorage.setItem("id_terapeuta", idTerapeuta);
     console.log(`📌 Usuario autenticado en perfil. ID Terapeuta guardado: ${idTerapeuta}`);
 
-    // Obtener datos del perfil (código mantenido igual)
+    // Función para establecer de manera segura los valores en los campos
+    function safelySetValue(selector, value) {
+        const element = document.querySelector(selector);
+        if (element) {
+            element.value = value || "";
+        } else {
+            console.warn(`⚠️ Elemento no encontrado: ${selector}`);
+        }
+    }
+
+    // Obtener datos del perfil
     try {
         const response = await fetch(`/perfil/${idTerapeuta}`, {
             method: "GET",
@@ -96,15 +106,18 @@ document.addEventListener("DOMContentLoaded", async function () {
 
         localStorage.setItem("nombre_usuario", data.nombre_usuario);
 
-        document.querySelector("input[placeholder='Nombre']").value = data.nombre;
-        document.querySelector("input[placeholder='Primer apellido']").value = data.primer_apellido;
-        document.querySelector("input[placeholder='Segundo apellido']").value = data.segundo_apellido || "";
-        document.querySelector("input[placeholder='Correo electrónico']").value = data.correo;
-        document.querySelector("input[placeholder='Código Postal']").value = data.codigo_postal || "";
-        document.querySelector("input[placeholder='Calle']").value = data.calle || "";
-        document.querySelector("input[placeholder='Colonia']").value = data.colonia || "";
-        document.querySelector("input[placeholder='Número exterior']").value = data.num_ext || "";
-        document.querySelector("input[placeholder='Número interior']").value = data.num_int || "";
+        // Establecer valores de manera segura
+        safelySetValue("input[placeholder='Nombre']", data.nombre);
+        safelySetValue("input[placeholder='Primer apellido']", data.primer_apellido);
+        safelySetValue("input[placeholder='Segundo apellido']", data.segundo_apellido);
+        safelySetValue("input[placeholder='Correo electrónico']", data.correo);
+        safelySetValue("input[placeholder='Código Postal']", data.codigo_postal);
+        safelySetValue("input[placeholder='Calle']", data.calle);
+        safelySetValue("input[placeholder='Colonia']", data.colonia);
+        safelySetValue("input[placeholder='Número exterior']", data.num_ext);
+        safelySetValue("input[placeholder='Número interior']", data.num_int);
+        safelySetValue("input[placeholder='Teléfono']", data.telefono);
+        safelySetValue("input[placeholder='Estado']", data.estado);
     } catch (error) {
         console.error("❌ Error al cargar perfil:", error);
     }
@@ -160,114 +173,123 @@ document.addEventListener("DOMContentLoaded", async function () {
     const cedulaPreview = document.getElementById('cedula-preview');
     const cedulaImage = document.getElementById('cedula-image');
     
-    // Asegurarse que la cédula inicie como no editable
-    cedulaUpload.disabled = true;
-    
-    // Crear botón para eliminar la cédula si no existe
-    let deleteButton = cedulaPreview.querySelector('.delete-cedula-btn');
-    if (!deleteButton) {
-        deleteButton = document.createElement('button');
-        deleteButton.className = 'delete-cedula-btn';
-        deleteButton.innerHTML = '❌';
-        deleteButton.title = 'Eliminar archivo';
-        deleteButton.style.position = 'absolute';
-        deleteButton.style.top = '5px';
-        deleteButton.style.right = '5px';
-        deleteButton.style.background = 'transparent';
-        deleteButton.style.border = 'none';
-        deleteButton.style.cursor = 'pointer';
-        deleteButton.style.fontSize = '16px';
-        deleteButton.style.display = 'none';
+    if (cedulaUpload && cedulaPreview && cedulaImage) {
+        // Asegurarse que la cédula inicie como no editable
+        cedulaUpload.disabled = true;
         
-        cedulaPreview.style.position = 'relative';
-        cedulaPreview.appendChild(deleteButton);
+        // Crear botón para eliminar la cédula si no existe
+        let deleteButton = cedulaPreview.querySelector('.delete-cedula-btn');
+        if (!deleteButton) {
+            deleteButton = document.createElement('button');
+            deleteButton.className = 'delete-cedula-btn';
+            deleteButton.innerHTML = '❌';
+            deleteButton.title = 'Eliminar archivo';
+            deleteButton.style.position = 'absolute';
+            deleteButton.style.top = '5px';
+            deleteButton.style.right = '5px';
+            deleteButton.style.background = 'transparent';
+            deleteButton.style.border = 'none';
+            deleteButton.style.cursor = 'pointer';
+            deleteButton.style.fontSize = '16px';
+            deleteButton.style.display = 'none';
+            
+            cedulaPreview.style.position = 'relative';
+            cedulaPreview.appendChild(deleteButton);
+        }
+        
+        // Mostrar el botón de eliminar cuando hay una imagen o PDF cargado
+        cedulaUpload.addEventListener('change', function() {
+            if (cedulaUpload.files.length > 0) {
+                deleteButton.style.display = 'block';
+            }
+        });
+        
+        // Función para eliminar la cédula subida
+        deleteButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            cedulaImage.src = '';
+            cedulaImage.style.display = 'none';
+            cedulaUpload.value = '';
+            deleteButton.style.display = 'none';
+            
+            // Eliminar mensaje de nombre de archivo si existe
+            const fileNameElement = cedulaPreview.querySelector('.file-name');
+            if (fileNameElement) {
+                cedulaPreview.removeChild(fileNameElement);
+            }
+        });
+    } else {
+        console.warn("⚠️ No se encontraron elementos para la cédula profesional");
     }
-    
-    // Mostrar el botón de eliminar cuando hay una imagen o PDF cargado
-    cedulaUpload.addEventListener('change', function() {
-        if (cedulaUpload.files.length > 0) {
-            deleteButton.style.display = 'block';
-        }
-    });
-    
-    // Función para eliminar la cédula subida
-    deleteButton.addEventListener('click', function(e) {
-        e.preventDefault();
-        cedulaImage.src = '';
-        cedulaImage.style.display = 'none';
-        cedulaUpload.value = '';
-        deleteButton.style.display = 'none';
-        
-        // Eliminar mensaje de nombre de archivo si existe
-        const fileNameElement = cedulaPreview.querySelector('.file-name');
-        if (fileNameElement) {
-            cedulaPreview.removeChild(fileNameElement);
-        }
-    });
 
     // ===== CÓDIGO PARA MANEJO DE IMAGEN DE PERFIL =====
     const fileInput = document.getElementById('file-input');
     const profilePhoto = document.getElementById('profile-photo');
     
-    // Deshabilitar la carga de imagen al iniciar
-    fileInput.disabled = true;
-    
-    // Cargar imagen guardada en localStorage (si existe)
-    const savedImage = localStorage.getItem("profile-image");
-    if (savedImage) {
-        profilePhoto.src = savedImage;
-    }
-
-    fileInput.addEventListener('change', function(event) {
-        const file = event.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                profilePhoto.src = e.target.result;
-                localStorage.setItem("profile-image", e.target.result);
-            };
-            reader.readAsDataURL(file);
+    if (fileInput && profilePhoto) {
+        // Deshabilitar la carga de imagen al iniciar
+        fileInput.disabled = true;
+        
+        // Cargar imagen guardada en localStorage (si existe)
+        const savedImage = localStorage.getItem("profile-image");
+        if (savedImage) {
+            profilePhoto.src = savedImage;
         }
-    });
+
+        fileInput.addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    profilePhoto.src = e.target.result;
+                    localStorage.setItem("profile-image", e.target.result);
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    } else {
+        console.warn("⚠️ No se encontraron elementos para la foto de perfil");
+    }
 
     // ===== CÓDIGO PARA GUARDAR CAMBIOS =====
     saveBtn.addEventListener("click", async function () {
-        const updatedData = {};
-
-        // Definir los campos a actualizar
-        const fields = [
-            { selector: "input[placeholder='Nombre']", key: "nombre" },
-            { selector: "input[placeholder='Primer apellido']", key: "primer_apellido" },
-            { selector: "input[placeholder='Segundo apellido']", key: "segundo_apellido" },
-            { selector: "input[placeholder='Correo electrónico']", key: "correo" },
-            { selector: "input[placeholder='Código Postal']", key: "codigo_postal" },
-            { selector: "input[placeholder='Calle']", key: "calle" },
-            { selector: "input[placeholder='Colonia']", key: "colonia" },
-            { selector: "input[placeholder='Número exterior']", key: "num_ext" },
-            { selector: "input[placeholder='Número interior']", key: "num_int" }
-        ];
-
-        fields.forEach(field => {
-            const element = document.querySelector(field.selector);
+        // Función para obtener valor de manera segura
+        function safelyGetValue(selector, key) {
+            const element = document.querySelector(selector);
             if (element) {
-                const value = element.value.trim();
-                if (value !== "") {  
-                    updatedData[field.key] = value;
-                }
+                return element.value.trim();
+            } else {
+                console.warn(`⚠️ Elemento no encontrado al guardar: ${selector}`);
+                return null;
             }
-        });
+        }
 
+        // Obtener todos los datos del formulario
+        const updatedData = {
+            "nombre": safelyGetValue("input[placeholder='Nombre']"),
+            "primer_apellido": safelyGetValue("input[placeholder='Primer apellido']"),
+            "segundo_apellido": safelyGetValue("input[placeholder='Segundo apellido']"),
+            "correo": safelyGetValue("input[placeholder='Correo electrónico']"),
+            "codigo_postal": safelyGetValue("input[placeholder='Código Postal']"),
+            "calle": safelyGetValue("input[placeholder='Calle']"),
+            "colonia": safelyGetValue("input[placeholder='Colonia']"),
+            "num_ext": safelyGetValue("input[placeholder='Número exterior']"),
+            "num_int": safelyGetValue("input[placeholder='Número interior']"),
+            "telefono": safelyGetValue("input[placeholder='Teléfono']"),
+            "estado": safelyGetValue("input[placeholder='Estado']")
+        };
+    
         // Agregar nombre_usuario porque FastAPI lo requiere
         updatedData["nombre_usuario"] = localStorage.getItem("nombre_usuario");
-
+    
         // Agregar información de la cédula profesional si existe
-        if (cedulaImage.src) {
+        if (cedulaImage && cedulaImage.src) {
             // Aquí puedes agregar código para enviar la cédula al servidor
             console.log('Cédula guardada:', cedulaImage.src.substring(0, 30) + '...');
         }
-
+    
         console.log("📌 Datos enviados al servidor:", JSON.stringify(updatedData, null, 2));
-
+    
         try {
             const response = await fetch(`/perfil/${idTerapeuta}`, {
                 method: "PUT",
@@ -277,24 +299,32 @@ document.addEventListener("DOMContentLoaded", async function () {
                 },
                 body: JSON.stringify(updatedData)
             });
-
+    
             if (!response.ok) {
                 const errorResponse = await response.json();
                 console.error("❌ Error en la respuesta del servidor:", JSON.stringify(errorResponse, null, 2));
                 throw new Error("Error al actualizar el perfil");
             }
-
+    
             const successAlert = document.getElementById("successAlert");
-            successAlert.classList.add("show");
-
-            setTimeout(() => {
-                successAlert.classList.remove("show");
-            }, 3000);
-
+            if (successAlert) {
+                successAlert.classList.add("show");
+        
+                setTimeout(() => {
+                    successAlert.classList.remove("show");
+                }, 3000);
+            } else {
+                console.warn("⚠️ Elemento #successAlert no encontrado");
+                alert("¡Perfil actualizado correctamente!");
+            }
+            
+            console.log("✅ Perfil actualizado correctamente");
+    
         } catch (error) {
             console.error("❌ Error al actualizar perfil:", error);
+            alert("Error al actualizar el perfil. Intente nuevamente.");
         }
-
+    
         // Volver al modo de solo lectura después de guardar
         toggleEditMode(false);
     });
@@ -307,3 +337,4 @@ document.addEventListener("DOMContentLoaded", async function () {
         window.location.replace("/");
     };
 });
+
