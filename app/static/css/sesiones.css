@@ -574,3 +574,28 @@ body {
     text-decoration: line-through;
 }
 
+#sessions-container {
+    display: flex; /* Para alinear los elementos dentro del contenedor */
+    flex-wrap: wrap; /* Permite que los elementos se acomoden en varias líneas */
+    justify-content: space-around; /* Distribuye los elementos de manera uniforme */
+    align-items: flex-start; /* Alinea los elementos en la parte superior */
+    padding: 20px; /* Espaciado interno alrededor del contenedor */
+    background-color: #f4f4f4; /* Color de fondo */
+    border-radius: 8px; /* Bordes redondeados */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra suave */
+    margin-top: 30px; /* Espaciado superior */
+}
+
+#sessions-container div {
+    background-color: #ffffff; /* Fondo blanco para los elementos */
+    padding: 15px; /* Espaciado interno */
+    margin: 10px; /* Espaciado entre los elementos */
+    border-radius: 8px; /* Bordes redondeados */
+    width: 200px; /* Ancho fijo para cada elemento */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra sutil */
+    transition: transform 0.3s ease-in-out; /* Transición suave para el hover */
+}
+
+#sessions-container div:hover {
+    transform: translateY(-5px); /* Efecto de elevación al pasar el cursor */
+}
