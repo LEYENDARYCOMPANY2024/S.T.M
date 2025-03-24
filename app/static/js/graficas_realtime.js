@@ -61,12 +61,10 @@ function suscribirseAGraficasRealtime() {
 
       const data = payload.new;
       const lado = data.lado_pierna_gf;
-      // Ajustar la fecha_hora recibida a CDMX
+      // 👇 Pega aquí la versión corregida:
       const fechaUTC = new Date(data.fecha_hora);
-
-      // Convertir a zona horaria de CDMX
-      const fechaLocal = new Date(fechaUTC.toLocaleString("en-US", { timeZone: "America/Mexico_City" }));
-
+      const offsetCDMX = -6 * 60;
+      const fechaLocal = new Date(fechaUTC.getTime() + offsetCDMX * 60 * 1000);
       const timestamp = fechaLocal.getTime();
 
       const valor = data.aceleracion_y ?? 0;
