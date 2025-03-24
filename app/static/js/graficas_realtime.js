@@ -61,11 +61,7 @@ function suscribirseAGraficasRealtime() {
 
       const data = payload.new;
       const lado = data.lado_pierna_gf;
-      // 👇 Pega aquí la versión corregida:
-      const fechaUTC = new Date(data.fecha_hora);
-      const offsetCDMX = -6 * 60;
-      const fechaLocal = new Date(fechaUTC.getTime() + offsetCDMX * 60 * 1000);
-      const timestamp = fechaLocal.getTime();
+      const timestamp = new Date(data.fecha_hora).getTime();
 
       const valor = data.aceleracion_y ?? 0;
 
