@@ -54,7 +54,22 @@
     padding: 20px;
 }
 
-#grafica_realtime {
+#grafica_chartjs {
+  width: 100%;
+  max-width: 800px;
+  height: 300px;
+  margin: 10px auto;
+  display: block;
+  border-radius: 10px;
+  border: 2px solid white;
+  background-color: #0b2a3d;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+  position: static !important;
+  object-fit: initial !important;
+  padding-bottom: 30px;
+}
+
+#grafica_smoothie {
   width: 100%;
   max-width: 800px;
   height: 300px;
@@ -118,5 +133,21 @@
   .estado-envio.status-false {
     background-color: #f44336;
     color: white;
+  }
+  
+
+  .btn-switch {
+    background-color: #222;         /* Fondo oscuro */
+    color: #fff;                    /* Texto blanco */
+    border: 2px solid #4CAF50;      /* Borde con color de tu paleta */
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: bold;
+    transition: background-color 0.3s;
+  }
+  
+  .btn-switch:hover {
+    background-color: #4CAF50;      /* Verde al pasar el mouse */
+    color: #000;                    /* Texto oscuro para contraste */
   }
   
