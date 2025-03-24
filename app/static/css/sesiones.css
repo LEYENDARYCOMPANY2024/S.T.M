@@ -598,7 +598,7 @@ body {
 
 #add-session-container h2 {
     text-align: center;
-    color: #2196f3;
+    color: #c0c6f0;
     margin-bottom: 20px;
 }
 
@@ -617,7 +617,7 @@ body {
 }
 
 #add-session-form button {
-    background-color: #2196f3;
+    background-color: #c0c6f0;
     color: white;
     border: none;
     padding: 12px;
@@ -627,7 +627,7 @@ body {
 }
 
 #add-session-form button:hover {
-    background-color: #1976d2;
+    background-color: #c0c6f0;
 }
 
 #sessions-container {
