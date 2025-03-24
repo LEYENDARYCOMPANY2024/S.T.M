@@ -1,240 +1,242 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/static/css/detalle_sesiones.css">
-    <link rel="stylesheet" href="/static/css/graficas_realtime.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <title>Sesión de Monitoreo</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sesión de Monitoreo</title>
+
+  <!-- Estilos -->
+  <link rel="stylesheet" href="/static/css/detalle_sesiones.css" />
+  <link rel="stylesheet" href="/static/css/graficas_realtime.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" />
+
+  <!-- Librerías -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/smoothie/1.34.0/smoothie.min.js"></script>
 </head>
 <body>
-    <div class="top-bar">
-   
-        <div class="user-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-circle" viewBox="0 0 16 16">
-                <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/>
-                <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1"/>
-            </svg>
-        </div>
-    </div>
 
-    
-
-    <nav class="navigation">
-      <div class="menu-icon">
-        <a href="/principal" class="home-button">
-            <i class="bi bi-house-fill"></i>
-        </a>
+  <!-- Top bar -->
+  <div class="top-bar">
+    <div class="user-icon">
+      <i class="bi bi-person-circle"></i>
     </div>
-        <a href="/historial_clinico" class="d-flex align-items-center">
-            <i class="bi bi-clock-history me-2"></i> Historia Clínica
-        </a>
-        <a href="/sesiones" class="d-flex align-items-center selected">
-            <i class="bi bi-menu-down me-2"></i> Sesiones
-        </a>          
-        <a href="/dispositivos" class="d-flex align-items-center">
-            <i class="bi bi-cpu me-2"></i> Dispositivos
-        </a>          
-        <a href="/niveles_ejercicios" class="d-flex align-items-center">
-            <i class="bi bi-person-walking me-2"></i> Ejercicios
-        </a>          
-        <a href="#" class="d-flex align-items-center">
-            <i class="bi bi-chat-dots me-2"></i> Chat
-        </a>
-    </nav>
-    
-    <!-- Encabezado de la sesión -->
-    <header class="header">
-        <div class="back-arrow" id="salir-detalle"><i class="bi bi-box-arrow-left"></i></div>
-        <div>
-            <h1 id="session-title">Sesión</h1>
-            <p id="session-date">📅 Cargando fecha...</p>
-            <p id="session-time">⏰ Cargando hora...</p>
-        </div>
-    </header>
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <!-- Incluir las librerías de MediaPipe -->
-        <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
-    </head>
-    <body>
-        <div class="main-container">
-            <header class="app-header">
-                <h1 class="app-title">MediaPipe Processor</h1>
-                <div class="status-badge" id="status">Esperando iniciar cámara</div>
-            </header>
-            
-            <div class="content-grid">
-                <div class="panel">
-                    <div class="panel-header">Visualización</div>
-                    <div class="panel-content">
-                        <div class="video-container">
-                            <video id="videoElement" autoplay playsinline></video>
-                            <canvas id="canvasElement"></canvas>
-                            <video id="recordedVideo" controls playsinline></video>
-                            <div class="placeholder">La previsualización aparecerá aquí</div>
-                        </div>
-                        
-                        <div class="button-row">
-                            <button id="startButton" class="btn-primary">
-                                <span class="material-icons"></span> Iniciar Cámara
-                            </button>
-                            <button id="recordButton" class="btn-danger" disabled>
-                                <span class="material-icons"></span> Grabar
-                            </button>
-                            <button id="stopButton" class="btn-secondary" disabled>
-                                <span class="material-icons"></span> Detener
-                            </button>
-                            <button id="processButton" class="btn-success" disabled>
-                                <span class="material-icons"></span> Procesar
-                            </button>
-                            <button id="playPauseButton" class="btn-warning" disabled>
-                                <span class="material-icons"></span> Pausar
-                            </button>
-                        </div>
-                        
-                        <div class="control-group">
-                            <div class="control-group-title">Filtros</div>
-                            <div class="filter-buttons" id="groupFilter">
-                                <!-- Generado dinámicamente -->
-                            </div>
-                        </div>
-                        
-                        <div class="control-group">
-                            <div class="control-group-title">Controles de Visualización</div>
-                            
-                            <div class="slider-control">
-                                <span class="slider-label">Velocidad de procesamiento:</span>
-                                <input type="range" id="speedSlider" min="1" max="20" value="3" step="1">
-                                <span class="slider-value" id="speedValue">3</span>
-                            </div>
-                            
-                            <div class="slider-control">
-                                <span class="slider-label">Tamaño de puntos:</span>
-                                <input type="range" id="pointSizeSlider" min="3" max="15" value="6" step="1">
-                                <span class="slider-value" id="pointSizeValue">6px</span>
-                            </div>
-                            
-                            <div class="checkbox-group">
-                                <label class="checkbox-label">
-                                    <input type="checkbox" id="showLabels" checked>
-                                    Mostrar etiquetas
-                                </label>
-                                <label class="checkbox-label">
-                                    <input type="checkbox" id="showConnections" checked>
-                                    Mostrar conexiones
-                                </label>
-                                <label class="checkbox-label">
-                                    <input type="checkbox" id="showHoverInfo" checked>
-                                    Info al pasar mouse
-                                </label>
-                            </div>
-                        </div>
-                        
-                        <div class="control-group">
-                            <div class="control-group-title">Leyenda de Colores</div>
-                            <div class="color-legend" id="colorLegend">
-                                <!-- Generado dinámicamente -->
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="panel">
-                    <div class="panel-header">Datos de Puntos de Pose</div>
-                    <div class="panel-content">
-                        <div class="control-group">
-                            <div class="slider-control">
-                                <span class="slider-label">Seleccionar Frame:</span>
-                                <input type="range" id="frameSlider" min="0" max="0" value="0" step="1">
-                                <span class="slider-value">
-                                    <span id="frameValue">0</span> / <span id="totalFrameValue">0</span>
-                                </span>
-                            </div>
-                        </div>
-                        
-                        <div class="data-header">
-                            <div class="search-box">
-                                <input type="text" id="tableFilter" class="search-input" placeholder="Filtrar puntos...">
-                            </div>
-                            
-                            <button id="exportButton" class="btn-secondary" disabled>
-                                <span class="material-icons">download</span>
-                                Exportar CSV
-                            </button>
-                        </div>
-                        
-                        <div class="table-container">
-                            <table id="dataTable">
-                                <thead>
-                                    <tr>
-                                        <th>Punto</th>
-                                        <th>Grupo</th>
-                                        <th>Color</th>
-                                        <th>X</th>
-                                        <th>Y</th>
-                                        <th>Visibilidad</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="tableBody">
-                                    <!-- Datos generados dinámicamente -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
+  </div>
+
+  <!-- Navegación lateral -->
+  <nav class="navigation">
+    <div class="menu-icon">
+      <a href="/principal" class="home-button"><i class="bi bi-house-fill"></i></a>
+    </div>
+    <a href="/historial_clinico"><i class="bi bi-clock-history me-2"></i> Historia Clínica</a>
+    <a href="/sesiones" class="selected"><i class="bi bi-menu-down me-2"></i> Sesiones</a>
+    <a href="/dispositivos"><i class="bi bi-cpu me-2"></i> Dispositivos</a>
+    <a href="/niveles_ejercicios"><i class="bi bi-person-walking me-2"></i> Ejercicios</a>
+    <a href="#"><i class="bi bi-chat-dots me-2"></i> Chat</a>
+  </nav>
+
+  <!-- Encabezado -->
+  <header class="header">
+    <div class="back-arrow" id="salir-detalle"><i class="bi bi-box-arrow-left"></i></div>
+    <div>
+      <h1 id="session-title">Sesión</h1>
+      <p id="session-date">📅 Cargando fecha...</p>
+      <p id="session-time">⏰ Cargando hora...</p>
+    </div>
+  </header>
+
+  <!-- Contenedor principal -->
+  <div class="main-container">
+    <div class="content-grid">
+      <!-- Panel izquierdo (MediaPipe) -->
+      <div class="panel">
+        <div class="panel-header">Visualización</div>
+        <div class="panel-content">
+          <div class="video-container">
+            <video id="videoElement" autoplay playsinline></video>
+            <canvas id="canvasElement"></canvas>
+            <video id="recordedVideo" controls playsinline></video>
+            <div class="placeholder">La previsualización aparecerá aquí</div>
+          </div>
+          <div class="button-row">
+            <button id="startButton" class="btn-primary">Iniciar Cámara</button>
+            <button id="recordButton" class="btn-danger" disabled>Grabar</button>
+            <button id="stopButton" class="btn-secondary" disabled>Detener</button>
+            <button id="processButton" class="btn-success" disabled>Procesar</button>
+            <button id="playPauseButton" class="btn-warning" disabled>Pausar</button>
+          </div>
+          <div class="control-group">
+            <div class="control-group-title">Filtros</div>
+            <div class="filter-buttons" id="groupFilter"></div>
+          </div>
+          <div class="control-group">
+            <div class="control-group-title">Controles de Visualización</div>
+            <div class="slider-control">
+              <span>Velocidad de procesamiento:</span>
+              <input type="range" id="speedSlider" min="1" max="20" value="3"/>
+              <span id="speedValue">3</span>
             </div>
+            <div class="slider-control">
+              <span>Tamaño de puntos:</span>
+              <input type="range" id="pointSizeSlider" min="3" max="15" value="6"/>
+              <span id="pointSizeValue">6px</span>
+            </div>
+            <div class="checkbox-group">
+              <label><input type="checkbox" id="showLabels" checked/> Mostrar etiquetas</label>
+              <label><input type="checkbox" id="showConnections" checked/> Mostrar conexiones</label>
+              <label><input type="checkbox" id="showHoverInfo" checked/> Info al pasar mouse</label>
+            </div>
+          </div>
+          <div class="control-group">
+            <div class="control-group-title">Leyenda de Colores</div>
+            <div class="color-legend" id="colorLegend"></div>
+          </div>
         </div>
-    
-<div class="container">
-    <!-- Panel izquierdo -->
+      </div>
+
+      <!-- Panel derecho (tabla) -->
+      <div class="panel">
+        <div class="panel-header">Datos de Puntos de Pose</div>
+        <div class="panel-content">
+          <div class="slider-control">
+            <span>Seleccionar Frame:</span>
+            <input type="range" id="frameSlider" min="0" max="0" value="0"/>
+            <span><span id="frameValue">0</span> / <span id="totalFrameValue">0</span></span>
+          </div>
+          <div class="data-header">
+            <input type="text" id="tableFilter" class="search-input" placeholder="Filtrar puntos..."/>
+            <button id="exportButton" class="btn-secondary" disabled>Exportar CSV</button>
+          </div>
+          <div class="table-container">
+            <table id="dataTable">
+              <thead>
+                <tr>
+                  <th>Punto</th>
+                  <th>Grupo</th>
+                  <th>Color</th>
+                  <th>X</th>
+                  <th>Y</th>
+                  <th>Visibilidad</th>
+                </tr>
+              </thead>
+              <tbody id="tableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Gráfica y nota -->
+  <div class="container">
     <div class="left-panel">
-        <div class="charts">
-            <canvas id="grafica_realtime"></canvas>
-            <div class="chart-buttons">
-              <button id="pauseButton" onclick="togglePause()">⏸️ Pausar</button>
-              <button onclick="reiniciarGrafica()">🔄 Reiniciar</button>
-              <button onclick="exportarGraficaCSV()">💾 Guardar CSV</button>
-              <button onclick="document.getElementById('importInput').click()">📥 Importar CSV</button>
-              <input type="file" id="importInput" accept=".csv" style="display:none" onchange="importarCSV(event)">
-            </div>
-            <div id="dispositivos-activos" class="device-controls">
-                <h3>Dispositivos Activos</h3>
-                <!-- Aquí se agregarán los selects dinámicamente -->
-              </div>                      
-          </div>                        
-    </div>
-    
-   
-    <!-- Columna derecha -->
-    <div class="right-column">
-        <!-- Descripción editable -->
-        <div class="description-box">
-            <div class="black-header">Descripción</div>
-            <div class="description-lines">
-                <textarea id="session-description" class="line" placeholder="Escribe la descripción aquí..." rows="3"></textarea>
-            </div>
+      <div class="charts">
+        <button id="toggleChart" class="btn-switch">Cambiar a Chart.js</button>
+        <canvas id="grafica_smoothie" width="800" height="300"></canvas>
+        <canvas id="grafica_chartjs"></canvas>
+        <div class="chart-buttons">
+          <button id="pauseButton" onclick="pausarGraficaActual()">▶️ Iniciar</button>
+          <button onclick="reiniciarGrafica()">🔄 Reiniciar</button>
+          <button onclick="exportarGraficaActual()">💾 Guardar CSV</button>
+          <button onclick="document.getElementById('importInput').click()">📥 Importar CSV</button>
+          <input type="file" id="importInput" accept=".csv" style="display:none" onchange="importarCSV(event)">
         </div>
-        
-        <!-- Nota Evolutiva -->
-        <div class="evolution-box">
-            <div class="black-header">Nota Evolutiva</div>
-            <div class="evolution-lines">
-                <textarea id="nota-evolutiva" class="line" placeholder="Escribe aquí..." rows="10" cols="50" style="resize: none;"></textarea>
-            </div>
+        <div id="dispositivos-activos" class="device-controls">
+          <h3>Dispositivos Activos</h3>
         </div>
+      </div>
     </div>
-</div>
-        <div id="message-container"></div>
 
-        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-        <script src="/static/js/graficas_realtime.js"></script>
-        
-        <script src="/static/js/detalle_sesiones.js"></script>
-    </body>
-    </html>
+    <div class="right-column">
+      <div class="description-box">
+        <div class="black-header">Descripción</div>
+        <div class="description-lines">
+          <textarea id="session-description" class="line" placeholder="Escribe la descripción aquí..." rows="3"></textarea>
+        </div>
+      </div>
+      <div class="evolution-box">
+        <div class="black-header">Nota Evolutiva</div>
+        <div class="evolution-lines">
+          <textarea id="nota-evolutiva" class="line" placeholder="Escribe aquí..." rows="10" cols="50" style="resize: none;"></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="message-container"></div>
+
+  <!-- Scripts -->
+  <script>
+    let currentChart = 'chartjs';
+    let reinicioPendiente = false;
+
+    document.getElementById("toggleChart").addEventListener("click", () => {
+      if (reinicioPendiente) {
+        alert("🔄 Reinicia la gráfica antes de cambiar de tipo.");
+        return;
+      }
+
+      const smoothieCanvas = document.getElementById("grafica_smoothie");
+      const chartjsCanvas = document.getElementById("grafica_chartjs");
+      const toggleBtn = document.getElementById("toggleChart");
+
+      if (currentChart === 'smoothie') {
+        smoothieCanvas.style.display = "none";
+        chartjsCanvas.style.display = "block";
+        currentChart = 'chartjs';
+        toggleBtn.textContent = "Cambiar a Smoothie";
+      } else {
+        chartjsCanvas.style.display = "none";
+        smoothieCanvas.style.display = "block";
+        currentChart = 'smoothie';
+        toggleBtn.textContent = "Cambiar a Chart.js";
+      }
+    });
+
+    function marcarCambioChart() {
+      reinicioPendiente = true;
+    }
+
+    function reiniciarGrafica() {
+      reinicioPendiente = false;
+      // Aquí llamas al reinicio según el tipo actual de gráfica
+      if (currentChart === 'smoothie') {
+        if (window.reiniciarSmoothie) reiniciarSmoothie();
+      } else {
+        if (window.reiniciarChartJS) reiniciarChartJS();
+      }
+    }
+    function exportarGraficaActual() {
+        if (currentChart === "chartjs" && typeof chartjs_exportarCSV === "function") {
+          chartjs_exportarCSV();
+        } else if (currentChart === "smoothie" && typeof smoothie_exportarCSV === "function") {
+          smoothie_exportarCSV();
+        } else {
+          alert("⚠️ No se puede exportar en este momento.");
+        }
+      }
+      function pausarGraficaActual() {
+        if (currentChart === "chartjs" && typeof chartjs_togglePause === "function") {
+          chartjs_togglePause();
+        } else if (currentChart === "smoothie" && typeof smoothie_togglePause === "function") {
+          smoothie_togglePause();
+        }
+      }
+      
+      
+
+    // Asegura que el botón empiece con texto correcto
+    window.addEventListener('DOMContentLoaded', () => {
+        document.getElementById("grafica_smoothie").style.display = "none";
+        document.getElementById("grafica_chartjs").style.display = "block";
+        document.getElementById("pauseButton").textContent = "▶️ Iniciar";
+      });
+  </script>
+  <script src="/static/js/grafica_chart.js" defer></script>
+  <script src="/static/js/grafica_smoothie.js" defer></script>
+  <script src="/static/js/detalle_sesiones.js"></script>
+</body>
+</html>

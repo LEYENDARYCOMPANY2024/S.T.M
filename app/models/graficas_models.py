@@ -1,23 +1,22 @@
 # models/graficas_models.py
-from sqlalchemy import Column, Integer, String, Numeric, ForeignKey, JSON
+from sqlalchemy import Column, Integer, String, Float, ForeignKey, JSON, DateTime
+
 from sqlalchemy.orm import relationship
 from database import Base
+from datetime import datetime
 
 class Grafica(Base):
     __tablename__ = "graficas"
 
     id_grafica = Column(Integer, primary_key=True, index=True)
     nombre_grafica = Column(String, nullable=False)
-    datos_extra = Column(JSON, nullable=True)
-    etiqueta = Column(String(255), nullable=True)
-    aceleracion_x = Column(Numeric(10, 2))
-    aceleracion_y = Column(Numeric(10, 2))
-    aceleracion_z = Column(Numeric(10, 2))
-    rotacion_x = Column(Numeric(10, 2))
-    rotacion_y = Column(Numeric(10, 2))
-    rotacion_z = Column(Numeric(10, 2))
+    aceleracion_x = Column(Float)
+    aceleracion_y = Column(Float)
+    fecha_hora = Column(DateTime, default=lambda: datetime.now())  # 🕒 Usa hora local naive
+    lado_pierna_gf = Column(String, nullable=True)
 
     dispositivos = relationship("GraficaDispositivo", back_populates="grafica")
+
 
 
 class GraficaDispositivo(Base):
