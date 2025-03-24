@@ -55,7 +55,7 @@ function smoothie_suscribirseRealtime() {
   console.log("🎧 Subscribiendo SMOOTHIE a Supabase Realtime...");
 
   supabase
-    .channel('graficas_realtime')
+    .channel('grafica_smoothie')
     .on('postgres_changes', {
       event: 'INSERT',
       schema: 'public',

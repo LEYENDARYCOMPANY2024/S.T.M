@@ -82,7 +82,7 @@ function chartjs_limitData() {
 function chartjs_suscribirRealtime() {
   console.log("🎧 Subscribiendo CHART.JS a Supabase Realtime...");
 
-  supabase.channel('graficas_realtime')
+  supabase.channel('grafica_chartjs')
     .on('postgres_changes', {
       event: 'INSERT', // ✅ ESCUCHA INSERTS en lugar de UPDATE
       schema: 'public',
