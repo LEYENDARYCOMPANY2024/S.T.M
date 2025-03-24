@@ -37,10 +37,12 @@ function suscribirseAGraficasRealtime() {
   supabase
     .channel('graficas_realtime')
     .on('postgres_changes', {
-      event: 'UPDATE',
+      event: '*',
       schema: 'public',
       table: 'graficas'
     }, payload => {
+      console.log("📥 Payload recibido:", payload);
+      console.log(`🦿 ${lado} => ${valor} @ ${new Date(timestamp).toLocaleTimeString()}`);
       if (realtimePaused) return;
 
       const data = payload.new;
