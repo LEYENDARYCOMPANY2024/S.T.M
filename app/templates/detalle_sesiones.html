@@ -169,32 +169,41 @@
   <div id="message-container"></div>
 
   <!-- Scripts -->
+
+  <script>
+    window.tipoGraficaActiva = "chartjs"; // o "smoothie" si prefieres iniciar con Smoothie
+  </script>
+  
   <script>
     let currentChart = 'chartjs';
-    let reinicioPendiente = false;
 
     document.getElementById("toggleChart").addEventListener("click", () => {
       if (reinicioPendiente) {
         alert("🔄 Reinicia la gráfica antes de cambiar de tipo.");
         return;
       }
-
+    
       const smoothieCanvas = document.getElementById("grafica_smoothie");
       const chartjsCanvas = document.getElementById("grafica_chartjs");
       const toggleBtn = document.getElementById("toggleChart");
-
+    
       if (currentChart === 'smoothie') {
         smoothieCanvas.style.display = "none";
         chartjsCanvas.style.display = "block";
         currentChart = 'chartjs';
         toggleBtn.textContent = "Cambiar a Smoothie";
+        if (window.smoothie_togglePause) window.smoothie_realtimePaused = true;
+        if (window.chartjs_togglePause) window.chartjs_realtimePaused = false;
       } else {
         chartjsCanvas.style.display = "none";
         smoothieCanvas.style.display = "block";
         currentChart = 'smoothie';
         toggleBtn.textContent = "Cambiar a Chart.js";
+        if (window.chartjs_togglePause) window.chartjs_realtimePaused = true;
+        if (window.smoothie_togglePause) window.smoothie_realtimePaused = false;
       }
     });
+    
 
     function marcarCambioChart() {
       reinicioPendiente = true;
@@ -202,13 +211,18 @@
 
     function reiniciarGrafica() {
       reinicioPendiente = false;
-      // Aquí llamas al reinicio según el tipo actual de gráfica
+    
       if (currentChart === 'smoothie') {
-        if (window.reiniciarSmoothie) reiniciarSmoothie();
+        if (typeof window.smoothie_reiniciarGrafica === "function") {
+          window.smoothie_reiniciarGrafica();
+        }
       } else {
-        if (window.reiniciarChartJS) reiniciarChartJS();
+        if (typeof window.chartjs_reiniciarChartJS === "function") {
+          window.chartjs_reiniciarChartJS();
+        }
       }
     }
+    
     function exportarGraficaActual() {
         if (currentChart === "chartjs" && typeof chartjs_exportarCSV === "function") {
           chartjs_exportarCSV();
@@ -219,12 +233,13 @@
         }
       }
       function pausarGraficaActual() {
-        if (currentChart === "chartjs" && typeof chartjs_togglePause === "function") {
-          chartjs_togglePause();
-        } else if (currentChart === "smoothie" && typeof smoothie_togglePause === "function") {
-          smoothie_togglePause();
+        if (currentChart === "chartjs" && typeof window.chartjs_togglePause === "function") {
+          window.chartjs_togglePause();
+        } else if (currentChart === "smoothie" && typeof window.smoothie_togglePause === "function") {
+          window.smoothie_togglePause();
         }
       }
+      
       
       
 
