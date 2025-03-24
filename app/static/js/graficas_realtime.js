@@ -105,67 +105,56 @@ const supabase = window.supabase.createClient(
   
   function suscribirseAGraficasRealtime() {
     console.log("🎧 Subscribiéndose a Supabase Realtime...");
-
+  
     supabase
-        .channel('graficas_realtime')
-        .on('postgres_changes', {
-            event: 'UPDATE',
-            schema: 'public',
-            table: 'graficas'
-        }, payload => {
-            console.log("📦 Payload recibido desde Supabase:", payload);  // 🧪 NUEVO LOG
-            if (realtimePaused) return;
-
-            const data = payload.new;
-            const lado = data.lado_pierna_gf;
-
-            if (!lado || !chartData.datasets[lado]) {
-                console.warn("⚠️ Lado inválido o desconocido:", lado);
-                return;
-            }
-
-            const idGrafica = data.id_grafica;
-            if (idGrafica) {
-                let ids = JSON.parse(localStorage.getItem("graficas_ids") || "[]");
-                if (!ids.includes(idGrafica)) {
-                    ids.push(idGrafica);
-                    localStorage.setItem("graficas_ids", JSON.stringify(ids));
-                    console.log(`📌 id_grafica ${idGrafica} guardado`);
-                }
-            }
-
-
-            // ⏱️ Timestamp como etiqueta
-            const t = new Date(data.fecha_hora).toLocaleTimeString();
-
-            chart.data.labels.push(t);
-
-            // Encuentra el dataset correcto
-            const datasetLabel = lado === "izquierda" ? "Pierna Izquierda" : "Pierna Derecha";
-            const dataset = chart.data.datasets.find(ds => ds.label === datasetLabel);
-            if (dataset) {
-              dataset.data.push(data.aceleracion_y ?? 0);
-            }
-
-            // Limita puntos para mantener rendimiento
-            if (chart.data.labels.length > MAX_DATA_POINTS) {
-              chart.data.labels.shift();
-              chart.data.datasets.forEach(ds => ds.data.shift());
-            }
-
-            // 🚀 Actualización más ligera
-            chart.update('none');
-
-            console.log(`✅ Gráfica actualizada (${lado})`);
-        })
-        .subscribe(status => {
-            if (status === "SUBSCRIBED") {
-                console.log("✅ Canal conectado a Supabase Realtime");
-            } else {
-                console.warn("⚠️ Estado de conexión:", status);
-            }
-        });
-}
+      .channel('graficas_realtime')
+      .on('postgres_changes', {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'graficas'
+      }, payload => {
+        if (realtimePaused) return;
+  
+        const data = payload.new;
+  
+        // ✅ Solo extraemos lo necesario
+        const { id_grafica, fecha_hora, lado_pierna_gf, aceleracion_y } = data;
+  
+        if (!lado_pierna_gf || aceleracion_y === undefined) {
+          console.warn("⚠️ Datos incompletos recibidos");
+          return;
+        }
+  
+        const t = new Date(fecha_hora).toLocaleTimeString();
+        chart.data.labels.push(t);
+  
+        const datasetLabel = lado_pierna_gf === "izquierda" ? "Pierna Izquierda" : "Pierna Derecha";
+        const dataset = chart.data.datasets.find(ds => ds.label === datasetLabel);
+  
+        if (dataset) {
+          dataset.data.push(aceleracion_y);
+        }
+  
+        // ⛔ No usamos más campos como aceleracion_x, rotaciones, etc.
+  
+        // Limitar puntos para mantener rendimiento
+        if (chart.data.labels.length > MAX_DATA_POINTS) {
+          chart.data.labels.shift();
+          chart.data.datasets.forEach(ds => ds.data.shift());
+        }
+  
+        chart.update('none');  // ⚡ Ligero
+        console.log(`✅ Gráfica actualizada (${lado_pierna_gf})`);
+      })
+      .subscribe(status => {
+        if (status === "SUBSCRIBED") {
+          console.log("✅ Canal conectado a Supabase Realtime");
+        } else {
+          console.warn("⚠️ Estado de conexión:", status);
+        }
+      });
+  }
+  
 
   
   function reiniciarGrafica() {
