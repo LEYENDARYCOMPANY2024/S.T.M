@@ -43,30 +43,6 @@
             <!-- Botón para mostrar/ocultar Términos y Condiciones -->
             <button type="button" id="toggleTerms">Ver Términos y Condiciones</button>
 
-            <!-- Contenedor de Términos y Condiciones (inicialmente oculto) -->
-            <div id="termsBox" class="terms-box">
-                <h3>Términos y Condiciones de Uso</h3>
-                <p>Bienvenido a <strong>Sistema de Monitoreo de la Marcha</strong> operado por <em>Leyendary Inc.</em>. Al registrarse en la aplicación, usted acepta los siguientes términos y condiciones:</p>
-                
-                <p><strong>1. Recopilación y Uso de Datos:</strong> Se recopilan datos personales, conversaciones y registros de rehabilitación para mejorar la experiencia del usuario.</p>
-                
-                <p><strong>2. Protección de Datos:</strong> Implementamos medidas de seguridad, pero el usuario es responsable de la seguridad de su cuenta.</p>
-                
-                <p><strong>3. Derechos del Usuario:</strong> Puede solicitar acceso, modificación o eliminación de su información, salvo cuando sea necesaria para cumplir con regulaciones legales o contractuales.</p>
-                
-                <p><strong>4. Uso Responsable:</strong> Está prohibido el uso de la aplicación con fines fraudulentos o ilegales. El usuario se compromete a utilizar la aplicación de manera responsable y a no compartir información confidencial de terceros sin su consentimiento.</p>
-                
-                <p><strong>5. Modificaciones:</strong> Nos reservamos el derecho de actualizar estos términos, notificando a los usuarios.</p>
-                
-                <p><strong>6. Responsabilidades del Usuario:</strong> El usuario se compromete a utilizar la aplicación de manera responsable y a no compartir información confidencial de terceros sin su consentimiento. Además, se prohíbe el uso de la aplicación con fines fraudulentos, ilegales o que perjudiquen a otros usuarios.</p>
-                
-                <p><strong>7. Modificaciones y Vigencia:</strong> Nos reservamos el derecho de modificar estos Términos y Condiciones en cualquier momento. Cualquier cambio será notificado a los usuarios a través de la aplicación. El uso continuo de la aplicación después de las modificaciones implica la aceptación de los nuevos términos.</p>
-                
-                <p><strong>8. Jurisdicción y Legislación Aplicable:</strong> Estos Términos y Condiciones se regirán e interpretarán de acuerdo con las leyes de los Estados Unidos Mexicanos. Cualquier controversia que surja en relación con la aplicación será sometida a los tribunales competentes de Tulancingo, Hidalgo.</p>
-                
-                <p><strong>9. Contacto:</strong> Para cualquier consulta sobre estos Términos y Condiciones, puede contactarnos a través del correo electrónico <strong>leyendary2024@gmail.com</strong>.</p>
-            </div>
-
             <!-- Checkbox de aceptación -->
             <div class="terms-container">
                 <input type="checkbox" id="termsCheckbox">
@@ -82,6 +58,34 @@
             <div class="alert" id="successAlert"></div>
         </form>
     </div>
+
+    <!-- Modal para Términos y Condiciones -->
+    <div id="termsModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h3>Términos y Condiciones de Uso</h3>
+            <p>Bienvenido a <strong>Sistema de Monitoreo de la Marcha</strong> operado por <em>Leyendary Inc.</em>. Al registrarse en la aplicación, usted acepta los siguientes términos y condiciones:</p>
+            
+            <p><strong>1. Recopilación y Uso de Datos:</strong> Se recopilan datos personales, conversaciones y registros de rehabilitación para mejorar la experiencia del usuario.</p>
+            
+            <p><strong>2. Protección de Datos:</strong> Implementamos medidas de seguridad, pero el usuario es responsable de la seguridad de su cuenta.</p>
+            
+            <p><strong>3. Derechos del Usuario:</strong> Puede solicitar acceso, modificación o eliminación de su información, salvo cuando sea necesaria para cumplir con regulaciones legales o contractuales.</p>
+            
+            <p><strong>4. Uso Responsable:</strong> Está prohibido el uso de la aplicación con fines fraudulentos o ilegales. El usuario se compromete a utilizar la aplicación de manera responsable y a no compartir información confidencial de terceros sin su consentimiento.</p>
+            
+            <p><strong>5. Modificaciones:</strong> Nos reservamos el derecho de actualizar estos términos, notificando a los usuarios.</p>
+            
+            <p><strong>6. Responsabilidades del Usuario:</strong> El usuario se compromete a utilizar la aplicación de manera responsable y a no compartir información confidencial de terceros sin su consentimiento. Además, se prohíbe el uso de la aplicación con fines fraudulentos, ilegales o que perjudiquen a otros usuarios.</p>
+            
+            <p><strong>7. Modificaciones y Vigencia:</strong> Nos reservamos el derecho de modificar estos Términos y Condiciones en cualquier momento. Cualquier cambio será notificado a los usuarios a través de la aplicación. El uso continuo de la aplicación después de las modificaciones implica la aceptación de los nuevos términos.</p>
+            
+            <p><strong>8. Jurisdicción y Legislación Aplicable:</strong> Estos Términos y Condiciones se regirán e interpretarán de acuerdo con las leyes de los Estados Unidos Mexicanos. Cualquier controversia que surja en relación con la aplicación será sometida a los tribunales competentes de Tulancingo, Hidalgo.</p>
+            
+            <p><strong>9. Contacto:</strong> Para cualquier consulta sobre estos Términos y Condiciones, puede contactarnos a través del correo electrónico <strong>leyendary2024@gmail.com</strong>.</p>
+        </div>
+    </div>
+
     <script src="/static/js/registro.js"></script>
 </body>
 </html>
