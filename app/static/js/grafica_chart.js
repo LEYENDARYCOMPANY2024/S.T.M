@@ -83,63 +83,72 @@ function chartjs_suscribirRealtime() {
   console.log("🎧 Subscribiendo CHART.JS a Supabase Realtime...");
 
   supabase
-  .channel('grafica_chartjs')
-  .on('postgres_changes', {
-    event: 'INSERT',
-    schema: 'public',
-    table: 'graficas'
-  }, payload => {
-    console.log("📡 Evento recibido en Chart.js");
+    .channel('grafica_chartjs')  // nombre del canal, puede ser el mismo para ambas si gustas
+    .on('postgres_changes', {
+      event: '*',  // O 'INSERT' si estás seguro que solo insertas
+      schema: 'public',
+      table: 'graficas'
+    }, payload => {
+      console.log("📡 Evento recibido en Chart.js");
 
-    const data = payload.new;
+      if (chartjs_realtimePaused) {
+        console.warn("⏸️ Chart.js pausado, no procesa datos.");
+        return;
+      }
 
-    // 🔎 Filtrar por nombre de gráfica
-    if (data.nombre_grafica !== 'grafica_chartjs') {
-      console.warn("📛 Ignorado: no es grafica_chartjs:", data.nombre_grafica);
-      return;
-    }
+      const data = payload.new;
 
-    if (chartjs_realtimePaused) {
-      console.warn("⏸️ Chart.js pausado, no procesa datos.");
-      return;
-    }
+      const lado = data.lado_pierna_gf;
+      const valor = data.aceleracion_y ?? 0;
+      const fecha = new Date(data.fecha_hora);
+      const ahora = new Date();
 
-    const lado = data.lado_pierna_gf;
-    const valor = data.aceleracion_y ?? 0;
-    const fecha = new Date(data.fecha_hora);
-    const ahora = new Date();
+      if (!lado || !chartjs_data.datasets[lado]) {
+        console.warn("⚠️ Lado inválido:", lado);
+        return;
+      }
 
-    if (!lado || !chartjs_data.datasets[lado]) {
-      console.warn("⚠️ Lado inválido:", lado);
-      return;
-    }
+      if (fecha > ahora) {
+        console.warn("🕒 Futuro ignorado:", fecha.toLocaleTimeString());
+        return;
+      }
 
-    if (fecha > ahora) {
-      console.warn("🕒 Futuro ignorado:", fecha.toLocaleTimeString());
-      return;
-    }
-
-    console.log(`✅ CHART - ${lado} => ${valor} @ ${fecha.toLocaleTimeString()}`);
-    chartjs_data.labels.push(fecha.toLocaleTimeString());
-    chartjs_data.datasets[lado].ay.push(valor);
-    chartjs_limitData();
-    chartjs_chart.update('none');
-  })
-  .subscribe(s => {
-    if (s === 'SUBSCRIBED') console.log("✅ Chart.js conectado a Realtime");
-  });
-
+      console.log(`✅ CHART - ${lado} => ${valor} @ ${fecha.toLocaleTimeString()}`);
+      chartjs_data.labels.push(fecha.toLocaleTimeString());
+      chartjs_data.datasets[lado].ay.push(valor);
+      chartjs_limitData();
+      chartjs_chart.update('none');
+    })
+    .subscribe(s => {
+      if (s === 'SUBSCRIBED') console.log("✅ Chart.js conectado a Realtime");
+    });
 }
 
-function chartjs_reiniciar() {
+
+async function chartjs_reiniciar() {
   chartjs_data.labels = [];
   Object.values(chartjs_data.datasets).forEach(d => d.ay = []);
   chartjs_chart.update();
   chartjs_realtimePaused = true;
-  reinicioPendiente = false; // ✅ permite cambiar de gráfica tras reiniciar
+  reinicioPendiente = false;
   document.getElementById("pauseButton").textContent = "Iniciar";
   chartjs_mensaje("🔄 Gráfica reiniciada");
+
+  // 🧠 Esto detiene el envío real desde el ESP
+  try {
+    const dispositivos = await fetch("/dispositivos/activos").then(r => r.json());
+    for (const d of dispositivos) {
+      await fetch(`/dispositivos/permiso_envio/${d.uuid}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ estado: false })
+      });
+    }
+  } catch (err) {
+    console.error("Error deteniendo envío en reinicio:", err);
+  }
 }
+
 
 async function chartjs_togglePause() {
   chartjs_realtimePaused = !chartjs_realtimePaused;

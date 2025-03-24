@@ -55,58 +55,68 @@ function smoothie_suscribirseRealtime() {
   console.log("🎧 Subscribiendo SMOOTHIE a Supabase Realtime...");
 
   supabase
-  .channel('grafica_smoothie')
-  .on('postgres_changes', {
-    event: 'INSERT',
-    schema: 'public',
-    table: 'graficas'
-  }, payload => {
-    console.log("📡 Evento recibido en Smoothie");
+    .channel('grafica_smoothie')
+    .on('postgres_changes', {
+      event: '*',
+      schema: 'public',
+      table: 'graficas'
+    }, payload => {
+      console.log("📡 Evento recibido en Smoothie");
 
-    const data = payload.new;
+      const data = payload.new;
 
-    // 🔎 Filtrar por nombre de gráfica
-    if (data.nombre_grafica !== 'grafica_smoothie') {
-      console.warn("📛 Ignorado: no es grafica_smoothie:", data.nombre_grafica);
-      return;
-    }
+      if (smoothie_realtimePaused) {
+        console.warn("⏸️ Smoothie pausado, no procesa datos.");
+        return;
+      }
 
-    if (smoothie_realtimePaused) {
-      console.warn("⏸️ Smoothie pausado, no procesa datos.");
-      return;
-    }
+      const lado = data.lado_pierna_gf;
+      const valor = data.aceleracion_y ?? 0;
+      const timestamp = new Date(data.fecha_hora).getTime();
 
-    const lado = data.lado_pierna_gf;
-    const valor = data.aceleracion_y ?? 0;
-    const timestamp = new Date(data.fecha_hora).getTime();
+      if (!lado || !["izquierda", "derecha"].includes(lado)) {
+        console.warn("⚠️ Lado inválido:", lado);
+        return;
+      }
 
-    if (!lado || !["izquierda", "derecha"].includes(lado)) {
-      console.warn("⚠️ Lado inválido:", lado);
-      return;
-    }
+      if (lado === 'izquierda') {
+        smoothie_izquierdaTS.append(timestamp, valor);
+      } else {
+        smoothie_derechaTS.append(timestamp, valor);
+      }
 
-    if (lado === 'izquierda') {
-      smoothie_izquierdaTS.append(timestamp, valor);
-    } else {
-      smoothie_derechaTS.append(timestamp, valor);
-    }
-
-    console.log(`✅ SMOOTHIE - ${lado} => ${valor} @ ${new Date(timestamp).toLocaleTimeString()}`);
-  })
-  .subscribe(s => {
-    if (s === 'SUBSCRIBED') console.log("✅ Smoothie conectado a Realtime");
-  });
-
+      console.log(`✅ SMOOTHIE - ${lado} => ${valor} @ ${new Date(timestamp).toLocaleTimeString()}`);
+    })
+    .subscribe(s => {
+      if (s === 'SUBSCRIBED') console.log("✅ Smoothie conectado a Realtime");
+    });
 }
 
-window.smoothie_reiniciarGrafica = function () {
+
+window.smoothie_reiniciarGrafica = async function () {
   smoothie_izquierdaTS.clear();
   smoothie_derechaTS.clear();
   smoothie_realtimePaused = true;
   reinicioPendiente = false;
   document.getElementById("pauseButton").textContent = "Iniciar";
   smoothie_mostrarMensaje("🔄 Gráfica reiniciada");
+
+  // 🧠 Pausar el envío de datos desde el ESP también
+  try {
+    const dispositivos = await fetch("/dispositivos/activos").then(res => res.json());
+    for (const dispositivo of dispositivos) {
+      await fetch(`/dispositivos/permiso_envio/${dispositivo.uuid}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ estado: false }) // ⛔ Detener envío real
+      });
+    }
+  } catch (err) {
+    console.error("❌ Error al pausar envío desde el ESP:", err);
+    smoothie_mostrarMensaje("❌ Error al pausar envío en ESP", "error");
+  }
 };
+
 
 window.smoothie_togglePause = async function () {
   smoothie_realtimePaused = !smoothie_realtimePaused;
