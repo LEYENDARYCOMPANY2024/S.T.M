@@ -138,7 +138,7 @@ window.smoothie_togglePause = async function () {
 
   const boton = document.getElementById("pauseButton");
   boton.textContent = smoothie_realtimePaused ? "Iniciar" : "Pausar";
-  smoothie_mostrarMensaje(smoothie_realtimePaused ? "⏸️ Pausado" : "▶️ Reanudado");
+  smoothie_mostrarMensaje(smoothie_realtimePaused ? "Pausado" : "Reanudado");
 
   if (!smoothie_realtimePaused) reinicioPendiente = true;
 
@@ -374,7 +374,7 @@ window.smoothie_reiniciarGrafica = function () {
     reinicioPendiente = false;
     document.getElementById("pauseButton").textContent = "Pausar";
 
-    smoothie_mostrarMensaje("🔁 Gráfica reiniciada y datos eliminados");
+    smoothie_mostrarMensaje("Gráfica reiniciada y datos eliminados");
 
     // 🧠 Reactivar envío de datos desde el ESP
     try {

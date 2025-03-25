@@ -147,6 +147,11 @@ document.addEventListener("DOMContentLoaded", async () => {
             // 🧹 También los datos de Smoothie si existen
             localStorage.removeItem("smoothie_import_izq");
             localStorage.removeItem("smoothie_import_der");
+            
+            // 🧹 Y los datos de Chart.js
+            localStorage.removeItem("chartjs_import_izq");
+            localStorage.removeItem("chartjs_import_der");
+
 
             window.location.href = "/sesiones";
             };
@@ -1615,6 +1620,10 @@ document.addEventListener("DOMContentLoaded", () => {
           // 🧹 Eliminar respaldo de datos importados o en tiempo real (Smoothie)
           localStorage.removeItem("smoothie_import_izq");
           localStorage.removeItem("smoothie_import_der");
+
+          // 🧹 Y los datos de Chart.js
+          localStorage.removeItem("chartjs_import_izq");
+          localStorage.removeItem("chartjs_import_der");
   
           window.location.href = "/principal";
         };

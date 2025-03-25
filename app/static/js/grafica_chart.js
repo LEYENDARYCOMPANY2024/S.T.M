@@ -15,6 +15,9 @@ let chartjs_data = {
 let chartjs_chart = null;
 let chartjs_realtimePaused = true;
 let chartjs_channel = null; // 🔁 Para gestionar el canal y cerrarlo si existe
+let chartjs_importadosIzquierda = [];
+let chartjs_importadosDerecha = [];
+window.reinicioPendiente = false;
 const chartjs_MAX_DATA = 30;
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -64,6 +67,18 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
   });
+
+    const datosIzq = JSON.parse(localStorage.getItem("chartjs_import_izq") || "[]");
+    const datosDer = JSON.parse(localStorage.getItem("chartjs_import_der") || "[]");
+
+    chartjs_data.labels = datosIzq.map(p => new Date(p.timestamp).toLocaleTimeString());
+    chartjs_data.datasets.izquierda.ay = datosIzq.map(p => p.value);
+    chartjs_data.datasets.derecha.ay = datosDer.map(p => p.value);
+
+    chartjs_importadosIzquierda = datosIzq;
+    chartjs_importadosDerecha = datosDer;
+
+    chartjs_chart.update();
 
   document.getElementById("importInput").addEventListener("change", chartjs_importarCSV);
 
@@ -117,6 +132,23 @@ function chartjs_suscribirRealtime() {
       chartjs_data.datasets[lado].ay.push(valor);
       chartjs_limitData();
       chartjs_chart.update('none');
+
+      const ts = fecha.getTime(); // timestamp real
+
+      if (lado === 'izquierda') {
+        chartjs_importadosIzquierda.push({ timestamp: ts, value: valor });
+        if (chartjs_importadosIzquierda.length > chartjs_MAX_DATA) {
+          chartjs_importadosIzquierda.shift();
+        }
+        localStorage.setItem("chartjs_import_izq", JSON.stringify(chartjs_importadosIzquierda));
+      } else if (lado === 'derecha') {
+        chartjs_importadosDerecha.push({ timestamp: ts, value: valor });
+        if (chartjs_importadosDerecha.length > chartjs_MAX_DATA) {
+          chartjs_importadosDerecha.shift();
+        }
+        localStorage.setItem("chartjs_import_der", JSON.stringify(chartjs_importadosDerecha));
+      }
+
     })
     .subscribe(s => {
       if (s === 'SUBSCRIBED') console.log("✅ Chart.js conectado a Realtime");
@@ -124,39 +156,71 @@ function chartjs_suscribirRealtime() {
 }
 
 
-async function chartjs_reiniciar() {
-  chartjs_data.labels = [];
-  Object.values(chartjs_data.datasets).forEach(d => d.ay = []);
-  chartjs_chart.update();
-  chartjs_realtimePaused = true;
-  reinicioPendiente = false;
-  document.getElementById("pauseButton").textContent = "Iniciar";
-  chartjs_mensaje("🔄 Gráfica reiniciada");
+function chartjs_reiniciarChartJS() {
+  // Mostrar confirmación antes de reiniciar
+  const overlay = document.createElement("div");
+  overlay.className = "modal-overlay";
 
-  // 🧠 Esto detiene el envío real desde el ESP
-  try {
-    const dispositivos = await fetch("/dispositivos/activos").then(r => r.json());
-    for (const d of dispositivos) {
-      await fetch(`/dispositivos/permiso_envio/${d.uuid}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ estado: false })
-      });
+  const modal = document.createElement("div");
+  modal.className = "modal-confirm";
+
+  modal.innerHTML = `
+    <h2>¿Reiniciar la gráfica?</h2>
+    <p>⚠️ Esto eliminará los datos obtenidos e importados.<br>💾 Guarda tus datos antes de reiniciar.<br>¿Estás seguro de continuar?</p>
+    <div class="modal-buttons">
+      <button class="btn-secondary" id="cancelarReinicioChart">Cancelar</button>
+      <button class="btn-danger" id="confirmarReinicioChart">Reiniciar</button>
+    </div>
+  `;
+
+  overlay.appendChild(modal);
+  document.body.appendChild(overlay);
+
+  document.getElementById("cancelarReinicioChart").onclick = () => overlay.remove();
+
+  document.getElementById("confirmarReinicioChart").onclick = async () => {
+    overlay.remove();
+
+    localStorage.removeItem("chartjs_import_izq");
+    localStorage.removeItem("chartjs_import_der");
+    chartjs_importadosIzquierda = [];
+    chartjs_importadosDerecha = [];
+
+    chartjs_data.labels = [];
+    Object.values(chartjs_data.datasets).forEach(d => d.ay = []);
+    chartjs_chart.update();
+    chartjs_realtimePaused = false;
+    document.getElementById("pauseButton").textContent = "Pausar";
+
+    chartjs_mensaje("Gráfica reiniciada y datos eliminados");
+
+    // 🧠 Reactivar envío de datos desde ESP
+    try {
+      const dispositivos = await fetch("/dispositivos/activos").then(r => r.json());
+      for (const d of dispositivos) {
+        await fetch(`/dispositivos/permiso_envio/${d.uuid}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ estado: true })
+        });
+      }
+    } catch (err) {
+      console.error("❌ Error reactivando envío desde el ESP:", err);
+      chartjs_mensaje("❌ Error al reactivar envío en ESP", "error");
     }
-  } catch (err) {
-    console.error("Error deteniendo envío en reinicio:", err);
-  }
-}
+  };
+};
+
 
 
 async function chartjs_togglePause() {
   chartjs_realtimePaused = !chartjs_realtimePaused;
   const btn = document.getElementById("pauseButton");
   btn.textContent = chartjs_realtimePaused ? "Iniciar" : "Pausar";
-  chartjs_mensaje(chartjs_realtimePaused ? "⏸️ Pausado" : "▶️ Reanudado");
+  chartjs_mensaje(chartjs_realtimePaused ? "Pausado" : "Reanudado");
 
   // ✅ Al iniciar (no está pausado), bloquea el cambio de tipo
-  if (!chartjs_realtimePaused) reinicioPendiente = true;
+  if (!chartjs_realtimePaused) window.reinicioPendiente = true;
 
   try {
     const dispositivos = await fetch("/dispositivos/activos").then(r => r.json());
@@ -243,23 +307,32 @@ async function chartjs_importarCSV(event) {
     }
 
     // 🔄 Reemplazar datos actuales
+    const ahora = Date.now();
     chartjs_data.labels = [];
     chartjs_data.datasets.izquierda.ay = [];
     chartjs_data.datasets.derecha.ay = [];
 
-    for (const fila of filas) {
-      const columnas = fila.split(",");
-      const hora = columnas[idxHora];
+    for (let i = 0; i < filas.length; i++) {
+      const columnas = filas[i].split(",");
+      const offset = i * 1000;
+      const ts = ahora + offset;
+
       const izq = parseFloat(columnas[idxIzq]) || 0;
       const der = parseFloat(columnas[idxDer]) || 0;
 
-      chartjs_data.labels.push(hora);
+      chartjs_data.labels.push(new Date(ts).toLocaleTimeString());
       chartjs_data.datasets.izquierda.ay.push(izq);
       chartjs_data.datasets.derecha.ay.push(der);
+
+      chartjs_importadosIzquierda.push({ timestamp: ts, value: izq });
+      chartjs_importadosDerecha.push({ timestamp: ts, value: der });
     }
 
+    localStorage.setItem("chartjs_import_izq", JSON.stringify(chartjs_importadosIzquierda));
+    localStorage.setItem("chartjs_import_der", JSON.stringify(chartjs_importadosDerecha));
     chartjs_chart.update();
-    chartjs_mensaje("📥 CSV importado y graficado correctamente");
+
+    chartjs_mensaje("CSV importado y graficado correctamente");
   };
 
   reader.readAsText(file);
@@ -345,5 +418,5 @@ async function cargarDispositivosActivos() {
 
 // Exponer funciones globales
 window.chartjs_togglePause = chartjs_togglePause;
-window.chartjs_reiniciarChartJS = chartjs_reiniciar;
+window.chartjs_reiniciarChartJS = chartjs_reiniciarChartJS;
 window.chartjs_exportarCSV = chartjs_exportarCSV;

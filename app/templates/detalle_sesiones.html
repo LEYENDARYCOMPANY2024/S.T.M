@@ -175,10 +175,11 @@
   </script>
   
   <script>
+    window.reinicioPendiente = false;
     let currentChart = 'chartjs';
 
     document.getElementById("toggleChart").addEventListener("click", () => {
-      if (reinicioPendiente) {
+      if (window.reinicioPendiente) {
         alert("🔄 Reinicia la gráfica antes de cambiar de tipo.");
         return;
       }
@@ -214,11 +215,11 @@
     
 
     function marcarCambioChart() {
-      reinicioPendiente = true;
+      window.reinicioPendiente = true;
     }
 
     function reiniciarGrafica() {
-      reinicioPendiente = false;
+      window.reinicioPendiente = false;
     
       if (currentChart === 'smoothie') {
         if (typeof window.smoothie_reiniciarGrafica === "function") {
