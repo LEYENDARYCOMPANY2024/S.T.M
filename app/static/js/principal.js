@@ -169,7 +169,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     
     let currentPageActivos = 1;
     let currentPageInactivos = 1;
-    let patientsPerPage = 5;
+    let patientsPerPage = 6; // Explicitly set to 6
     
     // Referencias del DOM
     const btnActivos       = document.getElementById("btn-activos");
@@ -386,60 +386,22 @@ document.addEventListener("DOMContentLoaded", async function () {
             // Guardar el ID del paciente en localStorage
             localStorage.setItem("id_paciente", id_paciente);
 
-
             // 🔹 Redirigir a la página de historial clínico
             window.location.href = "/historial_clinico";
-            
-            if (!response.ok) {
-                console.warn("ℹ️ No se encontró historial para este paciente.");
-                limpiarFormulario(); // Dejar formulario vacío si no hay historial
-                return;
-            }
-
-            const historialData = await response.json();
-            console.log("📋 Historial clínico del paciente:", historialData);
-
-            // Cargar los datos en el formulario
-            cargarHistorialEnFormulario(historialData.datos_historial_clinico);
-
         } catch (error) {
             console.error("❌ Error al obtener historial clínico:", error);
         }
     }
 
-    // 🔹 Función para limpiar el formulario si no hay historial
-    function limpiarFormulario() {
-        if (document.getElementById("nombre"))
-            document.getElementById("nombre").value = "";
-        if (document.getElementById("edad"))
-            document.getElementById("edad").value = "";
-        if (document.getElementById("ocupacion"))
-            document.getElementById("ocupacion").value = "";
-    }
-
-    // 🔹 Función para cargar datos en el formulario de historial clínico
-    function cargarHistorialEnFormulario(datos) {
-        if (document.getElementById("nombre"))
-            document.getElementById("nombre").value = datos.nombre || "";
-        if (document.getElementById("edad"))
-            document.getElementById("edad").value = datos.edad || "";
-        if (document.getElementById("ocupacion"))
-            document.getElementById("ocupacion").value = datos.ocupacion || "";
-        // Puedes agregar más campos aquí según los datos que recibas del backend
-    }
-
-    
-    
-    
     function actualizarPaginacion(totalPages, currentPage, cargarFuncion, selector) {
         const paginationContainer = document.querySelector(selector);
         if (!paginationContainer) return;
         paginationContainer.innerHTML = "";
     
         if (totalPages > 1) {
-            let maxVisiblePages = 10;
+            let maxVisiblePages = 6; // Limit to 6 visible pages
             let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
-            let endPage   = Math.min(totalPages, startPage + maxVisiblePages - 1);
+            let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
     
             if (endPage - startPage < maxVisiblePages - 1) {
                 startPage = Math.max(1, endPage - maxVisiblePages + 1);

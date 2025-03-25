@@ -101,14 +101,14 @@ body {
 :root {
     --primary-color: #4a90e2;
     --secondary-color: #7ed6df;
-    --background-color: rgba(74, 144, 226, 0.1);
-    --hover-background: rgba(74, 144, 226, 0.3);
+    --background-color: rgba(255, 255, 255, 0.1);
+    --hover-background: rgba(255, 255, 255, 0.2);
     --text-color: #ffffff;
-    --shadow-color: rgba(0, 0, 0, 0.15);
-    --border-color: rgba(255, 255, 255, 0.2);
+    --shadow-color: rgba(0, 0, 0, 0.2);
+    --border-color: rgba(255, 255, 255, 0.3);
+    --active-color: #6bff6b;
+    --inactive-color: #ff6b6b;
 }
-
-
 
 .patients-list {
     display: grid;
@@ -123,28 +123,29 @@ body {
     background: var(--background-color);
     color: var(--text-color);
     padding: 2rem;
-    border-radius: 20px;
+    border-radius: 15px;
     display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
-    box-shadow: 0 10px 20px var(--shadow-color);
+    box-shadow: 0 5px 15px var(--shadow-color);
     border: 1px solid var(--border-color);
-    backdrop-filter: blur(15px);
-    transition: transform 0.3s ease-in-out, background 0.3s;
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease-in-out;
     position: relative;
     overflow: hidden;
+    padding-bottom: 3rem;
 }
 
 .patient-card:hover {
-    transform: translateY(-10px);
+    transform: translateY(-8px);
     background: var(--hover-background);
-    box-shadow: 0 15px 30px var(--shadow-color);
+    box-shadow: 0 10px 25px var(--shadow-color);
 }
 
 .patient-card .profile-image-container {
-    width: 180px;
-    height: 180px;
+    width: 160px;
+    height: 160px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -153,21 +154,21 @@ body {
 }
 
 .patient-card .profile-image {
-    width: 150px;
-    height: 150px;
+    width: 140px;
+    height: 140px;
     border-radius: 50%;
     object-fit: cover;
-    border: 6px solid rgba(255, 255, 255, 0.3);
-    transition: transform 0.4s, border 0.3s;
+    border: 5px solid rgba(255, 255, 255, 0.3);
+    transition: transform 0.3s, border 0.3s;
 }
 
 .patient-card:hover .profile-image {
-    transform: scale(1.1);
+    transform: scale(1.05);
     border-color: var(--secondary-color);
 }
 
 .patient-card .patient-name {
-    font-size: 1.5rem;
+    font-size: 1.4rem;
     font-weight: bold;
     margin-bottom: 0.5rem;
     color: var(--text-color);
@@ -176,24 +177,31 @@ body {
 .patient-info {
     font-size: 1rem;
     color: rgba(255, 255, 255, 0.85);
-    margin-top: 1rem;
+    margin-top: 0.8rem;
 }
 
 .status {
     position: absolute;
-    top: 15px;
-    right: 15px;
-    width: 20px;
-    height: 20px;
+    top: 50px;
+    right: 25px;
+    width: 25px;
+    height: 25px;
     border-radius: 50%;
-    background: #ff6b6b;
     transition: transform 0.3s, background 0.3s;
 }
 
+.status.active {
+    background: var(--active-color);
+}
+
+.status.inactive {
+    background: var(--inactive-color);
+}
+
 .patient-card:hover .status {
-    background: #6bff6b;
-    transform: scale(1.3) rotate(360deg);
-}  
+    transform: scale(1.2);
+}
+ 
 /* Enter Button */
 .enter-btn {
     background: none;
