@@ -251,21 +251,26 @@ function chartjs_mensaje(msg, tipo = "success") {
 
 function chartjs_exportarCSV() {
   const filas = [["hora", "izquierda_ay", "derecha_ay"]];
-  for (let i = 0; i < chartjs_data.labels.length; i++) {
-    filas.push([
-      chartjs_data.labels[i],
-      chartjs_data.datasets.izquierda.ay[i] ?? "",
-      chartjs_data.datasets.derecha.ay[i] ?? ""
-    ]);
+  const largo = Math.max(chartjs_importadosIzquierda.length, chartjs_importadosDerecha.length);
+
+  for (let i = 0; i < largo; i++) {
+    const izq = chartjs_importadosIzquierda[i]?.value ?? "";
+    const der = chartjs_importadosDerecha[i]?.value ?? "";
+    const ts = chartjs_importadosIzquierda[i]?.timestamp || chartjs_importadosDerecha[i]?.timestamp || "";
+    const hora = ts ? new Date(ts).toLocaleTimeString() : "";
+    filas.push([hora, izq, der]);
   }
+
   const csv = filas.map(f => f.join(",")).join("\n");
   const blob = new Blob([csv], { type: "text/csv" });
+  const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
+  a.href = url;
   a.download = "grafica_chartjs.csv";
   a.click();
   a.remove();
 }
+
 
 async function chartjs_importarCSV(event) {
   const file = event.target.files[0];
@@ -330,6 +335,11 @@ async function chartjs_importarCSV(event) {
 
     localStorage.setItem("chartjs_import_izq", JSON.stringify(chartjs_importadosIzquierda));
     localStorage.setItem("chartjs_import_der", JSON.stringify(chartjs_importadosDerecha));
+
+    // 🔁 Forzar actualización de data en el gráfico
+    chartjs_chart.data.labels = chartjs_data.labels;
+    chartjs_chart.data.datasets[0].data = chartjs_data.datasets.izquierda.ay;
+    chartjs_chart.data.datasets[1].data = chartjs_data.datasets.derecha.ay;
     chartjs_chart.update();
 
     chartjs_mensaje("CSV importado y graficado correctamente");
@@ -420,3 +430,5 @@ async function cargarDispositivosActivos() {
 window.chartjs_togglePause = chartjs_togglePause;
 window.chartjs_reiniciarChartJS = chartjs_reiniciarChartJS;
 window.chartjs_exportarCSV = chartjs_exportarCSV;
+window.chartjs_importarCSV = chartjs_importarCSV;
+
