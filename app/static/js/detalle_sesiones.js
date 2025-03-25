@@ -175,6 +175,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById("btn-tabla").addEventListener("click", () => {
         cargarTablaMediapipe(); // 📌 Llamará a la función de tabla_mediapipe.js
     });
+      
     
 });
 
@@ -1630,4 +1631,89 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }
   });
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const finalizarBtn = document.getElementById("finalizarSesion");
+  
+    if (finalizarBtn) {
+      finalizarBtn.addEventListener("click", () => {
+        const overlay = document.createElement("div");
+        overlay.className = "modal-overlay";
+  
+        const modal = document.createElement("div");
+        modal.className = "modal-confirm";
+  
+        modal.innerHTML = `
+          <h2>¿Finalizar sesión?</h2>
+          <p>⚠️ Esto <strong>enviará los datos finales al paciente de la gráfica y tabla</strong>.<br>
+          🔒 Después de esto, <strong>ya no podrás hacer modificaciones</strong> en esta sesión.<br>
+          ¿Deseas continuar?</p>
+          <div class="modal-buttons">
+            <button class="btn-secondary" id="cancelarFinalizar">Cancelar</button>
+            <button class="btn-danger" id="confirmarFinalizar">Finalizar</button>
+          </div>
+        `;
+  
+        overlay.appendChild(modal);
+        document.body.appendChild(overlay);
+  
+        document.getElementById("cancelarFinalizar").onclick = () => {
+          overlay.remove();
+        };
+  
+        document.getElementById("confirmarFinalizar").onclick = async () => {
+          overlay.remove();
+  
+          const idSesion = localStorage.getItem("id_sesion");
+          if (!idSesion) {
+            mostrarMensaje("❌ No se encontró la sesión activa", "error");
+            return;
+          }
+  
+          let datosGrafica = null;
+  
+          if (window.tipoGraficaActiva === "chartjs") {
+            datosGrafica = {
+              izquierda: JSON.parse(localStorage.getItem("chartjs_import_izq") || "[]"),
+              derecha: JSON.parse(localStorage.getItem("chartjs_import_der") || "[]")
+            };
+          } else if (window.tipoGraficaActiva === "smoothie") {
+            datosGrafica = {
+              izquierda: JSON.parse(localStorage.getItem("smoothie_import_izq") || "[]"),
+              derecha: JSON.parse(localStorage.getItem("smoothie_import_der") || "[]")
+            };
+          }
+  
+          // 🔵 También puedes extraer datos de MediaPipe si ya los guardas
+          const datosMediapipe = JSON.parse(localStorage.getItem("tabla_mediapipe") || "[]");
+  
+          try {
+            const response = await fetch("/graficas_movil", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                id_sesion_fk: parseInt(idSesion),
+                datos_graficas: datosGrafica,
+                datos_mediapipe: datosMediapipe
+              })
+            });
+  
+            if (!response.ok) throw new Error("❌ Error al guardar en el backend");
+  
+            mostrarMensaje("✅ Sesión finalizada y datos enviados");
+  
+            // 🛑 Opcional: desactiva todos los inputs, botones y controles
+            document.querySelectorAll("button, input, select").forEach(el => el.disabled = true);
+            document.querySelectorAll("textarea").forEach(el => el.readOnly = true);
+
+  
+          } catch (error) {
+            console.error(error);
+            mostrarMensaje("❌ Error al finalizar sesión", "error");
+          }
+        };
+      });
+    }
+  });
+  
   
