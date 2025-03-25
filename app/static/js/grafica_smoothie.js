@@ -37,7 +37,7 @@ document.addEventListener("DOMContentLoaded", () => {
   for (const p of datosIzq) smoothie_izquierdaTS.append(p.timestamp, p.value);
   for (const p of datosDer) smoothie_derechaTS.append(p.timestamp, p.value);
 
-  document.getElementById("importInput").addEventListener("change", smoothie_importarCSV);
+  document.getElementById("importInput_smoothie").addEventListener("change", smoothie_importarCSV);
 
   if (window.tipoGraficaActiva === "smoothie") {
     smoothie_renderLeyenda();

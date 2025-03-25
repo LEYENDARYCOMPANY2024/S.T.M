@@ -80,7 +80,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     chartjs_chart.update();
 
-  document.getElementById("importInput").addEventListener("change", chartjs_importarCSV);
+    document.getElementById("importInput_chartjs").addEventListener("change", chartjs_importarCSV);
 
   if (window.tipoGraficaActiva === "chartjs") {
     chartjs_suscribirRealtime();
@@ -157,7 +157,6 @@ function chartjs_suscribirRealtime() {
 
 
 function chartjs_reiniciarChartJS() {
-  // Mostrar confirmación antes de reiniciar
   const overlay = document.createElement("div");
   overlay.className = "modal-overlay";
 
@@ -187,14 +186,21 @@ function chartjs_reiniciarChartJS() {
     chartjs_importadosDerecha = [];
 
     chartjs_data.labels = [];
-    Object.values(chartjs_data.datasets).forEach(d => d.ay = []);
+    chartjs_data.datasets.izquierda.ay = [];
+    chartjs_data.datasets.derecha.ay = [];
+
+    chartjs_chart.data.labels = [];
+    chartjs_chart.data.datasets[0].data = [];
+    chartjs_chart.data.datasets[1].data = [];
     chartjs_chart.update();
+
     chartjs_realtimePaused = false;
     document.getElementById("pauseButton").textContent = "Pausar";
 
-    chartjs_mensaje("Gráfica reiniciada y datos eliminados");
+    window.reinicioPendiente = false; // ✅ AQUÍ ESTÁ EL CAMBIO IMPORTANTE
 
-    // 🧠 Reactivar envío de datos desde ESP
+    chartjs_mensaje("🔁 Gráfica reiniciada y datos eliminados");
+
     try {
       const dispositivos = await fetch("/dispositivos/activos").then(r => r.json());
       for (const d of dispositivos) {
@@ -209,7 +215,9 @@ function chartjs_reiniciarChartJS() {
       chartjs_mensaje("❌ Error al reactivar envío en ESP", "error");
     }
   };
-};
+}
+
+
 
 
 
@@ -250,6 +258,14 @@ function chartjs_mensaje(msg, tipo = "success") {
 }
 
 function chartjs_exportarCSV() {
+  const tieneDatos =
+    chartjs_importadosIzquierda.length > 0 || chartjs_importadosDerecha.length > 0;
+
+  if (!tieneDatos) {
+    chartjs_mensaje("⚠️ No hay datos para exportar", "error");
+    return;
+  }
+
   const filas = [["hora", "izquierda_ay", "derecha_ay"]];
   const largo = Math.max(chartjs_importadosIzquierda.length, chartjs_importadosDerecha.length);
 
@@ -270,6 +286,7 @@ function chartjs_exportarCSV() {
   a.click();
   a.remove();
 }
+
 
 
 async function chartjs_importarCSV(event) {
@@ -346,6 +363,7 @@ async function chartjs_importarCSV(event) {
   };
 
   reader.readAsText(file);
+  event.target.value = "";
 }
 
 

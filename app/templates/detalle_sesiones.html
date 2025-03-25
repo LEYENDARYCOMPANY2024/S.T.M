@@ -141,8 +141,9 @@
           <button id="pauseButton" onclick="pausarGraficaActual()">▶️ Iniciar</button>
           <button onclick="reiniciarGrafica()">🔄 Reiniciar</button>
           <button onclick="exportarGraficaActual()">💾 Guardar CSV</button>
-          <button onclick="document.getElementById('importInput').click()">📥 Importar CSV</button>
-          <input type="file" id="importInput" accept=".csv" style="display:none" onchange="handleImportCSV(event)">
+          <button onclick="importarCSVActual()">📥 Importar CSV</button>
+          <input type="file" id="importInput_chartjs" accept=".csv" style="display:none" onchange="chartjs_importarCSV(event)">
+          <input type="file" id="importInput_smoothie" accept=".csv" style="display:none" onchange="smoothie_importarCSV(event)">
         </div>
         <div id="dispositivos-activos" class="device-controls">
           <h3>Dispositivos Activos</h3>
@@ -195,6 +196,7 @@
         toggleBtn.textContent = "Cambiar a Smoothie";
         smoothie_realtimePaused = true;
         chartjs_realtimePaused = false;
+        window.tipoGraficaActiva = "chartjs"; // ✅ Agrega esta línea
     
         // 🟢 Agrega esto si no lo tienes
         if (window.chartjs_suscribirRealtime) chartjs_suscribirRealtime();
@@ -206,6 +208,7 @@
         toggleBtn.textContent = "Cambiar a Chart.js";
         chartjs_realtimePaused = true;
         smoothie_realtimePaused = false;
+        window.tipoGraficaActiva = "smoothie"; // ✅ Agrega esta línea
     
         // 🟢 Agrega esto si no lo tienes
         if (window.smoothie_suscribirseRealtime) smoothie_suscribirseRealtime();
@@ -248,6 +251,15 @@
           window.smoothie_togglePause();
         }
       }
+
+      function importarCSVActual() {
+        if (currentChart === "chartjs") {
+          document.getElementById("importInput_chartjs").click();
+        } else if (currentChart === "smoothie") {
+          document.getElementById("importInput_smoothie").click();
+        }
+      }
+      
       
       
       
