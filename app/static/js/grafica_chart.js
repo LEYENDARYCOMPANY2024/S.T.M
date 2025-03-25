@@ -207,23 +207,65 @@ async function chartjs_importarCSV(event) {
   const file = event.target.files[0];
   if (!file) return;
 
-  const formData = new FormData();
-  formData.append("file", file);
-  const etiqueta = prompt("Etiqueta para los datos importados:", "importacion_chartjs");
-  if (etiqueta) formData.append("etiqueta", etiqueta);
+  const reader = new FileReader();
 
-  try {
-    const response = await fetch("/graficas/importar", {
-      method: "POST",
-      body: formData
-    });
-    const result = await response.json();
-    chartjs_mensaje(result.mensaje, "success");
-  } catch (error) {
-    chartjs_mensaje("Error al importar CSV", "error");
-    console.error(error);
-  }
+  reader.onload = async function (e) {
+    const contenido = e.target.result;
+    const filas = contenido.split("\n").map(linea => linea.trim()).filter(Boolean);
+    const encabezados = filas.shift().split(",");
+
+    const idxHora = encabezados.indexOf("hora");
+    const idxIzq = encabezados.indexOf("izquierda_ay");
+    const idxDer = encabezados.indexOf("derecha_ay");
+
+    if (idxHora === -1 || idxIzq === -1 || idxDer === -1) {
+      chartjs_mensaje("⚠️ El CSV debe tener columnas: hora, izquierda_ay, derecha_ay", "error");
+      return;
+    }
+
+    // ⏸️ Pausar la gráfica y actualizar botón
+    chartjs_realtimePaused = true;
+    document.getElementById("pauseButton").textContent = "Iniciar";
+
+    // ⛔ Detener envío desde ESP32
+    try {
+      const dispositivos = await fetch("/dispositivos/activos").then(r => r.json());
+      for (const d of dispositivos) {
+        await fetch(`/dispositivos/permiso_envio/${d.uuid}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ estado: false })
+        });
+      }
+      console.log("🚫 Envío de datos desde dispositivos pausado");
+    } catch (err) {
+      console.error("❌ Error al pausar dispositivos:", err);
+    }
+
+    // 🔄 Reemplazar datos actuales
+    chartjs_data.labels = [];
+    chartjs_data.datasets.izquierda.ay = [];
+    chartjs_data.datasets.derecha.ay = [];
+
+    for (const fila of filas) {
+      const columnas = fila.split(",");
+      const hora = columnas[idxHora];
+      const izq = parseFloat(columnas[idxIzq]) || 0;
+      const der = parseFloat(columnas[idxDer]) || 0;
+
+      chartjs_data.labels.push(hora);
+      chartjs_data.datasets.izquierda.ay.push(izq);
+      chartjs_data.datasets.derecha.ay.push(der);
+    }
+
+    chartjs_chart.update();
+    chartjs_mensaje("📥 CSV importado y graficado correctamente");
+  };
+
+  reader.readAsText(file);
 }
+
+
 
 async function enviarDatosAlESP(uuid, id_paciente, id_sesion_dispositivo, lado_pierna) {
   const response = await fetch("/esp/configurar_paciente", {

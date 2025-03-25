@@ -142,7 +142,7 @@
           <button onclick="reiniciarGrafica()">🔄 Reiniciar</button>
           <button onclick="exportarGraficaActual()">💾 Guardar CSV</button>
           <button onclick="document.getElementById('importInput').click()">📥 Importar CSV</button>
-          <input type="file" id="importInput" accept=".csv" style="display:none" onchange="importarCSV(event)">
+          <input type="file" id="importInput" accept=".csv" style="display:none" onchange="handleImportCSV(event)">
         </div>
         <div id="dispositivos-activos" class="device-controls">
           <h3>Dispositivos Activos</h3>
@@ -261,5 +261,17 @@
   <script src="/static/js/grafica_chart.js" defer></script>
   <script src="/static/js/grafica_smoothie.js" defer></script>
   <script src="/static/js/detalle_sesiones.js"></script>
+  <script>
+    window.handleImportCSV = function (event) {
+      if (window.tipoGraficaActiva === "chartjs") {
+        chartjs_importarCSV(event);
+      } else if (window.tipoGraficaActiva === "smoothie") {
+        smoothie_importarCSV(event);
+      } else {
+        console.warn("❓ Tipo de gráfica desconocido");
+      }
+    };
+    
+  </script>
 </body>
 </html>

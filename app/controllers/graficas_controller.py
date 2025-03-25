@@ -106,25 +106,49 @@ def exportar_grafica_solo_xy(db: Session, id_grafica: int):
     })
 
 
-def importar_csv(file, etiqueta: str, db: Session):
+def importar_csv(file, db: Session):
     content = file.file.read().decode("utf-8").splitlines()
     reader = csv.DictReader(content)
 
+    hoy = datetime.now(zona_mx).date()
     nuevos = 0
+
     for row in reader:
-        grafica = Grafica(
-            nombre_grafica=row.get("etiqueta", etiqueta),
-            etiqueta=etiqueta,
-            aceleracion_x=row.get("acel_x"),
-            aceleracion_y=row.get("acel_y"),
-            aceleracion_z=row.get("acel_z"),
-            rotacion_x=row.get("rot_x"),
-            rotacion_y=row.get("rot_y"),
-            rotacion_z=row.get("rot_z"),
-            datos_extra={}
-        )
-        db.add(grafica)
-        nuevos += 1
+        try:
+            hora_str = row.get("hora")
+            if not hora_str:
+                continue
+
+            # 🕒 Convertir hora a datetime con la fecha actual
+            fecha_hora = datetime.strptime(f"{hoy} {hora_str}", "%Y-%m-%d %H:%M:%S")
+
+            # 🔽 Si hay valor en izquierda
+            izquierda_valor = row.get("izquierda_ay")
+            if izquierda_valor:
+                db.add(Grafica(
+                    nombre_grafica="importada_csv",
+                    aceleracion_y=float(izquierda_valor),
+                    aceleracion_x=0.0,
+                    fecha_hora=fecha_hora,
+                    lado_pierna_gf="izquierda"
+                ))
+                nuevos += 1
+
+            # 🔽 Si hay valor en derecha
+            derecha_valor = row.get("derecha_ay")
+            if derecha_valor:
+                db.add(Grafica(
+                    nombre_grafica="importada_csv",
+                    aceleracion_y=float(derecha_valor),
+                    aceleracion_x=0.0,
+                    fecha_hora=fecha_hora,
+                    lado_pierna_gf="derecha"
+                ))
+                nuevos += 1
+
+        except Exception as e:
+            print(f"❌ Error en fila: {row} => {e}")
+            continue
 
     db.commit()
-    return {"mensaje": f"{nuevos} registros importados con la etiqueta '{etiqueta}'"}
+    return {"mensaje": f"{nuevos} registros importados correctamente"}
