@@ -418,13 +418,14 @@ body {
     align-items: center;
 }
 .modal-content {
-    background: var(--primary-gradient);
-    padding: 2rem;
-    border-radius:50px;
-    width: 98%;  /* Almost full width */
-    max-width: 1000px;  /* Much wider max-width */
+    background-color: #08232b;
+    width: 10%;  /* Almost full width */
+    max-width: 800px;  /* Much wider max-width */
+    padding: 2.5rem;
+    border-radius: 20px;
     box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
 }
+
 
 .modal-content::before {
     content: '';
@@ -460,18 +461,17 @@ body {
 }
 
 .modal-content {
-    background: var(--primary-gradient);
-    padding: 2rem;
+    width: 50%;  /* Almost full width */
+    max-width: 800px;  /* Much wider max-width */
+    padding: 2.5rem;
     border-radius: 20px;
-    width: 95%;  /* Increased from 90% to 95% */
-    max-width: 700px;  /* Increased from 500px to 700px */
     box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
 }
 
 .modal-content h2 {
     text-align: center;
-    margin-bottom: 1.5rem;
-    font-size: 1.8rem;
+    margin-bottom: 2rem;  /* More space below title */
+    font-size: 2rem;  /* Larger title */
 }
 
 .modal-content form {
@@ -521,9 +521,11 @@ body {
 /* Responsive */
 @media (max-width: 768px) {
     .modal-content {
-        width: 95%;
-        padding: 1.5rem;
+        width: 98%;  /* Even wider on smaller screens */
+        padding: 2rem;
+        max-width: 95%;
     }
+
 
     .patient-card {
         width: 95%;
@@ -566,16 +568,7 @@ body {
     transform: scale(1.1);
 }
 
-/* Actualizar el modal-content para manejar el botón de cierre */
-.modal-content {
-    position: relative;  /* Agregado para posicionamiento absoluto del botón */
-    background: var(--primary-gradient);
-    padding: 2rem;
-    border-radius: 20px;
-    width: 90%;
-    max-width: 500px;
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
-}
+
 /* Estilos para el select y sus opciones */
 .modal-content select {
     width: 100%;
@@ -885,12 +878,12 @@ body {
 }
 
 .modal-content {
-    background: #08232b; /* Fondo transparente para el modal */
-    padding: 30px;
+    background-color: #08232b;
+    width: 50%;  /* Almost full width */
+    max-width: 500px;  /* Much wider max-width */
+    padding: 2.5rem;
     border-radius: 20px;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
-    text-align: center;
-    width: 300px;
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
 }
 
 .confirm-box h2 {
