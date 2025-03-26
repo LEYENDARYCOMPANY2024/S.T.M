@@ -545,28 +545,34 @@ body {
     }
 }
 /* Agregar al CSS existente */
+/* Estilos del encabezado del modal */
+/* Estilos del botón de cerrar */
 .close-modal-btn {
     position: absolute;
     top: 10px;
-    right: 10px;
-    background: rgba(255, 255, 255, 0.2);
+    right: 15px;
+    background: none;
     border: none;
-    color: rgb(255, 0, 0);
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    font-size: 20px;
+    font-size: 1.8rem;
+    font-weight: bold;
     cursor: pointer;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    transition: var(--transition);
+    color: red;
+    transition: 0.3s ease;
 }
 
 .close-modal-btn:hover {
-    background: rgba(255, 255, 255, 0.3);
+    color: #ff4d4d; /* Cambia de color al pasar el mouse */
     transform: scale(1.1);
 }
+
+/* Asegurar que el modal tenga posición relativa */
+.modal-content {
+    position: relative;
+    padding: 20px;
+    border-radius: 8px;
+}
+
+
 
 
 /* Estilos para el select y sus opciones */
