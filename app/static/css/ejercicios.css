@@ -477,7 +477,7 @@
     gap: 30px;
     flex-wrap: wrap;
     padding: 20px;
-    background-color: #08232b;
+    background-color: white;
     border-radius: 10px;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
 }
@@ -499,14 +499,14 @@
     flex-direction: column;
     gap: 15px;
     padding: 10px;
-    background-color: #08232b;
+    background-color: white;
     border-radius: 8px;
     box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .level-description .exercise-list h3 {
     font-size: 1.2rem;
-    color: #ffffff;
+    color: white;
     margin-bottom: 5px;
 }
 
@@ -518,7 +518,7 @@
 .level-description .exercise-list ul li {
     font-size: 1rem;
     padding: 8px;
-    background: #f1f3f5;
+    background: white;
     border-left: 5px solid #007bff;
     border-radius: 5px;
 }
@@ -671,7 +671,7 @@
 
 .message {
     background-color: #989ad5;
-    color: white;
+    color: black;
     padding: 12px 24px;
     border-radius: 8px;
     margin: 8px 0;
