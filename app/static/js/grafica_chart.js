@@ -131,6 +131,10 @@ function chartjs_suscribirRealtime() {
       chartjs_data.labels.push(fecha.toLocaleTimeString());
       chartjs_data.datasets[lado].ay.push(valor);
       chartjs_limitData();
+      // 🔄 ACTUALIZA LOS DATOS DEL OBJETO DE Chart.js
+      chartjs_chart.data.labels = chartjs_data.labels;
+      chartjs_chart.data.datasets[0].data = chartjs_data.datasets.izquierda.ay;
+      chartjs_chart.data.datasets[1].data = chartjs_data.datasets.derecha.ay;
       chartjs_chart.update('none');
 
       const ts = fecha.getTime(); // timestamp real

@@ -30,6 +30,9 @@ const smoothie_chart = new SmoothieChart({
 document.addEventListener("DOMContentLoaded", () => {
   const canvas = document.getElementById("grafica_smoothie");
   smoothie_chart.streamTo(canvas, 0);
+  if (!smoothie_realtimePaused) {
+    smoothie_chart.start();
+  }  
   smoothie_chart.addTimeSeries(smoothie_izquierdaTS, { strokeStyle: '#00ff00', lineWidth: 2 });
   smoothie_chart.addTimeSeries(smoothie_derechaTS, { strokeStyle: '#ff3333', lineWidth: 2 });
   const datosIzq = JSON.parse(localStorage.getItem("smoothie_import_izq") || "[]");
