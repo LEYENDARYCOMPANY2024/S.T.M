@@ -117,3 +117,36 @@ $(document).ready(function () {
        updateRegisterButton();
        modal.css('display', 'none');
    });
+
+   document.addEventListener("DOMContentLoaded", function() {
+    const passwordInput = document.getElementById("contrasena");
+    const strengthIndicator = document.getElementById("strengthIndicator");
+    const strengthText = document.getElementById("strengthText");
+
+    passwordInput.addEventListener("input", function() {
+        const password = passwordInput.value;
+        const strength = checkPasswordStrength(password);
+
+        strengthIndicator.style.width = strength.percentage;
+        strengthIndicator.style.backgroundColor = strength.color;
+        strengthText.innerText = "Seguridad: " + strength.text;
+    });
+
+    function checkPasswordStrength(password) {
+        let strength = 0;
+
+        if (password.length >= 8) strength += 1;
+        if (password.match(/[A-Z]/)) strength += 1;
+        if (password.match(/[0-9]/)) strength += 1;
+        if (password.match(/[@$!%*?&]/)) strength += 1;
+
+        const levels = [
+            { text: "Muy débil", color: "red", percentage: "25%" },
+            { text: "Débil", color: "orange", percentage: "50%" },
+            { text: "Aceptable", color: "yellow", percentage: "75%" },
+            { text: "Segura", color: "green", percentage: "100%" }
+        ];
+
+        return levels[strength] || levels[0];
+    }
+});
