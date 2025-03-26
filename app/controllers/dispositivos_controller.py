@@ -149,7 +149,20 @@ def registrar_dispositivo_por_correo(db: Session, correo: str, nombre_dispositiv
     if not terapeuta:
         raise HTTPException(status_code=404, detail="Terapeuta no encontrado")
 
-    # Verificar si ya existe ese UUID (por seguridad)
+    # 🔄 Buscar si YA EXISTE un dispositivo con el mismo nombre y terapeuta
+    dispositivo_existente = db.query(DispositivoIOT).filter(
+        DispositivoIOT.nombre_dispositivo == nombre_dispositivo,
+        DispositivoIOT.id_terapeuta_fk == terapeuta.id_terapeuta
+    ).first()
+
+    if dispositivo_existente:
+        return {
+            "mensaje": "Dispositivo ya registrado",
+            "uuid": dispositivo_existente.uuid,
+            "estado": "desactivado"
+        }
+
+    # ✅ Si NO existe, generamos un nuevo UUID y lo registramos
     nuevo_uuid = str(uuid_lib.uuid4())
     while db.query(DispositivoIOT).filter(DispositivoIOT.uuid == nuevo_uuid).first():
         nuevo_uuid = str(uuid_lib.uuid4())
@@ -164,11 +177,13 @@ def registrar_dispositivo_por_correo(db: Session, correo: str, nombre_dispositiv
     db.add(nuevo)
     db.commit()
     db.refresh(nuevo)
+
     return {
         "mensaje": "Dispositivo registrado exitosamente",
         "uuid": nuevo.uuid,
         "estado": "desactivado"
     }
+
 
 
 def verificar_estado_dispositivo(db: Session, uuid: str):

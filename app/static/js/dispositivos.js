@@ -123,6 +123,8 @@ document.addEventListener("DOMContentLoaded", async function () {
                 const result = await response.json();
                 const uuid = result.uuid || uuidAttr;
 
+                
+
                 if (result.estado === "activado") {
                     // Guardar sesión_dispositivo_id
                     let ids = JSON.parse(localStorage.getItem("sesion_dispositivo_ids")) || [];
