@@ -3,7 +3,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (!pacienteId) {
         alert("No hay paciente seleccionado.");
-        window.location.href = "/principal"; // Redirigir si no hay paciente
+        window.location.href = "/principal";
         return;
     }
 
@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 async function cargarNiveles(pacienteId) {
     try {
-        const response = await fetch(`/api/pacientes/${pacienteId}/niveles`); // Modificar la ruta con el id_paciente
+        const response = await fetch(`/api/pacientes/${pacienteId}/niveles`);
         if (!response.ok) {
             throw new Error(`Error en la API: ${response.status}`);
         }
@@ -22,21 +22,53 @@ async function cargarNiveles(pacienteId) {
             throw new Error("La API no devolvió una lista de niveles válida.");
         }
 
-        const menuContainer = document.getElementById("levels-menu");
-        menuContainer.innerHTML = ""; // Limpiar contenido previo
+        // Ordenar niveles de forma ascendente por ID
+        niveles.sort((a, b) => a.id_nivel - b.id_nivel);
 
-        niveles.forEach(async (nivel) => {
+        const menuContainer = document.getElementById("levels-menu");
+        menuContainer.innerHTML = "";
+
+        const nombresNiveles = [
+            "Introducción al Movimiento",
+            "Movilidad Básica",
+            "Equilibrio Fundamental",
+            "Coordinación Motora Inicial",
+            "Fuerza y Estabilidad",
+            "Resistencia Funcional",
+            "Flexibilidad Avanzada",
+            "Integración Neuromotora Completa"
+        ];
+
+        const estadosNiveles = new Map();
+
+        niveles.forEach((nivel, index) => {
+            nivel.nombre_nivel = `Nivel ${index + 1}: ${nombresNiveles[index]}`;
+
+            if (index > 0) {
+                const estadoNivelAnterior = estadosNiveles.get(index) || "bloqueado";
+                
+                if (estadoNivelAnterior === "bloqueado") {
+                    nivel.estado = "bloqueado";
+                }
+            }
+
+            estadosNiveles.set(index + 1, nivel.estado);
+        });
+
+        // Procesar niveles de forma secuencial
+        for (const [index, nivel] of niveles.entries()) {
             const nivelContainer = document.createElement("div");
             nivelContainer.classList.add("level-container");
             nivelContainer.setAttribute("data-level", nivel.id_nivel);
 
+            // Obtener ejercicios ordenados
             const ejercicios = await obtenerEjercicios(pacienteId, nivel.id_nivel);
 
             nivelContainer.innerHTML = `
                 <div class="level-row">
                     <div class="level-indicator ${nivel.estado === "desbloqueado" ? "unlocked" : "locked"}"></div>
                     <div class="level-name">${nivel.nombre_nivel}</div>
-                    <button class="lock-button" onclick="toggleLock(this, ${pacienteId}, ${nivel.id_nivel})">
+                    <button class="lock-button" onclick="toggleLock(this, ${pacienteId}, ${nivel.id_nivel}, ${index + 1})">
                         <i class="lock-icon">${nivel.estado === "desbloqueado" ? "🔓" : "🔒"}</i>
                     </button>
                     <button class="arrow-button" onclick="toggleDescription(this)">
@@ -67,21 +99,17 @@ async function cargarNiveles(pacienteId) {
             `;
 
             menuContainer.appendChild(nivelContainer);
-        });
+        }
     } catch (error) {
         console.error("Error al cargar niveles:", error);
     }
 }
 
-// 📌 Función para obtener el ID del video de YouTube desde la URL
 function obtenerYouTubeID(url) {
     const regExp = /(?:youtube\.com\/(?:[^\/]+\/[^\/]+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/;
     const match = url.match(regExp);
     return match ? match[1] : null;
 }
-
-
-
 
 async function obtenerEjercicios(pacienteId, id_nivel) {
     try {
@@ -89,20 +117,32 @@ async function obtenerEjercicios(pacienteId, id_nivel) {
         if (!response.ok) {
             throw new Error(`Error en la API: ${response.status}`);
         }
-        return await response.json();
+        const ejercicios = await response.json();
+        
+        // Ordenar ejercicios por ID o por el orden que quieras
+        return ejercicios.sort((a, b) => a.id_ejercicio - b.id_ejercicio);
     } catch (error) {
         console.error(`Error al obtener ejercicios del nivel ${id_nivel}:`, error);
         return [];
     }
 }
 
-
-async function toggleLock(button, pacienteId, id_nivel) {
-    // Obtener el contenedor del nivel y sus elementos
+async function toggleLock(button, pacienteId, id_nivel, nivelNumero) {
     const levelContainer = button.closest(".level-container");
     const lockIcon = button.querySelector(".lock-icon");
     const indicator = levelContainer.querySelector(".level-indicator");
-    const levelName = levelContainer.querySelector(".level-name").textContent.trim(); // 🔹 Obtener el nombre del nivel
+    const levelName = levelContainer.querySelector(".level-name").textContent.trim();
+
+    const niveles = Array.from(document.querySelectorAll(".level-container"));
+    const currentIndex = niveles.findIndex(nivel => nivel === levelContainer);
+
+    for (let i = 0; i < currentIndex; i++) {
+        const previousLevelLockIcon = niveles[i].querySelector(".lock-icon");
+        if (previousLevelLockIcon.textContent === "🔒") {
+            showMessage(`Debes desbloquear primero los niveles anteriores`, "error");
+            return;
+        }
+    }
 
     let nuevoEstado = lockIcon.textContent === "🔒" ? "desbloqueado" : "bloqueado";
 
@@ -114,17 +154,16 @@ async function toggleLock(button, pacienteId, id_nivel) {
 
         if (!response.ok) throw new Error("No se pudo actualizar el nivel");
 
-        // Cambiar visualmente el estado del nivel
         if (nuevoEstado === "desbloqueado") {
             lockIcon.textContent = "🔓";
             indicator.classList.remove("locked");
             indicator.classList.add("unlocked");
-            showMessage(`¡${levelName} desbloqueado!`, "success"); // 🔹 Mostrar el nombre del nivel
+            showMessage(`¡${levelName} desbloqueado!`, "success");
         } else {
             lockIcon.textContent = "🔒";
             indicator.classList.remove("unlocked");
             indicator.classList.add("locked");
-            showMessage(`${levelName} bloqueado`, "error"); // 🔹 Mostrar el nombre del nivel
+            showMessage(`${levelName} bloqueado`, "error");
         }
     } catch (error) {
         console.error("Error al actualizar el estado del nivel:", error);
@@ -132,16 +171,12 @@ async function toggleLock(button, pacienteId, id_nivel) {
     }
 }
 
-
-
-// Función para mostrar/ocultar la descripción del nivel
 function toggleDescription(button) {
     button.classList.toggle("open");
     const description = button.parentNode.nextElementSibling;
     description.classList.toggle("open");
 }
 
-// Función para mostrar mensajes de notificación
 function showMessage(text, type = "success") {
     const messageContainer = document.getElementById("message-container");
     
@@ -160,7 +195,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const homeButton = document.querySelector(".home-button");
     if (homeButton) {
         homeButton.addEventListener("click", async (e) => {
-            e.preventDefault(); // ✋ prevenir redirección inmediata
+            e.preventDefault();
 
             const sesionId = localStorage.getItem("id_sesion");
 
@@ -180,7 +215,6 @@ document.addEventListener("DOMContentLoaded", () => {
             localStorage.removeItem("nombre_sesion");
             localStorage.removeItem("sesion_dispositivo_ids");
 
-            // ✅ Redirigir luego de limpiar todo
             window.location.href = "/principal";
         });
     }
