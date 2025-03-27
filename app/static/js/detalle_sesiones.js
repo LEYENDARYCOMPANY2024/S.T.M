@@ -100,56 +100,64 @@ document.addEventListener("DOMContentLoaded", async () => {
         const salirDetalleBtn = document.getElementById("salir-detalle");
 
         if (salirDetalleBtn) {
-            salirDetalleBtn.addEventListener("click", () => {
-                // Crear overlay oscuro
-                const overlay = document.createElement("div");
-                overlay.className = "modal-overlay";
+        salirDetalleBtn.addEventListener("click", () => {
+            const overlay = document.createElement("div");
+            overlay.className = "modal-overlay";
 
-                // Crear modal
-                const modal = document.createElement("div");
-                modal.className = "modal-confirm";
+            const modal = document.createElement("div");
+            modal.className = "modal-confirm";
 
-                modal.innerHTML = `
-                    <h2>¿Salir de la sesión?</h2>
-                    <p>⚠️ Si sales ahora, podrías perder los datos en tiempo real.<br>
-                    💾 Se recomienda exportar tu gráfica antes de salir.</p>
-                    <div class="modal-buttons">
-                        <button class="btn-secondary" id="cancelarSalir">Cancelar</button>
-                        <button class="btn-danger" id="confirmarSalir">Salir</button>
-                    </div>
-                `;
+            modal.innerHTML = `
+            <h2>¿Salir del detalle de sesión?</h2>
+            <p>⚠️ Esto eliminará los datos en tiempo real e importados de esta sesión.<br>
+            💾 Se recomienda <strong>guardar tu gráfica</strong> antes de salir.</p>
+            <div class="modal-buttons">
+                <button class="btn-secondary" id="cancelarSalir">Cancelar</button>
+                <button class="btn-danger" id="confirmarSalir">Salir</button>
+            </div>
+            `;
 
-                overlay.appendChild(modal);
-                document.body.appendChild(overlay);
+            overlay.appendChild(modal);
+            document.body.appendChild(overlay);
 
-                // Eventos botones
-                document.getElementById("cancelarSalir").onclick = () => {
-                    overlay.remove();
-                };
+            document.getElementById("cancelarSalir").onclick = () => {
+            overlay.remove();
+            };
 
-                document.getElementById("confirmarSalir").onclick = async () => {
-                    const sesionId = localStorage.getItem("id_sesion");
+            document.getElementById("confirmarSalir").onclick = async () => {
+            const sesionId = localStorage.getItem("id_sesion");
 
-                    if (sesionId) {
-                        try {
-                            await fetch(`/dispositivos/desactivar/${sesionId}`, {
-                                method: "PUT"
-                            });
-                            console.log("🔌 Dispositivos desactivados al salir de la sesión.");
-                        } catch (error) {
-                            console.error("❌ Error al desactivar dispositivos:", error);
-                        }
-                    }
+            if (sesionId) {
+                try {
+                await fetch(`/dispositivos/desactivar/${sesionId}`, {
+                    method: "PUT"
+                });
+                console.log("🔌 Dispositivos desactivados al salir de la sesión.");
+                } catch (error) {
+                console.error("❌ Error al desactivar dispositivos:", error);
+                }
+            }
 
-                    localStorage.removeItem("id_sesion");
-                    localStorage.removeItem("nombre_sesion");
-                    localStorage.removeItem("sesion_dispositivo_ids");
-                    localStorage.removeItem("graficas_ids");
+            // 🧹 Eliminar datos de sesión y gráficas
+            localStorage.removeItem("id_sesion");
+            localStorage.removeItem("nombre_sesion");
+            localStorage.removeItem("sesion_dispositivo_ids");
+            localStorage.removeItem("graficas_ids");
 
-                    window.location.href = "/sesiones";
-                };
-            });
+            // 🧹 También los datos de Smoothie si existen
+            localStorage.removeItem("smoothie_import_izq");
+            localStorage.removeItem("smoothie_import_der");
+            
+            // 🧹 Y los datos de Chart.js
+            localStorage.removeItem("chartjs_import_izq");
+            localStorage.removeItem("chartjs_import_der");
+
+
+            window.location.href = "/sesiones";
+            };
+        });
         }
+
 
 
 
@@ -167,6 +175,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById("btn-tabla").addEventListener("click", () => {
         cargarTablaMediapipe(); // 📌 Llamará a la función de tabla_mediapipe.js
     });
+      
     
 
 
@@ -1566,56 +1575,149 @@ tableBody.addEventListener('mouseout', function(event) {
 
 
 document.addEventListener("DOMContentLoaded", () => {
-    // 📌 Evento para ir al INICIO pero con confirmación
     const irInicioBtn = document.querySelector(".home-button");
-
+  
     if (irInicioBtn) {
-        irInicioBtn.addEventListener("click", (e) => {
-            e.preventDefault(); // Cancelar navegación automática
+      irInicioBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+  
+        const overlay = document.createElement("div");
+        overlay.className = "modal-overlay";
+  
+        const modal = document.createElement("div");
+        modal.className = "modal-confirm";
+  
+        modal.innerHTML = `
+          <h2>¿Ir al inicio?</h2>
+          <p>⚠️ Si vuelves al inicio, <strong>se eliminarán los datos de las gráficas importadas o en tiempo real</strong>.<br>
+          💾 Te recomendamos <strong>guardar tu gráfica</strong> antes de continuar.</p>
+          <div class="modal-buttons">
+            <button class="btn-secondary" id="cancelarInicio">Cancelar</button>
+            <button class="btn-danger" id="confirmarInicio">Ir al inicio</button>
+          </div>
+        `;
+  
+        overlay.appendChild(modal);
+        document.body.appendChild(overlay);
+  
+        document.getElementById("cancelarInicio").onclick = () => {
+          overlay.remove();
+        };
+  
+        document.getElementById("confirmarInicio").onclick = async () => {
+          const sesionId = localStorage.getItem("id_sesion");
+  
+          if (sesionId) {
+            try {
+              await fetch(`/dispositivos/desactivar/${sesionId}`, { method: "PUT" });
+              console.log("🔌 Dispositivos desactivados al ir al inicio.");
+            } catch (error) {
+              console.error("❌ Error al desactivar dispositivos:", error);
+            }
+          }
+  
+          // 🧹 Eliminar todo lo relacionado a gráficas
+          localStorage.removeItem("id_sesion");
+          localStorage.removeItem("nombre_sesion");
+          localStorage.removeItem("sesion_dispositivo_ids");
+          localStorage.removeItem("graficas_ids");
+  
+          // 🧹 Eliminar respaldo de datos importados o en tiempo real (Smoothie)
+          localStorage.removeItem("smoothie_import_izq");
+          localStorage.removeItem("smoothie_import_der");
 
-            const overlay = document.createElement("div");
-            overlay.className = "modal-overlay";
-
-            const modal = document.createElement("div");
-            modal.className = "modal-confirm";
-
-            modal.innerHTML = `
-                <h2>¿Ir al inicio?</h2>
-                <p>⚠️ Si vuelves al inicio podrías perder datos no guardados.<br>
-                💾 Te recomendamos exportar tus gráficas antes de continuar.</p>
-                <div class="modal-buttons">
-                    <button class="btn-secondary" id="cancelarInicio">Cancelar</button>
-                    <button class="btn-danger" id="confirmarInicio">Ir al inicio</button>
-                </div>
-            `;
-
-            overlay.appendChild(modal);
-            document.body.appendChild(overlay);
-
-            document.getElementById("cancelarInicio").onclick = () => {
-                overlay.remove();
-            };
-
-            document.getElementById("confirmarInicio").onclick = async () => {
-                const sesionId = localStorage.getItem("id_sesion");
-
-                if (sesionId) {
-                    try {
-                        await fetch(`/dispositivos/desactivar/${sesionId}`, { method: "PUT" });
-                        console.log("🔌 Dispositivos desactivados al ir al inicio.");
-                    } catch (error) {
-                        console.error("❌ Error al desactivar dispositivos:", error);
-                    }
-                }
-
-                localStorage.removeItem("id_sesion");
-                localStorage.removeItem("nombre_sesion");
-                localStorage.removeItem("sesion_dispositivo_ids");
-                localStorage.removeItem("graficas_ids");
-
-                window.location.href = "/principal";
-            };
-        });
+          // 🧹 Y los datos de Chart.js
+          localStorage.removeItem("chartjs_import_izq");
+          localStorage.removeItem("chartjs_import_der");
+  
+          window.location.href = "/principal";
+        };
+      });
     }
+  });
 
-});
+  document.addEventListener("DOMContentLoaded", () => {
+    const finalizarBtn = document.getElementById("finalizarSesion");
+  
+    if (finalizarBtn) {
+      finalizarBtn.addEventListener("click", () => {
+        const overlay = document.createElement("div");
+        overlay.className = "modal-overlay";
+  
+        const modal = document.createElement("div");
+        modal.className = "modal-confirm";
+  
+        modal.innerHTML = `
+          <h2>¿Finalizar sesión?</h2>
+          <p>⚠️ Esto <strong>enviará los datos finales al paciente de la gráfica y tabla</strong>.<br>
+          🔒 Después de esto, <strong>ya no podrás hacer modificaciones</strong> en esta sesión.<br>
+          ¿Deseas continuar?</p>
+          <div class="modal-buttons">
+            <button class="btn-secondary" id="cancelarFinalizar">Cancelar</button>
+            <button class="btn-danger" id="confirmarFinalizar">Finalizar</button>
+          </div>
+        `;
+  
+        overlay.appendChild(modal);
+        document.body.appendChild(overlay);
+  
+        document.getElementById("cancelarFinalizar").onclick = () => {
+          overlay.remove();
+        };
+  
+        document.getElementById("confirmarFinalizar").onclick = async () => {
+          overlay.remove();
+  
+          const idSesion = localStorage.getItem("id_sesion");
+          if (!idSesion) {
+            mostrarMensaje("❌ No se encontró la sesión activa", "error");
+            return;
+          }
+  
+          let datosGrafica = null;
+  
+          if (window.tipoGraficaActiva === "chartjs") {
+            datosGrafica = {
+              izquierda: JSON.parse(localStorage.getItem("chartjs_import_izq") || "[]"),
+              derecha: JSON.parse(localStorage.getItem("chartjs_import_der") || "[]")
+            };
+          } else if (window.tipoGraficaActiva === "smoothie") {
+            datosGrafica = {
+              izquierda: JSON.parse(localStorage.getItem("smoothie_import_izq") || "[]"),
+              derecha: JSON.parse(localStorage.getItem("smoothie_import_der") || "[]")
+            };
+          }
+  
+          // 🔵 También puedes extraer datos de MediaPipe si ya los guardas
+          const datosMediapipe = JSON.parse(localStorage.getItem("tabla_mediapipe") || "[]");
+  
+          try {
+            const response = await fetch("/graficas_movil", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                id_sesion_fk: parseInt(idSesion),
+                datos_graficas: datosGrafica,
+                datos_mediapipe: datosMediapipe
+              })
+            });
+  
+            if (!response.ok) throw new Error("❌ Error al guardar en el backend");
+  
+            mostrarMensaje("✅ Sesión finalizada y datos enviados");
+  
+            // 🛑 Opcional: desactiva todos los inputs, botones y controles
+            document.querySelectorAll("button, input, select").forEach(el => el.disabled = true);
+            document.querySelectorAll("textarea").forEach(el => el.readOnly = true);
+
+  
+          } catch (error) {
+            console.error(error);
+            mostrarMensaje("❌ Error al finalizar sesión", "error");
+          }
+        };
+      });
+    }
+  });
+  
+  

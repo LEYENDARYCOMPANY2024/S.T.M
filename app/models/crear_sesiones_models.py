@@ -18,7 +18,8 @@ class Sesion(Base):
     hora_inicio = Column(Time, nullable=False)
     nota_evolutiva = Column(Text, nullable=True) 
     video_mediapipe_t = Column(JSON, nullable=False, default={})  # ✅ JSON vacío por defecto
-
+    
+    tabla_movil = relationship("GraficasTablasMovil", back_populates="sesion", uselist=False)
     pacientes = relationship("PacienteSesion", back_populates="sesion")
 
 
