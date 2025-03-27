@@ -12,14 +12,9 @@ from routes.crear_sesiones_routes import router as crear_sesiones_routes
 from routes.ejercicios_routes import router as niveles_router
 from routes.dispositivos_routes import router as dispositivos_routes
 from routes.detalle_sesiones_routes import router as detalle_sesiones_routes
-<<<<<<< HEAD
 from routes.chat_routes import router as chat_router  # Agregamos la importación del router de chat
-=======
 from routes.graficas_routes import router as graficas_routes
 from routes.movil_routes import router as movil_routes
-
-
->>>>>>> pruebas
 
 
 app = FastAPI()
