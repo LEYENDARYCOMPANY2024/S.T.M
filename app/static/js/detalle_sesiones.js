@@ -1692,7 +1692,21 @@ document.addEventListener("DOMContentLoaded", () => {
           }
   
           // 🔵 También puedes extraer datos de MediaPipe si ya los guardas
-          const datosMediapipe = JSON.parse(localStorage.getItem("tabla_mediapipe") || "[]");
+          let datosMediapipe = [];
+
+            try {
+            const stored = localStorage.getItem("tabla_mediapipe");
+            const parsed = JSON.parse(stored);
+
+            if (Array.isArray(parsed)) {
+                datosMediapipe = parsed;
+            } else {
+                console.warn("⚠️ MediaPipe no es un array, usando [] por defecto");
+            }
+            } catch (e) {
+            console.warn("⚠️ Error parseando tabla_mediapipe, usando [] por defecto");
+            }
+
   
           try {
             const response = await fetch("/graficas_movil", {
@@ -1712,6 +1726,8 @@ document.addEventListener("DOMContentLoaded", () => {
             // 🛑 Opcional: desactiva todos los inputs, botones y controles
             document.querySelectorAll("button, input, select").forEach(el => el.disabled = true);
             document.querySelectorAll("textarea").forEach(el => el.readOnly = true);
+
+            localStorage.removeItem("tabla_mediapipe");
 
   
           } catch (error) {
