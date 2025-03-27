@@ -1,4 +1,3 @@
-
 // 📌 Función para mostrar mensajes de éxito o error con el diseño personalizado
 function mostrarMensaje(mensaje, tipo = "success") {
     const alertBox = document.createElement("div");
@@ -78,7 +77,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
         });
 
-        // 📌 **Evento para actualizar la descripción**
+        // 📌 *Evento para actualizar la descripción*
         document.getElementById("session-description").addEventListener("change", async () => {
             try {
                 const updateResponse = await fetch(`/detalle_sesiones/${idSesion}/descripcion`, {
@@ -109,7 +108,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             modal.innerHTML = `
             <h2>¿Salir del detalle de sesión?</h2>
-            <p>⚠️ Esto eliminará los datos en tiempo real e importados de esta sesión.<br>
+            <p>⚠ Esto eliminará los datos en tiempo real e importados de esta sesión.<br>
             💾 Se recomienda <strong>guardar tu gráfica</strong> antes de salir.</p>
             <div class="modal-buttons">
                 <button class="btn-secondary" id="cancelarSalir">Cancelar</button>
@@ -147,7 +146,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             // 🧹 También los datos de Smoothie si existen
             localStorage.removeItem("smoothie_import_izq");
             localStorage.removeItem("smoothie_import_der");
-            
+
             // 🧹 Y los datos de Chart.js
             localStorage.removeItem("chartjs_import_izq");
             localStorage.removeItem("chartjs_import_der");
@@ -167,14 +166,18 @@ document.addEventListener("DOMContentLoaded", async () => {
         console.error(error);
         mostrarMensaje("Error cargando la sesión", "error");
     }
-});
+
     document.getElementById("btn-grafica").addEventListener("click", () => {
         cargarGrafica(); // 📌 Llamará a la función de grafica.js
     });
-    
+
     document.getElementById("btn-tabla").addEventListener("click", () => {
         cargarTablaMediapipe(); // 📌 Llamará a la función de tabla_mediapipe.js
     });
+      
+
+});
+
       
     
 
@@ -1576,37 +1579,37 @@ tableBody.addEventListener('mouseout', function(event) {
 
 document.addEventListener("DOMContentLoaded", () => {
     const irInicioBtn = document.querySelector(".home-button");
-  
+
     if (irInicioBtn) {
       irInicioBtn.addEventListener("click", (e) => {
         e.preventDefault();
-  
+
         const overlay = document.createElement("div");
         overlay.className = "modal-overlay";
-  
+
         const modal = document.createElement("div");
         modal.className = "modal-confirm";
-  
+
         modal.innerHTML = `
           <h2>¿Ir al inicio?</h2>
-          <p>⚠️ Si vuelves al inicio, <strong>se eliminarán los datos de las gráficas importadas o en tiempo real</strong>.<br>
+          <p>⚠ Si vuelves al inicio, <strong>se eliminarán los datos de las gráficas importadas o en tiempo real</strong>.<br>
           💾 Te recomendamos <strong>guardar tu gráfica</strong> antes de continuar.</p>
           <div class="modal-buttons">
             <button class="btn-secondary" id="cancelarInicio">Cancelar</button>
             <button class="btn-danger" id="confirmarInicio">Ir al inicio</button>
           </div>
         `;
-  
+
         overlay.appendChild(modal);
         document.body.appendChild(overlay);
-  
+
         document.getElementById("cancelarInicio").onclick = () => {
           overlay.remove();
         };
-  
+
         document.getElementById("confirmarInicio").onclick = async () => {
           const sesionId = localStorage.getItem("id_sesion");
-  
+
           if (sesionId) {
             try {
               await fetch(`/dispositivos/desactivar/${sesionId}`, { method: "PUT" });
@@ -1615,13 +1618,13 @@ document.addEventListener("DOMContentLoaded", () => {
               console.error("❌ Error al desactivar dispositivos:", error);
             }
           }
-  
+
           // 🧹 Eliminar todo lo relacionado a gráficas
           localStorage.removeItem("id_sesion");
           localStorage.removeItem("nombre_sesion");
           localStorage.removeItem("sesion_dispositivo_ids");
           localStorage.removeItem("graficas_ids");
-  
+
           // 🧹 Eliminar respaldo de datos importados o en tiempo real (Smoothie)
           localStorage.removeItem("smoothie_import_izq");
           localStorage.removeItem("smoothie_import_der");
@@ -1629,7 +1632,7 @@ document.addEventListener("DOMContentLoaded", () => {
           // 🧹 Y los datos de Chart.js
           localStorage.removeItem("chartjs_import_izq");
           localStorage.removeItem("chartjs_import_der");
-  
+
           window.location.href = "/principal";
         };
       });
@@ -1649,7 +1652,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
         modal.innerHTML = `
           <h2>¿Finalizar sesión?</h2>
-          <p>⚠️ Esto <strong>enviará los datos finales al paciente de la gráfica y tabla</strong>.<br>
+          <p>⚠ Esto <strong>enviará los datos finales al paciente de la gráfica y tabla</strong>.<br>
           🔒 Después de esto, <strong>ya no podrás hacer modificaciones</strong> en esta sesión.<br>
           ¿Deseas continuar?</p>
           <div class="modal-buttons">
