@@ -30,12 +30,9 @@ app.include_router(crear_sesiones_routes)
 app.include_router(niveles_router, prefix="/api")
 app.include_router(dispositivos_routes)
 app.include_router(detalle_sesiones_routes)
-<<<<<<< HEAD
 app.include_router(chat_router)  # Incluimos el router de chat
-=======
 app.include_router(graficas_routes)
 app.include_router(movil_routes)
->>>>>>> pruebas
 
 # 📌 Montamos archivos estáticos
 app.mount("/static", StaticFiles(directory="static"), name="static")
