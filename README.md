@@ -177,5 +177,12 @@ find . -name "__pycache__" -type d -exec rm -r {} +
 find . -name "*.pyc" -delete
 ```
 
+## eliminar comentarios que generaste en github
+
+```shell
+git reset --hard HEAD~N
+```
+NONTA: N significa el numero de commits que quieres retroceder
+
 ## 📧 Contacto
 Para cualquier duda o sugerencia, puedes contactar a [leyendary2024@gmail.com].

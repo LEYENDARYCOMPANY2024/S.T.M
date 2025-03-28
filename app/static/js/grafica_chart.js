@@ -198,8 +198,9 @@ function chartjs_reiniciarChartJS() {
     chartjs_chart.data.datasets[1].data = [];
     chartjs_chart.update();
 
-    chartjs_realtimePaused = false;
-    document.getElementById("pauseButton").textContent = "Pausar";
+    chartjs_realtimePaused = true;
+    document.getElementById("pauseButton").textContent = "Iniciar";
+
 
     window.reinicioPendiente = false; // ✅ AQUÍ ESTÁ EL CAMBIO IMPORTANTE
 
@@ -211,7 +212,7 @@ function chartjs_reiniciarChartJS() {
         await fetch(`/dispositivos/permiso_envio/${d.uuid}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ estado: true })
+          body: JSON.stringify({ estado: false })
         });
       }
     } catch (err) {

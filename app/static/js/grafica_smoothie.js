@@ -372,10 +372,10 @@ window.smoothie_reiniciarGrafica = function () {
     smoothie_importadosIzquierda = [];
     smoothie_importadosDerecha = [];
 
-    smoothie_realtimePaused = false; // ✅ Reactivar tiempo real
-    smoothie_chart.start(); // ▶️ Reactiva la animación visual
+    smoothie_realtimePaused = true; // ✅ Reactivar tiempo real
+    smoothie_chart.stop(); // ▶️ Reactiva la animación visual
     reinicioPendiente = false;
-    document.getElementById("pauseButton").textContent = "Pausar";
+    document.getElementById("pauseButton").textContent = "Iniciar";
 
     smoothie_mostrarMensaje("Gráfica reiniciada y datos eliminados");
 
@@ -386,7 +386,7 @@ window.smoothie_reiniciarGrafica = function () {
         await fetch(`/dispositivos/permiso_envio/${dispositivo.uuid}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ estado: true }) // 🟢 Reactivar envío
+          body: JSON.stringify({ estado: false }) // 🟢 Reactivar envío
         });
       }
     } catch (err) {
