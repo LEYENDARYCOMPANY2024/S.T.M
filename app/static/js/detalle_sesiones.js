@@ -32,6 +32,23 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         const sesion = await response.json();
 
+        if (sesion.finalizada) {
+            mostrarMensaje("🔒 Esta sesión ya fue finalizada. No se permiten cambios.", "error");
+          
+            // Desactivar todos los botones, inputs, selects
+            document.querySelectorAll("button, input, select").forEach(el => el.disabled = true);
+            document.querySelectorAll("textarea").forEach(el => el.readOnly = true);
+          
+            // También puedes ocultar los botones de exportar, importar, guardar o reiniciar gráfica
+            const botonesOcultar = [
+              "exportButton", "importButton", "reiniciarButton", "finalizarSesion"
+            ];
+            botonesOcultar.forEach(id => {
+              const btn = document.getElementById(id);
+              if (btn) btn.style.display = "none";
+            });
+          }          
+
         // ✅ Mostrar el nombre de la sesión en lugar del ID
         document.getElementById("session-title").textContent = nombreSesion || `Sesión ${idSesion}`;  
         document.getElementById("session-description").value = sesion.descripcion_sesion || "";

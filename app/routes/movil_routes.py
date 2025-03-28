@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from database import get_db
 from models.movil_models import GraficasTablasMovil
 from models.movil_schemas import GraficasTablasMovilIn, GraficasTablasMovilOut
+from models.crear_sesiones_models import Sesion  # ✅ Asegúrate de importar el modelo de sesiones
 
 router = APIRouter()
 
@@ -17,13 +18,20 @@ def subir_tabla_movil(datos: GraficasTablasMovilIn, db: Session = Depends(get_db
         existente.datos_mediapipe = datos.datos_mediapipe
         db.commit()
         db.refresh(existente)
-        return existente
+    else:
+        existente = GraficasTablasMovil(**datos.model_dump())
+        db.add(existente)
+        db.commit()
+        db.refresh(existente)
 
-    nuevo = GraficasTablasMovil(**datos.model_dump())
-    db.add(nuevo)
-    db.commit()
-    db.refresh(nuevo)
-    return nuevo
+    # ✅ Marcar la sesión como finalizada
+    sesion = db.query(Sesion).filter(Sesion.id_sesion == datos.id_sesion_fk).first()
+    if sesion:
+        sesion.finalizada = True
+        db.commit()
+
+    return existente
+
 
 
 

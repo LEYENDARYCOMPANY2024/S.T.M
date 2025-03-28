@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, Text, Date, Time, ForeignKey, JSON
+from sqlalchemy import Column, Integer, Text, Date, Time, ForeignKey, JSON, Boolean
 from sqlalchemy.orm import relationship
 from pydantic import BaseModel
 from database import Base
@@ -18,6 +18,7 @@ class Sesion(Base):
     hora_inicio = Column(Time, nullable=False)
     nota_evolutiva = Column(Text, nullable=True) 
     video_mediapipe_t = Column(JSON, nullable=False, default={})  # ✅ JSON vacío por defecto
+    finalizada = Column(Boolean, default=False)
     
     tabla_movil = relationship("GraficasTablasMovil", back_populates="sesion", uselist=False)
     pacientes = relationship("PacienteSesion", back_populates="sesion")
