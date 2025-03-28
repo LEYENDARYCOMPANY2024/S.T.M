@@ -598,6 +598,7 @@ body {
     color: rgba(255, 255, 255, 0.8);
 }
 /* Estilos para la alerta de éxito */
+/* Estilos para la alerta de éxito o error */
 .alert {
     position: fixed;
     top: 20px;
@@ -605,7 +606,7 @@ body {
     transform: translateX(-50%);
     padding: 15px 30px;
     border-radius: 10px;
-    background: #08232b ;
+    background: #08232b;
     color: white;
     font-size: 18px;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
@@ -613,8 +614,8 @@ body {
     align-items: center;
     opacity: 0;
     visibility: hidden;
-    transition: opacity 0.3s, visibility 0.3s;
-    z-index: 1000;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    z-index: 3000; /* 🔥 más alto que el modal para que siempre esté encima */
 }
 
 .alert.show {
@@ -626,6 +627,7 @@ body {
     margin-right: 10px;
     font-size: 24px;
 }
+
 
 .estado-btn {
     background: none;
