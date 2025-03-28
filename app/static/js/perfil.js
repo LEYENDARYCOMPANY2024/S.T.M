@@ -116,8 +116,6 @@ document.addEventListener("DOMContentLoaded", async function () {
         safelySetValue("input[placeholder='Colonia']", data.colonia);
         safelySetValue("input[placeholder='Número exterior']", data.num_ext);
         safelySetValue("input[placeholder='Número interior']", data.num_int);
-        safelySetValue("input[placeholder='Teléfono']", data.telefono);
-        safelySetValue("input[placeholder='Estado']", data.estado);
     } catch (error) {
         console.error("❌ Error al cargar perfil:", error);
     }
@@ -196,6 +194,25 @@ document.addEventListener("DOMContentLoaded", async function () {
             cedulaPreview.style.position = 'relative';
             cedulaPreview.appendChild(deleteButton);
         }
+
+        // Mostrar vista previa de PDF si existe en backend
+        const cedulaUrl = `/perfil/${idTerapeuta}/cedula`;
+        fetch(cedulaUrl, {
+            method: 'GET',
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        }).then(res => {
+            if (res.ok) {
+                const link = document.createElement("a");
+                link.href = cedulaUrl;
+                link.target = "_blank";
+                link.innerText = "📄 Ver cédula PDF";
+                link.classList.add("pdf-link");
+                cedulaPreview.appendChild(link);
+            }
+        });
+
         
         // Mostrar el botón de eliminar cuando hay una imagen o PDF cargado
         cedulaUpload.addEventListener('change', function() {
@@ -231,10 +248,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         fileInput.disabled = true;
         
         // Cargar imagen guardada en localStorage (si existe)
-        const savedImage = localStorage.getItem("profile-image");
-        if (savedImage) {
-            profilePhoto.src = savedImage;
-        }
+        profilePhoto.src = `/perfil/${idTerapeuta}/foto`;
 
         fileInput.addEventListener('change', function(event) {
             const file = event.target.files[0];
@@ -282,12 +296,6 @@ document.addEventListener("DOMContentLoaded", async function () {
         // Agregar nombre_usuario porque FastAPI lo requiere
         updatedData["nombre_usuario"] = localStorage.getItem("nombre_usuario");
     
-        // Agregar información de la cédula profesional si existe
-        if (cedulaImage && cedulaImage.src) {
-            // Aquí puedes agregar código para enviar la cédula al servidor
-            console.log('Cédula guardada:', cedulaImage.src.substring(0, 30) + '...');
-        }
-    
         console.log("📌 Datos enviados al servidor:", JSON.stringify(updatedData, null, 2));
     
         try {
@@ -299,6 +307,50 @@ document.addEventListener("DOMContentLoaded", async function () {
                 },
                 body: JSON.stringify(updatedData)
             });
+
+            // Subir imagen y PDF a backend si hay archivos seleccionados
+            const formData = new FormData();
+
+            if (fileInput.files.length > 0) {
+                const img = fileInput.files[0];
+                if (!img.type.startsWith("image/")) {
+                    alert("❌ Solo se permiten imágenes para la foto de perfil");
+                    return;
+                }
+                formData.append("imagen", img);
+            }
+
+            if (cedulaUpload.files.length > 0) {
+                const pdf = cedulaUpload.files[0];
+                if (pdf.type !== "application/pdf") {
+                    alert("❌ Solo se permite PDF para la cédula profesional");
+                    return;
+                }
+                formData.append("cedula", pdf);
+            }
+
+            if (formData.has("imagen") || formData.has("cedula")) {
+                try {
+                    const uploadResponse = await fetch(`/perfil/${idTerapeuta}/subir-archivos`, {
+                        method: "POST",
+                        headers: {
+                            "Authorization": `Bearer ${token}`
+                        },
+                        body: formData
+                    });
+
+                    if (!uploadResponse.ok) {
+                        throw new Error("❌ Error al subir archivos");
+                    }
+
+                    console.log("✅ Archivos subidos correctamente");
+
+                } catch (error) {
+                    console.error(error);
+                    alert("❌ Error al subir imagen o PDF");
+                }
+            }
+
     
             if (!response.ok) {
                 const errorResponse = await response.json();

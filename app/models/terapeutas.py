@@ -1,6 +1,6 @@
 from pydantic import BaseModel, constr, EmailStr  # ✅ Solo importar lo necesario desde Pydantic
 from typing import Optional
-from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy import Column, Integer, String, ForeignKey, LargeBinary
 from sqlalchemy.orm import relationship
 
 from database import Base  # ✅ Base debe venir de SQLAlchemy, no de Pydantic
@@ -31,6 +31,14 @@ class Terapeuta(Base):
     segundo_apellido = Column(String, nullable=True)
     correo = Column(String, unique=True, nullable=False)
     contrasena = Column(String, nullable=False)
+    codigo_postal = Column(String, nullable=True)
+    calle = Column(String, nullable=True)
+    colonia = Column(String, nullable=True)
+    num_ext = Column(String, nullable=True)
+    num_int = Column(String, nullable=True)
+    foto_perfil = Column(LargeBinary, nullable=True)  # ✅ Imagen
+    documento_cedula = Column(LargeBinary, nullable=True)   # ✅ PDF
+
     
     dispositivos = relationship("DispositivoIOT", back_populates="terapeuta")
 
