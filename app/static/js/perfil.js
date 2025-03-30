@@ -195,7 +195,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             cedulaPreview.appendChild(deleteButton);
         }
 
-        // Mostrar vista previa de PDF si existe en backend
+        // Mostrar vista previa de PDF o imagen si existe en backend
         const cedulaUrl = `/perfil/${idTerapeuta}/cedula`;
         fetch(cedulaUrl, {
             method: 'GET',
@@ -204,14 +204,42 @@ document.addEventListener("DOMContentLoaded", async function () {
             }
         }).then(res => {
             if (res.ok) {
+                // Detectar si es PDF o imagen
+                const contentType = res.headers.get("Content-Type");
+                
+                if (contentType.includes("pdf")) {
+                    // PDF → insertar <iframe> para vista previa
+                    const iframe = document.createElement("iframe");
+                    iframe.src = cedulaUrl;
+                    iframe.width = "100%";
+                    iframe.height = "200px";
+                    iframe.style.border = "none";
+                    iframe.style.borderRadius = "8px";
+                    iframe.style.marginTop = "10px";
+                    cedulaPreview.appendChild(iframe);
+
+                } else if (contentType.startsWith("image/")) {
+                    // Imagen → mostrar en <img>
+                    cedulaImage.src = cedulaUrl;
+                    cedulaImage.style.display = 'block';
+                }
+
+                // Botón para ver completo
                 const link = document.createElement("a");
                 link.href = cedulaUrl;
                 link.target = "_blank";
-                link.innerText = "📄 Ver cédula PDF";
+                link.innerText = "📄 Ver cédula completa";
                 link.classList.add("pdf-link");
+                link.style.marginTop = "10px";
                 cedulaPreview.appendChild(link);
+
+                cedulaPreview.style.display = 'flex';
+
+            } else if (res.status === 404) {
+                console.warn("⚠️ No se encontró cédula profesional aún");
             }
         });
+       
 
         
         // Mostrar el botón de eliminar cuando hay una imagen o PDF cargado
@@ -239,6 +267,53 @@ document.addEventListener("DOMContentLoaded", async function () {
         console.warn("⚠️ No se encontraron elementos para la cédula profesional");
     }
 
+    // Modal para foto de perfil
+    window.handleUploadClick = function () {
+        const fileInput = document.getElementById('file-input');
+        if (fileInput.disabled) {
+            mostrarAlertaModal("Subida de foto no permitida", "✏️ Primero debes presionar <strong>Editar</strong> para activar este campo.");
+            return;
+        }
+        fileInput.click();
+    };
+
+    // Modal para cédula profesional
+    window.handleCedulaClick = function () {
+        const cedulaInput = document.getElementById('cedula-upload');
+        if (cedulaInput.disabled) {
+            mostrarAlertaModal("Subida de cédula no permitida", "✏️ Primero debes presionar <strong>Editar</strong> para activar este campo.");
+            return;
+        }
+        cedulaInput.click();
+    };
+
+    // Función genérica para mostrar el modal
+    function mostrarAlertaModal(titulo, mensaje) {
+        const overlay = document.createElement("div");
+        overlay.className = "modal-overlay";
+
+        const modal = document.createElement("div");
+        modal.className = "modal-confirm";
+
+        modal.innerHTML = `
+            <h2>${titulo}</h2>
+            <p>${mensaje}</p>
+            <div class="modal-buttons">
+                <button class="btn-secondary" id="cerrarAlertaModal">Cerrar</button>
+            </div>
+        `;
+
+        overlay.appendChild(modal);
+        document.body.appendChild(overlay);
+
+        document.getElementById("cerrarAlertaModal").onclick = () => {
+            overlay.remove();
+        };
+    }
+
+    
+    
+
     // ===== CÓDIGO PARA MANEJO DE IMAGEN DE PERFIL =====
     const fileInput = document.getElementById('file-input');
     const profilePhoto = document.getElementById('profile-photo');
@@ -248,7 +323,21 @@ document.addEventListener("DOMContentLoaded", async function () {
         fileInput.disabled = true;
         
         // Cargar imagen guardada en localStorage (si existe)
-        profilePhoto.src = `/perfil/${idTerapeuta}/foto`;
+        const fotoUrl = `/perfil/${idTerapeuta}/foto`;
+        fetch(fotoUrl, {
+            method: 'GET',
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        }).then(res => {
+            if (res.ok) {
+                profilePhoto.src = fotoUrl;
+            } else {
+                profilePhoto.src = "/static/images/utec.png"; // 🧠 ruta de imagen por defecto
+                console.warn("⚠️ Imagen de perfil no encontrada, se usa imagen por defecto.");
+            }
+        });
+
 
         fileInput.addEventListener('change', function(event) {
             const file = event.target.files[0];
@@ -289,8 +378,6 @@ document.addEventListener("DOMContentLoaded", async function () {
             "colonia": safelyGetValue("input[placeholder='Colonia']"),
             "num_ext": safelyGetValue("input[placeholder='Número exterior']"),
             "num_int": safelyGetValue("input[placeholder='Número interior']"),
-            "telefono": safelyGetValue("input[placeholder='Teléfono']"),
-            "estado": safelyGetValue("input[placeholder='Estado']")
         };
     
         // Agregar nombre_usuario porque FastAPI lo requiere
