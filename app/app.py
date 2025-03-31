@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.responses import FileResponse
+from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from controllers import index
 from routes.inicio_sesion import router as login_router
@@ -12,9 +13,14 @@ from routes.crear_sesiones_routes import router as crear_sesiones_routes
 from routes.ejercicios_routes import router as niveles_router
 from routes.dispositivos_routes import router as dispositivos_routes
 from routes.detalle_sesiones_routes import router as detalle_sesiones_routes
-from routes.chat_routes import router as chat_router  # Agregamos la importación del router de chat
+from routes.chat_routes import chat_router as chat_router  # Agregamos la importación del router de chat
 from routes.graficas_routes import router as graficas_routes
 from routes.movil_routes import router as movil_routes
+
+from fastapi.templating import Jinja2Templates
+from fastapi import Request
+
+templates = Jinja2Templates(directory="templates")
 
 
 app = FastAPI()
@@ -72,6 +78,6 @@ def serve_niveles():
 def serve_niveles():
     return FileResponse("templates/detalle_sesiones.html")
 
-@app.get("/chat")  # Agregamos la ruta para servir la página de chat
-def serve_chat():
-    return FileResponse("templates/chat.html")
+@app.get("/chat", response_class=HTMLResponse)
+def serve_chat(request: Request):
+    return templates.TemplateResponse("chat.html", {"request": request})

@@ -1,71 +1,98 @@
-from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Request, Depends, HTTPException
-from fastapi.responses import HTMLResponse, JSONResponse
-from typing import Dict, List, Optional
-import json
+# routes/chat_routes.py
 
-router = APIRouter()
+from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Depends, Query, HTTPException
+from sqlalchemy.orm import Session
+from controllers.chat_controller import guardar_mensaje, obtener_historial
+from models.chat_models import MensajeCreate, MensajeResponse, Chat
+from database import get_db
+from models.terapeutas import TerapeutaPaciente
+chat_router = APIRouter(prefix="/chat", tags=["chat"])
 
-# Manejador de conexiones WebSocket
-class ConnectionManager:
-    def __init__(self):
-        # Estructura para almacenar conexiones: {user_id: WebSocket}
-        self.active_connections = {}
+# Conexiones activas por ID de chat
+active_connections: dict[int, list[WebSocket]] = {}
 
-    async def connect(self, websocket: WebSocket, user_id: str):
-        await websocket.accept()
-        self.active_connections[user_id] = websocket
+@chat_router.websocket("/ws/{chat_id}")
+async def chat_websocket(chat_id: int, websocket: WebSocket, db: Session = Depends(get_db)):
+    await websocket.accept()
 
-    def disconnect(self, user_id: str):
-        if user_id in self.active_connections:
-            del self.active_connections[user_id]
+    if chat_id not in active_connections:
+        active_connections[chat_id] = []
+    active_connections[chat_id].append(websocket)
 
-    async def send_personal_message(self, message: str, user_id: str):
-        if user_id in self.active_connections:
-            await self.active_connections[user_id].send_text(message)
-
-    async def broadcast(self, message: str, exclude_user: str = None):
-        for user_id, connection in self.active_connections.items():
-            if user_id != exclude_user:
-                await connection.send_text(message)
-
-manager = ConnectionManager()
-
-@router.websocket("/ws/chat/{user_id}")
-async def websocket_endpoint(websocket: WebSocket, user_id: str):
-    # Aceptar la conexión WebSocket
-    await manager.connect(websocket, user_id)
-    
     try:
         while True:
-            # Recibir mensaje del cliente
-            data = await websocket.receive_text()
-            message_data = json.loads(data)
-            
-            # Aquí procesarías el mensaje y guardarías en la base de datos
-            # Por ejemplo:
-            # db.save_message(user_id, "user", message_data["message"])
-            
-            # Preparar respuesta
-            response = {
-                "sender_type": "user",
-                "content": message_data["message"],
-                "user_id": user_id,
-                "timestamp": datetime.now().isoformat()
-            }
-            
-            # Enviar mensaje de vuelta al mismo usuario
-            await manager.send_personal_message(json.dumps(response), user_id)
-            
-            # Si quieres implementar un chatbot o respuesta automática:
-            bot_response = {
-                "sender_type": "system",
-                "content": f"Respuesta a: {message_data['message']}",
-                "user_id": "system",
-                "timestamp": datetime.now().isoformat()
-            }
-            
-            # Enviar respuesta del sistema
-            await manager.send_personal_message(json.dumps(bot_response), user_id)
-            
+            data = await websocket.receive_json()
+
+            # 🔄 Manejo de "escribiendo"
+            if "typing" in data:
+                for conn in active_connections[chat_id]:
+                    if conn != websocket:
+                        try:
+                            await conn.send_json(data)
+                        except:
+                            continue
+                continue
+
+            # 📩 Verifica datos válidos
+            if "mensaje" not in data or "remitente" not in data:
+                print("❌ Mensaje inválido recibido:", data)
+                continue
+
+            # 🧠 Guardar mensaje
+            mensaje_data = MensajeCreate(
+                id_chat_m_fk=chat_id,
+                remitente=data["remitente"],
+                mensaje=data["mensaje"]
+            )
+            mensaje_guardado = guardar_mensaje(mensaje_data, db)
+
+            # 📡 Enviar a todos los conectados
+            for conn in active_connections[chat_id]:
+                try:
+                    await conn.send_text(mensaje_guardado.model_dump_json())  # ✅ Usa model_dump_json
+                except Exception as e:
+                    print("⚠️ Error enviando mensaje a cliente:", e)
+                    continue
+
+
     except WebSocketDisconnect:
-        manager.disconnect(user_id)
+        active_connections[chat_id].remove(websocket)
+        print(f"🔌 Cliente desconectado del chat {chat_id}")
+
+
+
+@chat_router.get("/mensajes/{chat_id}", response_model=list[MensajeResponse])
+def obtener_mensajes_route(chat_id: int, db: Session = Depends(get_db)):
+    return obtener_historial(chat_id, db)
+
+
+@chat_router.post("/crear")
+def crear_chat(
+    terapeuta_id: int = Query(...),
+    paciente_id: int = Query(...),
+    db: Session = Depends(get_db)
+):
+    # ✅ Corrige los nombres de campo
+    relacion = db.query(TerapeutaPaciente).filter_by(
+        id_terapeuta_tp_fk=terapeuta_id,
+        id_paciente_tp_fk=paciente_id
+    ).first()
+
+    if not relacion:
+        raise HTTPException(status_code=404, detail="No existe relación entre terapeuta y paciente")
+
+    # Verifica si ya existe un chat para esa relación
+    chat_existente = db.query(Chat).filter_by(
+        id_terapeuta_paciente_c_fk=relacion.id_terapeuta_paciente
+    ).first()
+
+    if chat_existente:
+        return {"chat_id": chat_existente.id_chat}
+
+    # Si no existe, crea uno nuevo
+    nuevo_chat = Chat(id_terapeuta_paciente_c_fk=relacion.id_terapeuta_paciente)
+    db.add(nuevo_chat)
+    db.commit()
+    db.refresh(nuevo_chat)
+
+    return {"chat_id": nuevo_chat.id_chat}

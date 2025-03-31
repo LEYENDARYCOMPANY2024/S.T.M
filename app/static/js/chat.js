@@ -1,102 +1,148 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function () {
     const messagesContainer = document.getElementById('messagesContainer');
     const messageInput = document.getElementById('messageInput');
     const sendButton = document.getElementById('sendButton');
     const typingIndicator = document.getElementById('typingIndicator');
-    
-    // ID de usuario (puedes obtenerlo de la sesión o cookie)
-    const userId = getCookie('user_id') || 'default_user';
-    
-    // Crear conexión WebSocket
-    const socket = new WebSocket(`ws://${window.location.host}/ws/chat/${userId}`);
-    
-    // Cargar mensajes anteriores al iniciar
-    loadPreviousMessages();
-    
-    // Manejar eventos WebSocket
-    socket.onopen = function(e) {
-        console.log('Conexión WebSocket establecida');
-    };
-    
-    socket.onmessage = function(event) {
-        const data = JSON.parse(event.data);
-        addMessageToUI(data.sender_type, data.content);
-        scrollToBottom();
-    };
-    
-    socket.onclose = function(event) {
-        if (event.wasClean) {
-            console.log(`Conexión cerrada limpiamente, código=${event.code} razón=${event.reason}`);
-        } else {
-            console.log('Conexión interrumpida');
-            // Intentar reconectar después de un tiempo
-            setTimeout(() => {
-                location.reload();
-            }, 3000);
+
+    const remitente = "terapeuta"; // ✅ Enum esperado por el backend
+    const idTerapeuta = localStorage.getItem("id_terapeuta");
+    const pacienteId = localStorage.getItem("id_paciente");
+    let chatId = localStorage.getItem("chat_id");
+
+    if (!idTerapeuta || !pacienteId) {
+        console.error("❌ Faltan id_terapeuta o id_paciente en localStorage.");
+        mostrarMensajeSistema("No se pudo iniciar el chat. Selecciona un paciente primero.");
+        return;
+    }
+
+    // 🧠 Crear chat si no existe
+    if (!chatId) {
+        try {
+            const res = await fetch(`/chat/crear?terapeuta_id=${idTerapeuta}&paciente_id=${pacienteId}`, {
+                method: "POST"
+            });
+
+            if (!res.ok) throw new Error("No se pudo crear el chat");
+
+            const data = await res.json();
+            chatId = data.chat_id;
+            localStorage.setItem("chat_id", chatId);
+            document.body.setAttribute("data-chat-id", chatId);
+            console.log("✅ Chat creado:", chatId);
+        } catch (err) {
+            console.error("❌ Error creando chat:", err);
+            mostrarMensajeSistema("No se pudo crear el chat.");
+            return;
         }
-    };
-    
-    socket.onerror = function(error) {
-        console.log(`Error WebSocket: ${error.message}`);
-    };
-    
-    // Enviar mensaje al hacer clic en el botón o presionar Enter
-    sendButton.addEventListener('click', sendMessage);
-    messageInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            sendMessage();
+    }
+
+    let socket;
+    let isSending = false;
+    let typingTimeout;
+
+    conectarWebSocket();
+    cargarMensajesAnteriores();
+
+    sendButton.addEventListener('click', enviarMensaje);
+    messageInput.addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') enviarMensaje();
+    });
+
+    messageInput.addEventListener('input', () => {
+        if (socket.readyState === WebSocket.OPEN) {
+            socket.send(JSON.stringify({ typing: true, remitente }));
+            clearTimeout(typingTimeout);
+            typingTimeout = setTimeout(() => {
+                socket.send(JSON.stringify({ typing: false, remitente }));
+            }, 1500);
         }
     });
-    
-    function loadPreviousMessages() {
-        fetch('/api/messages')
-            .then(response => response.json())
-            .then(messages => {
-                messages.forEach(message => {
-                    addMessageToUI(message.sender_type, message.content);
-                });
-                scrollToBottom();
+
+    function conectarWebSocket() {
+        socket = new WebSocket(`ws://${window.location.host}/chat/ws/${chatId}`);
+
+        socket.onopen = () => {
+            console.log('✅ WebSocket conectado');
+            sendButton.disabled = false;
+        };
+
+        socket.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+
+            if (data.typing !== undefined) {
+                typingIndicator.style.display = data.typing && data.remitente !== remitente ? 'flex' : 'none';
+                return;
+            }
+
+            agregarMensajeUI(data.remitente, data.mensaje);
+            scrollAlFinal();
+        };
+
+        socket.onclose = () => {
+            sendButton.disabled = true;
+            mostrarMensajeSistema("Conexión cerrada. Reconectando...");
+            setTimeout(() => location.reload(), 3000);
+        };
+
+        socket.onerror = (error) => {
+            console.error('❌ Error WebSocket:', error.message);
+            mostrarMensajeSistema("Error de conexión. Esperando reconexión...");
+        };
+    }
+
+    function cargarMensajesAnteriores() {
+        fetch(`/chat/mensajes/${chatId}`)
+            .then(res => res.json())
+            .then(mensajes => {
+                mensajes.forEach(msg => agregarMensajeUI(msg.remitente, msg.mensaje));
+                scrollAlFinal();
             })
-            .catch(error => console.error('Error cargando mensajes:', error));
+            .catch(err => console.error('❌ Error cargando historial:', err));
     }
-    
-    function sendMessage() {
-        const messageText = messageInput.value.trim();
-        if (messageText === '' || socket.readyState !== WebSocket.OPEN) return;
-        
-        // Limpiar input
+
+    function enviarMensaje() {
+        const mensaje = messageInput.value.trim();
+        if (!mensaje || socket.readyState !== WebSocket.OPEN || isSending) return;
+
+        isSending = true;
         messageInput.value = '';
-        
-        // Mostrar indicador de escritura
-        typingIndicator.style.display = 'flex';
-        
-        // Enviar mensaje a través de WebSocket
-        socket.send(JSON.stringify({
-            message: messageText,
-            userId: userId
-        }));
+
+        socket.send(JSON.stringify({ mensaje, remitente }));
+        socket.send(JSON.stringify({ typing: false, remitente }));
+
+        setTimeout(() => isSending = false, 250);
     }
-    
-    function addMessageToUI(sender, text) {
-        const messageDiv = document.createElement('div');
-        messageDiv.classList.add('message');
-        messageDiv.classList.add(sender === 'user' ? 'user-message' : 'system-message');
-        
-        const messageContent = document.createElement('div');
-        messageContent.classList.add('message-content');
-        messageContent.textContent = text;
-        
-        messageDiv.appendChild(messageContent);
-        messagesContainer.appendChild(messageDiv);
+
+    function agregarMensajeUI(remitenteMensaje, texto) {
+        const mensajeDiv = document.createElement('div');
+        mensajeDiv.classList.add('message', remitenteMensaje === remitente ? 'user-message' : 'system-message');
+
+        const contenidoDiv = document.createElement('div');
+        contenidoDiv.classList.add('message-content');
+        contenidoDiv.textContent = texto;
+
+        mensajeDiv.appendChild(contenidoDiv);
+        messagesContainer.appendChild(mensajeDiv);
     }
-    
-    function scrollToBottom() {
+
+    function mostrarMensajeSistema(texto) {
+        agregarMensajeUI('sistema', texto);
+    }
+
+    function scrollAlFinal() {
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
     }
-    
-    function getCookie(name) {
-        const value = `; ${document.cookie}`;
-        const parts = value.split(`; ${name}=`);
-        if (parts.length === 2) return parts.pop().split(';').shift();
+
+    // 🔙 Volver al inicio
+    const btnInicio = document.querySelector(".home-button");
+    if (btnInicio) {
+        btnInicio.addEventListener("click", () => {
+            const confirmSalir = confirm("¿Seguro que deseas ir al inicio? Se cerrará el chat.");
+            if (confirmSalir) {
+                localStorage.removeItem("chat_id");
+                localStorage.removeItem("id_paciente");
+                window.location.href = "/principal";
+            }
+        });
     }
 });
