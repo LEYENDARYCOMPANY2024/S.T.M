@@ -510,6 +510,7 @@ videoToProcess.requestVideoFrameCallback(processVideo);
 }
 
 // Function to update landmark table
+// Function to update landmark table
 function updateLandmarkTable(processedFrame) {
     let tableBody = document.getElementById('tableBody');
     
@@ -544,12 +545,12 @@ function updateLandmarkTable(processedFrame) {
 
     if (processedFrame && processedFrame.landmarks) {
         processedFrame.landmarks.forEach(landmark => {
-            if (landmark.visibility > 0 && landmark.x !== undefined && landmark.y !== undefined) {
+            // Solo agregar a la tabla si la visibilidad supera un umbral mínimo
+            // MediaPipe considera un landmark como "detectado" cuando su visibilidad es mayor a 0.5
+            if (landmark.visibility > 0.5) {
                 const row = document.createElement('tr');
-                // Destacar filas con baja visibilidad
-                if (landmark.visibility < 0.5) {
-                    row.classList.add('table-warning');
-                }
+                row.dataset.point = landmark.name; // Para filtrado
+                
                 row.innerHTML = `
                     <td>${landmark.index}</td>
                     <td>${landmark.name}</td>
@@ -561,6 +562,80 @@ function updateLandmarkTable(processedFrame) {
                 tableBody.appendChild(row);
             }
         });
+        
+        // Mostrar mensaje si no hay puntos detectados
+        if (tableBody.children.length === 0) {
+            const noDataRow = document.createElement('tr');
+            noDataRow.innerHTML = `
+                <td colspan="6" class="text-center">No se detectaron puntos con suficiente visibilidad</td>
+            `;
+            tableBody.appendChild(noDataRow);
+        }
+    }
+}
+
+// Agregar un control deslizante para ajustar el umbral de visibilidad
+function addVisibilityThresholdControl() {
+    const container = document.createElement('div');
+    container.className = 'form-group mt-3';
+    container.innerHTML = `
+        <label for="visibilityThreshold">Umbral de visibilidad: <span id="thresholdValue">0.5</span></label>
+        <input type="range" class="form-control-range" id="visibilityThreshold" 
+               min="0" max="1" step="0.1" value="0.5">
+        <small class="form-text text-muted">Ajusta este valor para filtrar puntos con baja visibilidad</small>
+    `;
+    
+    document.body.appendChild(container);
+    
+    // Actualizar al cambiar el umbral
+    const slider = document.getElementById('visibilityThreshold');
+    const valueDisplay = document.getElementById('thresholdValue');
+    
+    slider.addEventListener('input', function() {
+        valueDisplay.textContent = this.value;
+        // Si hay datos procesados, actualizar la tabla con el nuevo umbral
+        if (processedFrames.length > 0) {
+            updateLandmarkTableWithThreshold(
+                processedFrames[processedFrames.length - 1],
+                parseFloat(this.value)
+            );
+        }
+    });
+}
+
+// Versión modificada que acepta un umbral personalizado
+function updateLandmarkTableWithThreshold(processedFrame, threshold = 0.5) {
+    let tableBody = document.getElementById('tableBody');
+    if (!tableBody) return;
+    
+    tableBody.innerHTML = ''; // Clear previous data
+
+    if (processedFrame && processedFrame.landmarks) {
+        processedFrame.landmarks.forEach(landmark => {
+            // Solo agregar a la tabla si la visibilidad supera el umbral
+            if (landmark.visibility > threshold) {
+                const row = document.createElement('tr');
+                row.dataset.point = landmark.name;
+                
+                row.innerHTML = `
+                    <td>${landmark.index}</td>
+                    <td>${landmark.name}</td>
+                    <td><div style="background-color:${getLandmarkDetails(landmark.index)?.color || '#000000'}; width:20px; height:20px;"></div></td>
+                    <td>${(landmark.x * 100).toFixed(2)}%</td>
+                    <td>${(landmark.y * 100).toFixed(2)}%</td>
+                    <td>${landmark.visibility.toFixed(2)}</td>
+                `;
+                tableBody.appendChild(row);
+            }
+        });
+        
+        if (tableBody.children.length === 0) {
+            const noDataRow = document.createElement('tr');
+            noDataRow.innerHTML = `
+                <td colspan="6" class="text-center">No se detectaron puntos con visibilidad > ${threshold}</td>
+            `;
+            tableBody.appendChild(noDataRow);
+        }
     }
 }
 
