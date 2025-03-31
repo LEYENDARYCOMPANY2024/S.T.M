@@ -3,11 +3,28 @@ document.addEventListener("DOMContentLoaded", async function () {
     // Función para mostrar mensajes de forma uniforme
     function mostrarMensaje(mensaje, tipo = "success") {
         const alertBox = document.createElement("div");
-        alertBox.classList.add("alert", tipo === "success" ? "success" : "error");
+        
+        // Agregar clases según el tipo
+        alertBox.classList.add("alert");
+        if (tipo === "success") {
+            alertBox.classList.add("success");
+        } else if (tipo === "error") {
+            alertBox.classList.add("error");
+        } else if (tipo === "alert") {
+            alertBox.classList.add("warning");
+        }
+    
+        // Íconos según el tipo
+        const icon = tipo === "success" ? "✅" :
+                     tipo === "error"   ? "❌" :
+                     tipo === "alert"   ? "⚠️" :
+                     "";
+    
         alertBox.innerHTML = `
-            <span class="alert-icon">${tipo === "success" ? "✅" : "❌"}</span> 
+            <span class="alert-icon">${icon}</span> 
             ${mensaje}
         `;
+    
         document.body.appendChild(alertBox);
     
         setTimeout(() => {
@@ -19,6 +36,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             setTimeout(() => alertBox.remove(), 300);
         }, 3000);
     }
+    
 
     const token = localStorage.getItem("session_token");
 
@@ -323,7 +341,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                 cedulaUpload.files = e.dataTransfer.files;
                 fileNameDisplay.textContent = `📄 ${file.name}`;
             } else {
-                alert("❌ Solo se permite subir archivos PDF.");
+                mostrarMensaje("Solo se permite subir archivos PDF.", "alert");
             }
         }
     });
@@ -332,7 +350,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         const file = cedulaUpload.files[0];
         if (file) {
             if (file.type !== "application/pdf") {
-                mostrarMensaje("Solo se permite subir archivos PDF.", "error");
+                mostrarMensaje("Solo se permite subir archivos PDF.", "alert");
                 cedulaUpload.value = "";
                 return;
             }
@@ -456,7 +474,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             if (fileInput.files.length > 0) {
                 const img = fileInput.files[0];
                 if (!img.type.startsWith("image/")) {
-                    alert("❌ Solo se permiten imágenes para la foto de perfil");
+                    mostrarMensaje("Solo se permiten imágenes para la foto de perfil", "alert");
                     return;
                 }
                 formData.append("imagen", img);
@@ -465,7 +483,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             if (cedulaUpload.files.length > 0) {
                 const pdf = cedulaUpload.files[0];
                 if (pdf.type !== "application/pdf") {
-                    alert("❌ Solo se permite PDF para la cédula profesional");
+                    mostrarMensaje("Solo se permite PDF para la cédula profesional", "alert");
                     return;
                 }
                 formData.append("cedula", pdf);
@@ -490,7 +508,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
                 } catch (error) {
                     console.error(error);
-                    alert("❌ Error al subir imagen o PDF");
+                    mostrarMensaje("Error al subir imagen o PDF", "error");
                 }
             }
 
@@ -510,14 +528,14 @@ document.addEventListener("DOMContentLoaded", async function () {
                 }, 3000);
             } else {
                 console.warn("⚠️ Elemento #successAlert no encontrado");
-                alert("¡Perfil actualizado correctamente!");
+                mostrarMensaje("¡Perfil actualizado correctamente!", "success");
             }
             
             console.log("✅ Perfil actualizado correctamente");
     
         } catch (error) {
             console.error("❌ Error al actualizar perfil:", error);
-            alert("Error al actualizar el perfil. Intente nuevamente.");
+            mostrarMensaje("Error al actualizar el perfil. Intente nuevamente.","error");
         }
     
         // Volver al modo de solo lectura después de guardar
