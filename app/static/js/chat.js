@@ -159,16 +159,41 @@ document.addEventListener('DOMContentLoaded', async function () {
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
     }
 
-    // 🔙 Botón de volver al inicio
     const btnInicio = document.querySelector(".home-button");
+
     if (btnInicio) {
-        btnInicio.addEventListener("click", () => {
-            const confirmSalir = confirm("¿Seguro que deseas ir al inicio? Se cerrará el chat.");
-            if (confirmSalir) {
+        btnInicio.addEventListener("click", (e) => {
+            e.preventDefault(); // ❗ Detiene el redireccionamiento inmediato        
+            const overlay = document.createElement("div");
+            overlay.className = "modal-overlay";
+
+            const modal = document.createElement("div");
+            modal.className = "modal-confirm";
+
+            modal.innerHTML = `
+                <h2>¿Ir al inicio?</h2>
+                <p>⚠️ Si vuelves al inicio, se cerrará el chat con el paciente actual.<br>
+                Los datos de conversación se mantendrán, pero se limpiará el estado de sesión.</p>
+                <div class="modal-buttons">
+                    <button class="btn-secondary" id="cancelarInicio">Cancelar</button>
+                    <button class="btn-danger" id="confirmarInicio">Ir al inicio</button>
+                </div>
+            `;
+
+            overlay.appendChild(modal);
+            document.body.appendChild(overlay);
+
+            document.getElementById("cancelarInicio").onclick = () => {
+                overlay.remove();
+            };
+
+            document.getElementById("confirmarInicio").onclick = () => {
                 localStorage.removeItem("chat_id");
                 localStorage.removeItem("id_paciente");
+                overlay.remove();
                 window.location.href = "/principal";
-            }
+            };
         });
     }
+
 });
