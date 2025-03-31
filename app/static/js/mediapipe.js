@@ -1202,3 +1202,129 @@ document.getElementById("resetVideoButton").addEventListener("click", () => {
     }
   });
   
+function initializeControls() {
+  // Obtenemos los elementos del DOM correspondientes a los controles:
+  // - Slider de velocidad de procesamiento
+  // - Slider del tamaño de puntos
+  // - Checkbox para mostrar etiquetas, conexiones e info al pasar el mouse
+  const speedSlider = document.getElementById("speedSlider");
+  const pointSizeSlider = document.getElementById("pointSizeSlider");
+  const speedValue = document.getElementById("speedValue");
+  const pointSizeValue = document.getElementById("pointSizeValue");
+  const checkboxShowLabels = document.getElementById("showLabels");
+  const checkboxShowConnections = document.getElementById("showConnections");
+  const checkboxShowHoverInfo = document.getElementById("showHoverInfo");
+
+  // Establecer los valores iniciales en los controles
+  speedSlider.value = processingSpeed;
+  pointSizeSlider.value = pointSize;
+  speedValue.textContent = processingSpeed;
+  pointSizeValue.textContent = pointSize + "px";
+  checkboxShowLabels.checked = showLabels;
+  checkboxShowConnections.checked = showConnections;
+  checkboxShowHoverInfo.checked = showHoverInfo;
+
+  // Actualizar la velocidad de procesamiento al mover el slider
+  speedSlider.addEventListener("input", () => {
+    processingSpeed = parseInt(speedSlider.value, 10);
+    speedValue.textContent = processingSpeed;
+    // Aquí puedes incluir la lógica para ajustar el procesamiento (p. ej., saltar frames)
+  });
+
+  // Actualizar el tamaño de los puntos al mover el slider
+  pointSizeSlider.addEventListener("input", () => {
+    pointSize = parseInt(pointSizeSlider.value, 10);
+    pointSizeValue.textContent = pointSize + "px";
+    // Actualiza aquí el tamaño de los puntos en tu función de dibujo, por ejemplo, en drawLandmark()
+  });
+
+  // Actualizar la opción de mostrar etiquetas
+  checkboxShowLabels.addEventListener("change", () => {
+    showLabels = checkboxShowLabels.checked;
+  });
+
+  // Actualizar la opción de mostrar conexiones
+  checkboxShowConnections.addEventListener("change", () => {
+    showConnections = checkboxShowConnections.checked;
+  });
+
+  // Actualizar la opción de mostrar información al pasar el mouse
+  checkboxShowHoverInfo.addEventListener("change", () => {
+    showHoverInfo = checkboxShowHoverInfo.checked;
+  });
+}
+
+// Llamada a la función al cargar el DOM
+document.addEventListener("DOMContentLoaded", () => {
+  initializeControls();
+});
+function drawLandmark(canvasCtx, landmark, index) {
+    const x = landmark.x * canvasElement.width;
+    const y = landmark.y * canvasElement.height;
+  
+    // Dibujar el punto con el tamaño definido
+    canvasCtx.beginPath();
+    canvasCtx.arc(x, y, pointSize, 0, 2 * Math.PI);
+    canvasCtx.fillStyle = getLandmarkDetails(index)?.color || '#FF0000';
+    canvasCtx.fill();
+  
+    // Mostrar la etiqueta si está activado
+    if (showLabels) {
+      canvasCtx.font = 'bold 14px Arial';
+      canvasCtx.fillStyle = 'white';
+      canvasCtx.fillText(index, x + 10, y);
+    }
+  }
+  
+
+
+  // Función para exportar la tabla a CSV
+function exportTableToCSV(filename = 'datos_puntos_pose.csv') {
+    // Selecciona la tabla que deseas exportar
+    const table = document.getElementById('dataTable');
+    if (!table) {
+      alert("La tabla no se encontró.");
+      return;
+    }
+    
+    const csv = [];
+    const rows = table.querySelectorAll('tr');
+  
+    // Recorre cada fila de la tabla
+    rows.forEach(row => {
+      const cols = row.querySelectorAll('td, th');
+      const rowData = [];
+      cols.forEach(col => {
+        // Escapar comillas y envolver cada valor entre comillas
+        rowData.push('"' + col.innerText.replace(/"/g, '""') + '"');
+      });
+      csv.push(rowData.join(','));
+    });
+  
+    // Une las filas con saltos de línea
+    const csvString = csv.join('\n');
+    
+    // Crear un blob con el contenido CSV y generar el enlace de descarga
+    const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+  
+  // Configurar el botón de exportación para activar la función
+  document.addEventListener("DOMContentLoaded", () => {
+    const exportButton = document.getElementById('exportButton');
+    
+    // Habilita el botón si deseas (por ejemplo, cuando ya haya datos cargados en la tabla)
+    exportButton.disabled = false;
+    
+    exportButton.addEventListener('click', () => {
+      exportTableToCSV();
+    });
+  });
+  
