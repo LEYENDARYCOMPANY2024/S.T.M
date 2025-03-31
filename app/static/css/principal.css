@@ -219,63 +219,6 @@ body {
     text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
 }
 
-/* Add Button */
-.add-btn {
-    background: var(--glass-bg);
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 60px;
-    height: 60px;
-    position: fixed;
-    bottom: 2rem;
-    right: 2rem;
-    cursor: pointer;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    transition: var(--transition);
-    z-index: 1000;
-}
-
-.add-btn i {
-    font-size: 1.8rem;
-    color: white;
-    transition: var(--transition);
-}
-
-.add-btn:hover {
-    background: var(--glass-hover);
-    transform: scale(1.1);
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-    .patient-card {
-        width: 95%;
-        padding: 1rem;
-        font-size: 1rem;
-    }
-
-    .search-bar input {
-        width: 90%;
-    }
-
-    .add-btn {
-        width: 50px;
-        height: 50px;
-        bottom: 1.5rem;
-        right: 1.5rem;
-    }
-
-    .add-btn i {
-        font-size: 1.5rem;
-    }
-}
 /* Variables globales */
 :root {
     --primary-gradient: #08232b;
@@ -502,7 +445,7 @@ body {
 }
 
 .submit-btn {
-    background: rgba(255, 255, 255, 0.2);
+    background: linear-gradient(135deg, #134e5e, #71b280);
     color: white;
     border: none;
     padding: 1rem;
@@ -514,7 +457,7 @@ body {
 }
 
 .submit-btn:hover {
-    background: rgba(255, 255, 255, 0.3);
+    background: linear-gradient(135deg, #1e6776, #8fd7a0);
     transform: translateY(-2px);
 }
 
@@ -659,7 +602,7 @@ body {
 }
 
 .tab-btn.active {
-    background-color: #1565;
+    background: linear-gradient(135deg, #134e5e, #71b280);
     color: white;
 }
 
@@ -952,7 +895,7 @@ body {
     margin-bottom: 0.5rem; /* 🔹 Agrega margen abajo */
     border: none;
     border-radius: 10px;
-    background: rgba(255, 255, 255, 0.2);
+    background: linear-gradient(135deg, #134e5e, #71b280);
     color: white;
     font-size: 0.9rem;
     cursor: pointer;
@@ -964,7 +907,7 @@ body {
 }
 
 #searchPacienteBtn:hover {
-    background: rgba(255, 255, 255, 0.3);
+    background: linear-gradient(135deg, #1e6776, #8fd7a0);
     transform: translateY(-2px);
 }
 

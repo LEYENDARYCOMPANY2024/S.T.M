@@ -240,12 +240,13 @@
   
   /* SAVE & EDIT */
   .save-btn {
-    background: linear-gradient(135deg, #43e97b, #38f9d7);
+    background: linear-gradient(135deg, #00c6ff, #0072ff);
+
     color: white;
   }
   
   .save-btn:hover {
-    background: linear-gradient(135deg, #3ddc84, #1de9b6);
+    background: linear-gradient(135deg, #33d4ff, #3396ff);
     transform: translateY(-3px);
     box-shadow: 0 7px 14px rgba(0, 0, 0, 0.2);
   }
