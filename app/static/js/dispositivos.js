@@ -10,31 +10,59 @@ document.addEventListener("DOMContentLoaded", async function () {
         window.location.href = "/principal";
         return;
     }
-
-    // 🔄 Botón para regresar a principal y limpiar localStorage + desactivar dispositivos
-    if (homeButton) {
-        homeButton.addEventListener("click", async (e) => {
+      
+        if (homeButton) {
+          homeButton.addEventListener("click", (e) => {
             e.preventDefault();
-
-            if (sesionId) {
+      
+            const overlay = document.createElement("div");
+            overlay.className = "modal-overlay";
+      
+            const modal = document.createElement("div");
+            modal.className = "modal-confirm";
+      
+            modal.innerHTML = `
+              <h2>¿Ir al inicio?</h2>
+              <p>⚠ Al volver al inicio, <strong>se cerrará esta sección</strong> y se desactivarán los dispositivos activos.<br>
+              ¿Deseas continuar?</p>
+              <div class="modal-buttons">
+                <button class="btn-secondary" id="cancelarInicio">Cancelar</button>
+                <button class="btn-danger" id="confirmarInicio">Ir al inicio</button>
+              </div>
+            `;
+      
+            overlay.appendChild(modal);
+            document.body.appendChild(overlay);
+      
+            document.getElementById("cancelarInicio").onclick = () => {
+              overlay.remove();
+            };
+      
+            document.getElementById("confirmarInicio").onclick = async () => {
+              overlay.remove();
+      
+              const sesionId = localStorage.getItem("id_sesion"); // ✅ mover aquí
+      
+              if (sesionId) {
                 try {
-                    await fetch(`/dispositivos/desactivar/${sesionId}`, {
-                        method: "PUT"
-                    });
-                    console.log("🔌 Dispositivos desactivados correctamente.");
+                  await fetch(`/dispositivos/desactivar/${sesionId}`, { method: "PUT" });
+                  console.log("🔌 Dispositivos desactivados correctamente.");
                 } catch (error) {
-                    console.error("❌ Error al desactivar dispositivos:", error);
+                  console.error("❌ Error al desactivar dispositivos:", error);
                 }
-            }
-
-            console.log("🏠 Limpiando localStorage al volver a principal...");
-            localStorage.removeItem("id_sesion");
-            localStorage.removeItem("nombre_sesion");
-            localStorage.removeItem("sesion_dispositivo_ids");
-
-            window.location.href = "/principal";
-        });
-    }
+              }
+      
+              console.log("🏠 Limpiando localStorage al volver a principal...");
+              localStorage.removeItem("id_sesion");
+              localStorage.removeItem("nombre_sesion");
+              localStorage.removeItem("sesion_dispositivo_ids");
+      
+              window.location.href = "/principal";
+            };
+          });
+        }
+      
+      
 
     async function fetchDevices() {
         if (!pacienteId || !terapeutaId) {

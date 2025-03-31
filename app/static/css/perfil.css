@@ -1,296 +1,229 @@
+/* RESET */
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
-body {
+  }
+  
+  /* BASE */
+  body {
     min-height: 100vh;
-    background: #08232b ;
+    background: #08232b;
+    color: white;
     display: flex;
     flex-direction: column;
     align-items: center;
-}
-
-.header {
+  }
+  
+  /* HEADER */
+  .header {
     width: 100%;
     padding: 1rem;
-    background: #1565 ;
+    background: rgba(255, 255, 255, 0.15);
     backdrop-filter: blur(10px);
     box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
-}
-
-.back-button {
+  }
+  
+  /* BACK BUTTON */
+  .back-button {
     width: 40px;
     height: 40px;
     background: transparent;
     border: none;
     cursor: pointer;
     transition: transform 0.2s;
-}
-
-.back-button:hover {
+  }
+  
+  .back-button:hover {
     transform: scale(1.1);
-}
-
-.back-button img {
+  }
+  
+  .back-button img {
     width: 100%;
     height: 100%;
     filter: brightness(0) invert(1);
-}
-
-.profile-container {
+  }
+  
+  /* CONTAINER */
+  .profile-container {
     width: 90%;
     max-width: 800px;
     margin: 2rem auto;
-    background: #c0c6f0;
-    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(12px);
     border-radius: 20px;
     padding: 2rem;
-    color: white;
     box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
     transition: transform 0.3s;
-}
-
-.profile-container:hover {
+  }
+  
+  .profile-container:hover {
     transform: translateY(-5px);
-}
-
-.profile-content {
+  }
+  
+  /* CONTENT */
+  .profile-content {
     display: flex;
     gap: 2rem;
     align-items: flex-start;
-}
-
-.profile-image-section {
+    text-align: center;
+    padding: 20px;
+    flex-wrap: wrap;
+  }
+  
+  /* PROFILE IMAGE */
+  .profile-image-section {
+    position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 1rem;
-}
-
-.profile-image {
+  }
+  
+  .profile-image {
     width: 150px;
     height: 150px;
     border-radius: 50%;
-    background: rgba(106, 27, 154, 0.4);
+    background: rgba(255, 255, 255, 0.1);
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
-    transition: box-shadow 0.3s;
     position: relative;
-}
-
-.profile-image:hover {
-    box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
-}
-
-.profile-image img {
+    border: 3px solid rgba(255, 255, 255, 0.3);
+  }
+  
+  .profile-image img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-}
-
-.upload-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin: -100rem auto 1rem auto; /* Desplaza hacia arriba */
-}
-
-.upload-photo-btn {
-    background: rgba(88, 24, 69, 0.3);
-    border: none;
     border-radius: 50%;
-    padding: 1rem;
+  }
+  
+
+  .upload-btn {
+    padding: 10px 20px;
+    background: linear-gradient(135deg, #00bcd4, #009688);
+    color: white;
+    border: none;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 1rem;
     cursor: pointer;
-    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
-    transition: transform 0.3s, box-shadow 0.3s;
-}
-
-.upload-photo-btn:hover {
-    transform: translateY(-10px); /* Mueve el botón un poco más al elevarlo */
-    box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
-}
-
-.upload-photo-btn svg {
-    width: 24px;
-    height: 24px;
-    fill: white;
-}
-
-#photo-upload {
+    transition: background 0.3s, transform 0.2s, box-shadow 0.3s;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+  
+  .upload-btn:hover {
+    background: linear-gradient(135deg, #00acc1, #00796b);
+    transform: scale(1.05);
+  }
+  
+  input[type="file"] {
     display: none;
-}
-
-
-.upload-photo-btn {
-    position: absolute;
-    bottom: 5px;
-    right: 5px;
-    color: white;
-    background: #1565;
-    border: none;
-    border-radius: 50%;
-    width: 30px;
-    height: 30px;
-    font-size: 1.5rem;
-    line-height: 30px;
-    text-align: center;
-    cursor: pointer;
-    transition: background 0.3s ease, transform 0.2s;
-}
-
-.upload-photo-btn:hover {
-    background: #1565;
-    transform: scale(1.07);
-}
-
-.username input {
-    background: rgba(106, 27, 154, 0.4);
-    padding: 0.75rem 1.5rem;
-    border-radius: 10px;
-    text-align: center;
-    min-width: 150px;
-    border: none;
-    color: white;
-    font-size: 1.1rem;
-    transition: background 0.3s, box-shadow 0.3s;
-}
-
-.username input:hover, .username input:focus {
-    background: #1565;
-    box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
-    outline: none;
-}
-
-.profile-info {
-    flex-grow: 1;
-}
-
-.info-field input {
+  }
+  
+  /* INPUTS */
+  .username input,
+  .info-field input,
+  .address-field input,
+  .professional-id input {
     width: 100%;
-    background: #1565;
+    background: rgba(255, 255, 255, 0.05);
     padding: 14px;
     margin-bottom: 1rem;
     border-radius: 10px;
-    border: none;
+    border: 2px solid #444;
     color: white;
     font-size: 1rem;
-    transition: background 0.3s, box-shadow 0.3s;
-    border: 2px solid black; 
-}
-
-.info-field input:hover, .info-field input:focus {
-    background: #1565;
-    box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+    transition: all 0.3s ease;
+  }
+  
+  .username input:focus,
+  .info-field input:focus,
+  .address-field input:focus,
+  .professional-id input:focus {
     outline: none;
-}
-
-.address-field {
-    background: #1565;
-    padding: 14px;
-    margin-bottom: 1rem;
-    border-radius: 10px;
-    transition: background 0.3s, box-shadow 0.3s;
-}
-
-.address-field input {
-    width: 100%;
-    background: #1565;
-    padding: 10px;
-    margin: 5px 0;
-    border-radius: 8px;
-    border: none;
-    color: white;
-    font-size: 1rem;
-    transition: background 0.3s;
-    border: 2px solid black; 
-}
-
-.address-field input:hover, .address-field input:focus {
-    background: #1565;
-    outline: none;
-    border: 2px solid black; 
-}
-
-.professional-id {
-    background: #1565;
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+  }
+  
+  /* SECTIONS */
+  .address-field,
+  .professional-id {
+    background: rgba(255, 255, 255, 0.05);
     padding: 14px;
     border-radius: 10px;
-    transition: background 0.3s, box-shadow 0.3s;
     margin-bottom: 1.5rem;
-}
-
-.professional-id-input {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 10px;
-}
-
-.professional-id input {
-    flex-grow: 1;
-    background: #1565;
-    padding: 10px;
+  }
+  
+  /* DROP ZONE */
+  .drop-zone {
+    border: 2px dashed #70c1ff;
     border-radius: 8px;
-    border: none;
-    color: white;
-    font-size: 1rem;
-    transition: background 0.3s; 
-}
-
-.professional-id input:hover, .professional-id input:focus {
-    background: #1565;
-    outline: none;
-}
-
-.add-button {
-    color: white;
-    background: #1565;
-    border: none;
-    border-radius: 5px;
-    width: 30px;
-    height: 30px;
-    font-size: 1.5rem;
-    line-height: 30px;
+    padding: 20px;
     text-align: center;
+    color: #fff;
+    background-color: rgba(33, 150, 243, 0.1);
     cursor: pointer;
-    transition: background 0.3s ease, transform 0.2s;
-}
-
-.add-button:hover {
-    background: #1565;
-    transform: scale(1.07);
-}
-
-.cedula-preview {
-    width: 100%;
-    height: 150px;
+    margin-bottom: 10px;
+    transition: background-color 0.3s ease;
+  }
+  
+  .drop-zone.dragover {
+    background-color: rgba(33, 150, 243, 0.3);
+  }
+  
+  /* CÉDULA PREVIEW */
+  .cedula-preview {
     margin-top: 10px;
-    display: none;
-    background: #1565;
-    border-radius: 8px;
-    overflow: hidden;
-}
-
-.cedula-preview img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-}
-
-.action-buttons {
+    border: 1px dashed #70c1ff;
+    border-radius: 5px;
+    padding: 10px;
+    min-height: 100px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(255, 255, 255, 0.05);
+    color: white;
+  }
+  
+  /* FILE NAME */
+  .file-name {
+    font-size: 14px;
+    color: #90caf9;
+    margin-top: 5px;
+  }
+  
+  /* PDF LINK */
+  .pdf-link {
+    color: #fff;
+    background-color: #1e88e5;
+    padding: 6px 12px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 14px;
+    margin-top: 8px;
+    display: inline-block;
+    transition: background-color 0.3s ease;
+  }
+  
+  .pdf-link:hover {
+    background-color: #1565c0;
+  }
+  
+  /* ACTION BUTTONS */
+  .action-buttons {
     display: flex;
     justify-content: space-between;
     gap: 20px;
     margin-top: 30px;
-}
-
-.action-btn {
+    flex-wrap: wrap;
+  }
+  
+  .action-btn {
     flex: 1;
     padding: 12px 0;
     border-radius: 10px;
@@ -303,141 +236,189 @@ body {
     justify-content: center;
     align-items: center;
     gap: 10px;
-}
+  }
+  
+  /* SAVE & EDIT */
+  .save-btn {
+    background: linear-gradient(135deg, #00c6ff, #0072ff);
 
-.save-btn {
-    background: #1565;
     color: white;
-}
-
-.save-btn:hover {
-    background: #1565;
+  }
+  
+  .save-btn:hover {
+    background: linear-gradient(135deg, #33d4ff, #3396ff);
     transform: translateY(-3px);
     box-shadow: 0 7px 14px rgba(0, 0, 0, 0.2);
-}
-
-.edit-btn {
-    background: linear-gradient(135deg, #FF9F43, #FF9A9E);
+  }
+  
+  .edit-btn {
+    background: linear-gradient(135deg, #00bcd4, #009688);
     color: white;
-}
-
-.edit-btn:hover {
-    background: linear-gradient(135deg, #ff8f23, #ff8a8e);
+  }
+  
+  .edit-btn:hover {
+    background: linear-gradient(135deg, #00acc1, #00796b);
     transform: translateY(-3px);
     box-shadow: 0 7px 14px rgba(0, 0, 0, 0.2);
-}
-
-.action-btn:disabled {
+  }
+  
+  .action-btn:disabled {
     background: #cccccc;
     color: #999999;
     cursor: not-allowed;
     transform: none;
     box-shadow: none;
-}
-
-/* Estilo para placeholder */
-::placeholder {
-    color: rgba(255, 255, 255, 0.7);
-}
-
-/* Estilo para label */
-label {
-    color: white;
-    font-size: 0.9rem;
-    margin-bottom: 5px;
-    display: block;
-}
-
-@media (max-width: 768px) {
-    .profile-container {
-        width: 95%;
-        padding: 1.5rem;
-        margin: 1rem auto;
-    }
-
-    .profile-content {
-        flex-direction: column;
-        align-items: center;
-    }
-
-    .profile-info {
-        width: 100%;
-    }
-
-    .action-buttons {
-        flex-direction: column;
-    }
-}
-/* Estilos para la alerta de éxito */
+  }
+  
+  /* ALERT */
+/* Alertas flotantes fijas (usadas por mostrarMensaje) */
 .alert {
     position: fixed;
-    top: -70px; /* Cambié el valor de 20px a 10px para subirla más */
+    top: 20px;
     left: 50%;
     transform: translateX(-50%);
+    z-index: 9999;
     padding: 15px 30px;
     border-radius: 10px;
-    background: #1565;
+    background: #4caf50; /* Por defecto verde */
     color: white;
-    font-size: 18px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    font-size: 16px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
     display: flex;
     align-items: center;
+    gap: 10px;
     opacity: 0;
     visibility: hidden;
-    transition: opacity 0.3s, visibility 0.3s;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
 }
 
+/* Variantes de tipo */
+.alert.success {
+    background: #4caf50;
+}
+.alert.error {
+    background: #f44336;
+}
+.alert.warning {
+    background: #ff9800;
+}
 
 .alert.show {
     opacity: 1;
     visibility: visible;
 }
 
-.alert-icon {
-    margin-right: 10px;
-    font-size: 24px;
-}
-
-.profile-content {
+  
+  
+  .alert.uploading {
+    background-color: #fff3cd;
+    border-left: 6px solid #ffeeba;
+    color: #856404;
+  }
+  
+  .alert-icon.loading::after {
+    content: "\23F3";
+    animation: pulse 1s infinite;
+  }
+  
+  @keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+  }
+  
+  /* MODAL */
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+  }
+  
+  .modal-confirm {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 16px;
+    padding: 2rem;
+    max-width: 400px;
+    width: 90%;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
     text-align: center;
-    padding: 20px;
-}
-.profile-image-section {
-    position: relative;
-    display: inline-block;
-}
-.profile-image img {
-    width: 150px;
-    height: 150px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 3px solid #ccc;
-}
-.upload-btn {
-    margin-top: 10px;
-    padding: 8px 12px;
-    background: #c0c6f0 ;
+    color: #fff;
+    animation: fadeIn 0.3s ease-in-out;
+  }
+  
+  .modal-confirm h2 {
+    margin-bottom: 10px;
+    font-size: 1.6rem;
+    color: #fff;
+  }
+  
+  .modal-confirm p {
+    font-size: 1rem;
+    margin-bottom: 20px;
+    color: #ddd;
+  }
+  
+  .modal-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+  }
+  
+  .modal-buttons .btn-secondary {
+    background: #555;
     color: white;
+    padding: 8px 16px;
     border: none;
-    border-radius: 5px;
+    border-radius: 8px;
     cursor: pointer;
-}
-.upload-btn:hover {
-    background: #c0c6f0 ;
-}
-input[type="file"] {
-    display: none;
-}
+    transition: background 0.3s;
+  }
+  
+  .modal-buttons .btn-secondary:hover {
+    background: #333;
+  }
+  
+  /* PLACEHOLDER */
+  ::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+  }
+  
+  label {
+    color: #fff;
+    font-size: 0.95rem;
+    margin-bottom: 6px;
+    display: block;
+  }
+  
+  /* RESPONSIVE */
+  @media (max-width: 768px) {
+    .profile-container {
+      width: 95%;
+      padding: 1.5rem;
+      margin: 1rem auto;
+    }
+  
+    .profile-content {
+      flex-direction: column;
+      align-items: center;
+    }
+  
+    .action-buttons {
+      flex-direction: column;
+    }
+  }
 
-
-
-
-
-
-
-
+  
+  /* ⚠️ ALERTA DE SESIÓN CRÍTICA */
 .session-alert {
-    display: none; /* Se ocultará por defecto */
+    display: none;
     position: fixed;
     top: 20px;
     left: 50%;
@@ -452,76 +433,41 @@ input[type="file"] {
     box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
     z-index: 9999;
     transition: opacity 0.3s ease-in-out;
-}
-
-.session-alert.show {
-    display: block; /* Se muestra cuando se activa */
+  }
+  
+  .session-alert.show {
+    display: block;
     opacity: 1;
-}
+  }
+  
 
-.hidden {
-    display: none !important;
-}
+  .profile-image {
+    width: 180px;
+    height: 180px;
+    border: 4px solid rgba(255, 255, 255, 0.4);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .profile-image:hover {
+    transform: scale(1.05);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.6);
+  }
 
-/* Estilos para la sección de cédula profesional */
-.cedula-preview {
-    margin-top: 10px;
-    border: 1px dashed #ccc;
-    border-radius: 5px;
-    padding: 10px;
-    min-height: 100px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-}
+  
+  .profile-content {
+    justify-content: center; /* Centra todo horizontalmente */
+  }
+  
 
-#cedula-image {
-    max-width: 100%;
-    max-height: 200px;
-    display: none;
-}
-
-.file-name {
-    font-size: 14px;
-    margin-top: 5px;
-    color: #555;
-}
-
-.upload-confirmation {
-    margin-top: 8px;
-    padding: 5px 10px;
-    border-radius: 3px;
-    background-color: #f0f9eb;
-    color: #67c23a;
-    font-size: 14px;
-}
-
-.add-button {
-    background-color: #4CAF50;
+  .logout-btn {
+    background: linear-gradient(135deg, #ff4e50, #f9d423);
     color: white;
-    border: none;
-    border-radius: 3px;
-    padding: 5px 10px;
-    cursor: pointer;
-    font-size: 16px;
-}
-
-.add-button:hover {
-    background-color: #45a049;
-}
-
-.professional-id-input {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.professional-id-input input {
-    flex-grow: 1;
-}
-
-.delete-cedula-btn:hover {
-    color: red;
-}
+  }
+  
+  .logout-btn:hover {
+    background: linear-gradient(135deg, #ff3b3b, #fca311);
+    transform: translateY(-3px);
+    box-shadow: 0 7px 14px rgba(0, 0, 0, 0.2);
+  }
+  

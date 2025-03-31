@@ -1,26 +1,16 @@
-from models.chat_models import ChatModel
-from datetime import datetime
+# controllers/chat_controller.py
 
-class ChatController:
-    def __init__(self):
-        self.chat_model = ChatModel()
-    
-    def get_messages(self, user_id: str):
-        # Obtener mensajes históricos
-        return self.chat_model.get_messages_by_user(user_id)
-    
-    def process_message(self, user_id: str, message_text: str):
-        # Guardar mensaje del usuario
-        self.chat_model.save_message(user_id, 'user', message_text)
-        
-        # Lógica para generar respuestas
-        # Puedes integrar aquí tu lógica de chatbot o respuestas predefinidas
-        response_text = "Respuesta de ejemplo al mensaje: " + message_text
-        
-        # Guardar respuesta del sistema
-        self.chat_model.save_message(user_id, 'system', response_text)
-        
-        return {
-            "status": "success",
-            "message": response_text
-        }
+from sqlalchemy.orm import Session
+from fastapi import HTTPException
+from models.chat_models import Mensaje, MensajeCreate, MensajeResponse
+
+def guardar_mensaje(data: MensajeCreate, db: Session) -> MensajeResponse:
+    nuevo = Mensaje(**data.model_dump())
+    db.add(nuevo)
+    db.commit()
+    db.refresh(nuevo)
+    return MensajeResponse(**nuevo.__dict__)
+
+def obtener_historial(chat_id: int, db: Session) -> list[MensajeResponse]:
+    mensajes = db.query(Mensaje).filter(Mensaje.id_chat_m_fk == chat_id).order_by(Mensaje.enviado_en.asc()).all()
+    return [MensajeResponse(**m.__dict__) for m in mensajes]

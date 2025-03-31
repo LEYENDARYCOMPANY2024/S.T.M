@@ -1,4 +1,43 @@
 document.addEventListener("DOMContentLoaded", async function () {
+
+    // Función para mostrar mensajes de forma uniforme
+    function mostrarMensaje(mensaje, tipo = "success") {
+        const alertBox = document.createElement("div");
+        
+        // Agregar clases según el tipo
+        alertBox.classList.add("alert");
+        if (tipo === "success") {
+            alertBox.classList.add("success");
+        } else if (tipo === "error") {
+            alertBox.classList.add("error");
+        } else if (tipo === "alert") {
+            alertBox.classList.add("warning");
+        }
+    
+        // Íconos según el tipo
+        const icon = tipo === "success" ? "✅" :
+                     tipo === "error"   ? "❌" :
+                     tipo === "alert"   ? "⚠️" :
+                     "";
+    
+        alertBox.innerHTML = `
+            <span class="alert-icon">${icon}</span> 
+            ${mensaje}
+        `;
+    
+        document.body.appendChild(alertBox);
+    
+        setTimeout(() => {
+            alertBox.classList.add("show");
+        }, 100);
+    
+        setTimeout(() => {
+            alertBox.classList.remove("show");
+            setTimeout(() => alertBox.remove(), 300);
+        }, 3000);
+    }
+    
+
     const token = localStorage.getItem("session_token");
 
     // Control del botón de regreso
@@ -116,8 +155,6 @@ document.addEventListener("DOMContentLoaded", async function () {
         safelySetValue("input[placeholder='Colonia']", data.colonia);
         safelySetValue("input[placeholder='Número exterior']", data.num_ext);
         safelySetValue("input[placeholder='Número interior']", data.num_int);
-        safelySetValue("input[placeholder='Teléfono']", data.telefono);
-        safelySetValue("input[placeholder='Estado']", data.estado);
     } catch (error) {
         console.error("❌ Error al cargar perfil:", error);
     }
@@ -196,13 +233,57 @@ document.addEventListener("DOMContentLoaded", async function () {
             cedulaPreview.style.position = 'relative';
             cedulaPreview.appendChild(deleteButton);
         }
-        
-        // Mostrar el botón de eliminar cuando hay una imagen o PDF cargado
-        cedulaUpload.addEventListener('change', function() {
-            if (cedulaUpload.files.length > 0) {
-                deleteButton.style.display = 'block';
+
+        // Mostrar vista previa de PDF o imagen si existe en backend
+        const cedulaUrl = `/perfil/${idTerapeuta}/cedula`;
+        fetch(cedulaUrl, {
+            method: 'GET',
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        }).then(res => {
+            if (res.ok) {
+                // Detectar si es PDF o imagen
+                const contentType = res.headers.get("Content-Type");
+                
+                //if (contentType.includes("pdf")) {
+                    // PDF → insertar <iframe> para vista previa
+                    //const iframe = document.createElement("iframe");
+                    //iframe.src = cedulaUrl;
+                    //iframe.width = "100%";
+                    //iframe.height = "200px";
+                    //iframe.style.border = "none";
+                    //iframe.style.borderRadius = "8px";
+                    //iframe.style.marginTop = "10px";
+                    // 🛡️ Agrega sandbox aquí
+                    //iframe.setAttribute("sandbox", "");
+                    //cedulaPreview.appendChild(iframe);
+
+                //} else if (contentType.startsWith("image/")) {
+                    // Imagen → mostrar en <img>
+                    //cedulaImage.src = cedulaUrl;
+                    //cedulaImage.style.display = 'block';
+                //}
+
+                // Botón para ver completo
+                const link = document.createElement("a");
+                link.href = cedulaUrl;
+                link.target = "_blank";
+                link.innerText = "📄 Ver cédula completa";
+                link.classList.add("pdf-link");
+                link.style.marginTop = "10px";
+                cedulaPreview.appendChild(link);
+
+                cedulaPreview.style.display = 'flex';
+
+            } else if (res.status === 404) {
+                console.warn("⚠️ No se encontró cédula profesional aún");
             }
         });
+       
+
+        
+        
         
         // Función para eliminar la cédula subida
         deleteButton.addEventListener('click', function(e) {
@@ -222,6 +303,90 @@ document.addEventListener("DOMContentLoaded", async function () {
         console.warn("⚠️ No se encontraron elementos para la cédula profesional");
     }
 
+    // Modal para foto de perfil
+    window.handleUploadClick = function (event) {
+        event?.preventDefault();  // ✅ Evita comportamiento por defecto si el evento se pasa
+        const fileInput = document.getElementById('file-input');
+        if (fileInput.disabled) {
+            mostrarAlertaModal("Subida de foto no permitida", "✏️ Primero debes presionar <strong>Editar</strong> para activar este campo.");
+            return;
+        }
+        fileInput.click();
+    };
+
+    const dropZone = document.getElementById("drop-zone");
+    const fileNameDisplay = cedulaPreview.querySelector(".file-name");
+
+    dropZone.addEventListener("click", () => {
+        if (!cedulaUpload.disabled) {
+            cedulaUpload.click();
+        }
+    });
+
+    dropZone.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        dropZone.classList.add("dragover");
+    });
+
+    dropZone.addEventListener("dragleave", () => {
+        dropZone.classList.remove("dragover");
+    });
+
+    dropZone.addEventListener("drop", (e) => {
+        e.preventDefault();
+        dropZone.classList.remove("dragover");
+        if (!cedulaUpload.disabled) {
+            const file = e.dataTransfer.files[0];
+            if (file && file.type === "application/pdf") {
+                cedulaUpload.files = e.dataTransfer.files;
+                fileNameDisplay.textContent = `📄 ${file.name}`;
+            } else {
+                mostrarMensaje("Solo se permite subir archivos PDF.", "alert");
+            }
+        }
+    });
+
+    cedulaUpload.addEventListener("change", () => {
+        const file = cedulaUpload.files[0];
+        if (file) {
+            if (file.type !== "application/pdf") {
+                mostrarMensaje("Solo se permite subir archivos PDF.", "alert");
+                cedulaUpload.value = "";
+                return;
+            }
+            fileNameDisplay.textContent = `📄 ${file.name}`;
+            document.getElementById("uploadingAlert").style.display = "flex";
+        }
+    });
+
+
+    // Función genérica para mostrar el modal
+    function mostrarAlertaModal(titulo, mensaje) {
+        const overlay = document.createElement("div");
+        overlay.className = "modal-overlay";
+
+        const modal = document.createElement("div");
+        modal.className = "modal-confirm";
+
+        modal.innerHTML = `
+            <h2>${titulo}</h2>
+            <p>${mensaje}</p>
+            <div class="modal-buttons">
+                <button class="btn-secondary" id="cerrarAlertaModal">Cerrar</button>
+            </div>
+        `;
+
+        overlay.appendChild(modal);
+        document.body.appendChild(overlay);
+
+        document.getElementById("cerrarAlertaModal").onclick = () => {
+            overlay.remove();
+        };
+    }
+
+    
+    
+
     // ===== CÓDIGO PARA MANEJO DE IMAGEN DE PERFIL =====
     const fileInput = document.getElementById('file-input');
     const profilePhoto = document.getElementById('profile-photo');
@@ -231,10 +396,21 @@ document.addEventListener("DOMContentLoaded", async function () {
         fileInput.disabled = true;
         
         // Cargar imagen guardada en localStorage (si existe)
-        const savedImage = localStorage.getItem("profile-image");
-        if (savedImage) {
-            profilePhoto.src = savedImage;
-        }
+        const fotoUrl = `/perfil/${idTerapeuta}/foto`;
+        fetch(fotoUrl, {
+            method: 'GET',
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        }).then(res => {
+            if (res.ok) {
+                profilePhoto.src = fotoUrl;
+            } else {
+                profilePhoto.src = "/static/images/utec.png"; // 🧠 ruta de imagen por defecto
+                console.warn("⚠️ Imagen de perfil no encontrada, se usa imagen por defecto.");
+            }
+        });
+
 
         fileInput.addEventListener('change', function(event) {
             const file = event.target.files[0];
@@ -275,18 +451,10 @@ document.addEventListener("DOMContentLoaded", async function () {
             "colonia": safelyGetValue("input[placeholder='Colonia']"),
             "num_ext": safelyGetValue("input[placeholder='Número exterior']"),
             "num_int": safelyGetValue("input[placeholder='Número interior']"),
-            "telefono": safelyGetValue("input[placeholder='Teléfono']"),
-            "estado": safelyGetValue("input[placeholder='Estado']")
         };
     
         // Agregar nombre_usuario porque FastAPI lo requiere
         updatedData["nombre_usuario"] = localStorage.getItem("nombre_usuario");
-    
-        // Agregar información de la cédula profesional si existe
-        if (cedulaImage && cedulaImage.src) {
-            // Aquí puedes agregar código para enviar la cédula al servidor
-            console.log('Cédula guardada:', cedulaImage.src.substring(0, 30) + '...');
-        }
     
         console.log("📌 Datos enviados al servidor:", JSON.stringify(updatedData, null, 2));
     
@@ -299,6 +467,51 @@ document.addEventListener("DOMContentLoaded", async function () {
                 },
                 body: JSON.stringify(updatedData)
             });
+
+            // Subir imagen y PDF a backend si hay archivos seleccionados
+            const formData = new FormData();
+
+            if (fileInput.files.length > 0) {
+                const img = fileInput.files[0];
+                if (!img.type.startsWith("image/")) {
+                    mostrarMensaje("Solo se permiten imágenes para la foto de perfil", "alert");
+                    return;
+                }
+                formData.append("imagen", img);
+            }
+
+            if (cedulaUpload.files.length > 0) {
+                const pdf = cedulaUpload.files[0];
+                if (pdf.type !== "application/pdf") {
+                    mostrarMensaje("Solo se permite PDF para la cédula profesional", "alert");
+                    return;
+                }
+                formData.append("cedula", pdf);
+            }
+
+            if (formData.has("imagen") || formData.has("cedula")) {
+                try {
+                    const uploadResponse = await fetch(`/perfil/${idTerapeuta}/subir-archivos`, {
+                        method: "POST",
+                        headers: {
+                            "Authorization": `Bearer ${token}`
+                        },
+                        body: formData
+                    });
+
+                    if (!uploadResponse.ok) {
+                        throw new Error("❌ Error al subir archivos");
+                    }
+
+                    console.log("✅ Archivos subidos correctamente");
+                    document.getElementById("uploadingAlert").style.display = "none";
+
+                } catch (error) {
+                    console.error(error);
+                    mostrarMensaje("Error al subir imagen o PDF", "error");
+                }
+            }
+
     
             if (!response.ok) {
                 const errorResponse = await response.json();
@@ -315,14 +528,14 @@ document.addEventListener("DOMContentLoaded", async function () {
                 }, 3000);
             } else {
                 console.warn("⚠️ Elemento #successAlert no encontrado");
-                alert("¡Perfil actualizado correctamente!");
+                mostrarMensaje("¡Perfil actualizado correctamente!", "success");
             }
             
             console.log("✅ Perfil actualizado correctamente");
     
         } catch (error) {
             console.error("❌ Error al actualizar perfil:", error);
-            alert("Error al actualizar el perfil. Intente nuevamente.");
+            mostrarMensaje("Error al actualizar el perfil. Intente nuevamente.","error");
         }
     
         // Volver al modo de solo lectura después de guardar
@@ -336,5 +549,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         localStorage.removeItem("nombre_usuario");
         window.location.replace("/");
     };
+
+    window.scrollTo(0, 0);
 });
 
