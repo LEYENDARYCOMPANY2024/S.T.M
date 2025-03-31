@@ -485,29 +485,28 @@ async function processVideoWithMediaPipe() {
             console.log('Video processing complete');
             console.log('Processed Frames:', processedFrames);
             
-            // Actualizar tabla de landmarks
-            if (processedFrames.length > 0) {
-                updateLandmarkTable(processedFrames[processedFrames.length - 1]);
-            }
-            
-            
-            // Mostrar notificación para guardar los datos
-            showNotification('Procesamiento completado. Haz clic en "Guardar Datos" para exportar.', 'success');
-            
-            return;
-        }
+// Actualizar tabla de landmarks
+if (processedFrames.length > 0) {
+    updateLandmarkTable(processedFrames[processedFrames.length - 1]);
+}
 
-        await pose.send({image: videoToProcess});
-        
-        // Move to next frame
-        videoToProcess.requestVideoFrameCallback(processVideo);
-    };
+// Mostrar notificación para guardar los datos
+showNotification('Procesamiento completado. Haz clic en "Guardar Datos" para exportar.', 'success');
 
-    // Start processing
-    videoToProcess.loop = false;
-    videoToProcess.play();
-    await pose.initialize();
-    videoToProcess.requestVideoFrameCallback(processVideo);
+return;
+}
+
+await pose.send({image: videoToProcess});
+
+// Move to next frame
+videoToProcess.requestVideoFrameCallback(processVideo);
+};
+
+// Start processing
+videoToProcess.loop = false;
+videoToProcess.play();
+await pose.initialize();
+videoToProcess.requestVideoFrameCallback(processVideo);
 }
 
 // Function to update landmark table
@@ -545,20 +544,22 @@ function updateLandmarkTable(processedFrame) {
 
     if (processedFrame && processedFrame.landmarks) {
         processedFrame.landmarks.forEach(landmark => {
-            const row = document.createElement('tr');
-            // Destacar filas con baja visibilidad
-            if (landmark.visibility < 0.5) {
-                row.classList.add('table-warning');
+            if (landmark.visibility > 0 && landmark.x !== undefined && landmark.y !== undefined) {
+                const row = document.createElement('tr');
+                // Destacar filas con baja visibilidad
+                if (landmark.visibility < 0.5) {
+                    row.classList.add('table-warning');
+                }
+                row.innerHTML = `
+                    <td>${landmark.index}</td>
+                    <td>${landmark.name}</td>
+                    <td><div style="background-color:${getLandmarkDetails(landmark.index)?.color || '#000000'}; width:20px; height:20px;"></div></td>
+                    <td>${(landmark.x * 100).toFixed(2)}%</td>
+                    <td>${(landmark.y * 100).toFixed(2)}%</td>
+                    <td>${landmark.visibility.toFixed(2)}</td>
+                `;
+                tableBody.appendChild(row);
             }
-            row.innerHTML = `
-                <td>${landmark.index}</td>
-                <td>${landmark.name}</td>
-                <td><div style="background-color:${getLandmarkDetails(landmark.index)?.color || '#000000'}; width:20px; height:20px;"></div></td>
-                <td>${(landmark.x * 100).toFixed(2)}%</td>
-                <td>${(landmark.y * 100).toFixed(2)}%</td>
-                <td>${landmark.visibility.toFixed(2)}</td>
-            `;
-            tableBody.appendChild(row);
         });
     }
 }
@@ -828,3 +829,97 @@ function drawLandmark(canvasCtx, landmark, index) {
     canvasCtx.fillStyle = 'white';
     canvasCtx.fillText(index, x + 10, y);
 }
+
+
+
+// Asegúrate de que estás usando un canvas o un contenedor correcto para dibujar las líneas.
+window.onload = function () {
+    const canvas = document.getElementById("myCanvas");
+    if (!canvas) {
+        console.error("No se encontró el canvas. Asegúrate de tener un elemento <canvas> con id 'myCanvas' en tu HTML.");
+        return;
+    }
+    const ctx = canvas.getContext("2d");
+    if (!ctx) {
+        console.error("No se pudo obtener el contexto 2D del canvas.");
+        return;
+    }
+
+    // Ajustar el tamaño del canvas si es necesario
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    // Dibujar líneas
+    function drawLine(x1, y1, x2, y2, color = "black", width = 2) {
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.strokeStyle = color;
+        ctx.lineWidth = width;
+        ctx.stroke();
+    }
+
+    // Ejemplo de líneas dibujadas en el canvas
+    drawLine(50, 50, 200, 50); // Línea horizontal
+    drawLine(50, 50, 50, 200); // Línea vertical
+    drawLine(50, 50, 200, 200, "red", 3); // Línea diagonal roja
+};
+
+
+
+document.addEventListener("DOMContentLoaded", function () {
+    const filterContainer = document.getElementById("groupFilter");
+    const colorLegend = document.getElementById("colorLegend");
+    const tableBody = document.getElementById("tableBody");
+    
+    // Definimos los grupos de puntos de pose y sus colores
+    const filters = [
+        { name: "Cabeza", color: "#FF5733", points: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"] },
+        { name: "Tronco", color: "#33FF57", points: ["11", "12", "13", "14", "15", "16"] },
+        { name: "Brazos", color: "#3357FF", points: ["17", "18", "19", "20", "21", "22"] },
+        { name: "Piernas", color: "#FF33A8", points: ["23", "24", "25", "26", "27", "28", "29", "30", "31", "32"] }
+    ];
+    
+    // Crear botones de filtro
+    filters.forEach(filter => {
+        const button = document.createElement("button");
+        button.textContent = filter.name;
+        button.classList.add("btn", "btn-filter");
+        button.style.backgroundColor = filter.color;
+        button.dataset.active = "true"; // Activado por defecto
+        
+        button.addEventListener("click", function () {
+            const isActive = button.dataset.active === "true";
+            button.dataset.active = isActive ? "false" : "true";
+            button.style.opacity = isActive ? "0.5" : "1";
+            toggleFilter(filter.points, !isActive);
+        });
+        
+        filterContainer.appendChild(button);
+    });
+    
+    // Crear leyenda de colores
+    filters.forEach(filter => {
+        const legendItem = document.createElement("div");
+        legendItem.classList.add("legend-item");
+        legendItem.innerHTML = `<span class="legend-color" style="background-color:${filter.color}"></span> ${filter.name}`;
+        colorLegend.appendChild(legendItem);
+    });
+    
+    // Función para alternar la visibilidad de los puntos y de la tabla
+    function toggleFilter(points, isVisible) {
+        points.forEach(point => {
+            // Ocultar o mostrar puntos en la visualización
+            const elements = document.querySelectorAll(`.pose-point[data-point='${point}']`);
+            elements.forEach(el => {
+                el.style.display = isVisible ? "block" : "none";
+            });
+            
+            // Ocultar o mostrar filas en la tabla
+            const rows = tableBody.querySelectorAll(`tr[data-point='${point}']`);
+            rows.forEach(row => {
+                row.style.display = isVisible ? "table-row" : "none";
+            });
+        });
+    }
+});
