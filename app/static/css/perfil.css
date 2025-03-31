@@ -101,26 +101,23 @@
     border-radius: 50%;
   }
   
-  .upload-photo-btn {
-    position: absolute;
-    bottom: 5px;
-    right: 5px;
-    background: rgba(255, 255, 255, 0.25);
-    border: none;
-    border-radius: 50%;
-    width: 30px;
-    height: 30px;
+
+  .upload-btn {
+    padding: 10px 20px;
+    background: linear-gradient(135deg, #00bcd4, #009688);
     color: white;
-    font-size: 1.3rem;
-    line-height: 30px;
-    text-align: center;
+    border: none;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 1rem;
     cursor: pointer;
-    transition: background 0.3s, transform 0.2s;
+    transition: background 0.3s, transform 0.2s, box-shadow 0.3s;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   }
   
-  .upload-photo-btn:hover {
-    background: rgba(255, 255, 255, 0.4);
-    transform: scale(1.07);
+  .upload-btn:hover {
+    background: linear-gradient(135deg, #00acc1, #00796b);
+    transform: scale(1.05);
   }
   
   input[type="file"] {
@@ -243,23 +240,23 @@
   
   /* SAVE & EDIT */
   .save-btn {
-    background: rgba(255, 255, 255, 0.2);
+    background: linear-gradient(135deg, #43e97b, #38f9d7);
     color: white;
   }
   
   .save-btn:hover {
-    background: rgba(255, 255, 255, 0.3);
+    background: linear-gradient(135deg, #3ddc84, #1de9b6);
     transform: translateY(-3px);
     box-shadow: 0 7px 14px rgba(0, 0, 0, 0.2);
   }
   
   .edit-btn {
-    background: linear-gradient(135deg, #FF9F43, #FF9A9E);
+    background: linear-gradient(135deg, #00bcd4, #009688);
     color: white;
   }
   
   .edit-btn:hover {
-    background: linear-gradient(135deg, #ff8f23, #ff8a8e);
+    background: linear-gradient(135deg, #00acc1, #00796b);
     transform: translateY(-3px);
     box-shadow: 0 7px 14px rgba(0, 0, 0, 0.2);
   }
@@ -440,5 +437,36 @@
   .session-alert.show {
     display: block;
     opacity: 1;
+  }
+  
+
+  .profile-image {
+    width: 180px;
+    height: 180px;
+    border: 4px solid rgba(255, 255, 255, 0.4);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .profile-image:hover {
+    transform: scale(1.05);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.6);
+  }
+
+  
+  .profile-content {
+    justify-content: center; /* Centra todo horizontalmente */
+  }
+  
+
+  .logout-btn {
+    background: linear-gradient(135deg, #ff4e50, #f9d423);
+    color: white;
+  }
+  
+  .logout-btn:hover {
+    background: linear-gradient(135deg, #ff3b3b, #fca311);
+    transform: translateY(-3px);
+    box-shadow: 0 7px 14px rgba(0, 0, 0, 0.2);
   }
   
