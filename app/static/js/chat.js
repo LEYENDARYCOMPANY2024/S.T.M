@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     const sendButton = document.getElementById('sendButton');
     const typingIndicator = document.getElementById('typingIndicator');
 
-    const remitente = "terapeuta"; // ✅ Enum esperado por el backend
+    const remitente = "terapeuta"; // 👈 Enum que espera el backend
     const idTerapeuta = localStorage.getItem("id_terapeuta");
     const pacienteId = localStorage.getItem("id_paciente");
     let chatId = localStorage.getItem("chat_id");
@@ -74,7 +74,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                 return;
             }
 
-            agregarMensajeUI(data.remitente, data.mensaje);
+            agregarMensajeUI(data.remitente, data.mensaje, data.id_mensaje);
             scrollAlFinal();
         };
 
@@ -94,7 +94,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         fetch(`/chat/mensajes/${chatId}`)
             .then(res => res.json())
             .then(mensajes => {
-                mensajes.forEach(msg => agregarMensajeUI(msg.remitente, msg.mensaje));
+                mensajes.forEach(msg => agregarMensajeUI(msg.remitente, msg.mensaje, msg.id_mensaje));
                 scrollAlFinal();
             })
             .catch(err => console.error('❌ Error cargando historial:', err));
@@ -113,13 +113,39 @@ document.addEventListener('DOMContentLoaded', async function () {
         setTimeout(() => isSending = false, 250);
     }
 
-    function agregarMensajeUI(remitenteMensaje, texto) {
+    function agregarMensajeUI(remitenteMensaje, texto, idMensaje = null) {
         const mensajeDiv = document.createElement('div');
         mensajeDiv.classList.add('message', remitenteMensaje === remitente ? 'user-message' : 'system-message');
 
         const contenidoDiv = document.createElement('div');
         contenidoDiv.classList.add('message-content');
         contenidoDiv.textContent = texto;
+
+        // 🗑️ Agregar botón eliminar si es terapeuta y tiene ID
+        if (remitenteMensaje === remitente && idMensaje) {
+            const deleteBtn = document.createElement('button');
+            deleteBtn.classList.add('delete-btn');
+            deleteBtn.textContent = "🗑️";
+            deleteBtn.onclick = async () => {
+                const confirmar = confirm("¿Eliminar este mensaje?");
+                if (!confirmar) return;
+
+                try {
+                    const res = await fetch(`/chat/mensajes/${idMensaje}`, {
+                        method: 'DELETE'
+                    });
+
+                    if (res.ok) {
+                        mensajeDiv.remove(); // Eliminar del DOM
+                    } else {
+                        alert("No se pudo eliminar el mensaje.");
+                    }
+                } catch (err) {
+                    console.error("❌ Error eliminando mensaje:", err);
+                }
+            };
+            contenidoDiv.appendChild(deleteBtn);
+        }
 
         mensajeDiv.appendChild(contenidoDiv);
         messagesContainer.appendChild(mensajeDiv);
@@ -133,7 +159,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
     }
 
-    // 🔙 Volver al inicio
+    // 🔙 Botón de volver al inicio
     const btnInicio = document.querySelector(".home-button");
     if (btnInicio) {
         btnInicio.addEventListener("click", () => {

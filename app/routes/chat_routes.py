@@ -3,7 +3,7 @@
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Depends, Query, HTTPException
 from sqlalchemy.orm import Session
 from controllers.chat_controller import guardar_mensaje, obtener_historial
-from models.chat_models import MensajeCreate, MensajeResponse, Chat
+from models.chat_models import MensajeCreate, MensajeResponse, Chat, Mensaje
 from database import get_db
 from models.terapeutas import TerapeutaPaciente
 chat_router = APIRouter(prefix="/chat", tags=["chat"])
@@ -96,3 +96,13 @@ def crear_chat(
     db.refresh(nuevo_chat)
 
     return {"chat_id": nuevo_chat.id_chat}
+
+@chat_router.delete("/mensajes/{mensaje_id}")
+def eliminar_mensaje(mensaje_id: int, db: Session = Depends(get_db)):
+    mensaje = db.query(Mensaje).filter_by(id_mensaje=mensaje_id).first()
+    if not mensaje:
+        raise HTTPException(status_code=404, detail="Mensaje no encontrado")
+
+    db.delete(mensaje)
+    db.commit()
+    return {"detail": "Mensaje eliminado correctamente"}
