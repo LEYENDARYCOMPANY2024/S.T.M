@@ -97,8 +97,9 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin: -100rem auto 1rem auto; /* Desplaza hacia arriba */
+    margin: 1rem auto;
 }
+
 
 .upload-photo-btn {
     background: rgba(88, 24, 69, 0.3);
@@ -269,7 +270,7 @@ body {
 
 .cedula-preview {
     width: 100%;
-    height: 150px;
+    height: 50px;
     margin-top: 10px;
     display: none;
     background: #1565;
@@ -556,7 +557,6 @@ input[type="file"] {
     width: 100%;
     height: 100%;
     background: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(8px);
     display: flex;
     align-items: center;
     justify-content: center;

@@ -207,22 +207,24 @@ document.addEventListener("DOMContentLoaded", async function () {
                 // Detectar si es PDF o imagen
                 const contentType = res.headers.get("Content-Type");
                 
-                if (contentType.includes("pdf")) {
+                //if (contentType.includes("pdf")) {
                     // PDF → insertar <iframe> para vista previa
-                    const iframe = document.createElement("iframe");
-                    iframe.src = cedulaUrl;
-                    iframe.width = "100%";
-                    iframe.height = "200px";
-                    iframe.style.border = "none";
-                    iframe.style.borderRadius = "8px";
-                    iframe.style.marginTop = "10px";
-                    cedulaPreview.appendChild(iframe);
+                    //const iframe = document.createElement("iframe");
+                    //iframe.src = cedulaUrl;
+                    //iframe.width = "100%";
+                    //iframe.height = "200px";
+                    //iframe.style.border = "none";
+                    //iframe.style.borderRadius = "8px";
+                    //iframe.style.marginTop = "10px";
+                    // 🛡️ Agrega sandbox aquí
+                    //iframe.setAttribute("sandbox", "");
+                    //cedulaPreview.appendChild(iframe);
 
-                } else if (contentType.startsWith("image/")) {
+                //} else if (contentType.startsWith("image/")) {
                     // Imagen → mostrar en <img>
-                    cedulaImage.src = cedulaUrl;
-                    cedulaImage.style.display = 'block';
-                }
+                    //cedulaImage.src = cedulaUrl;
+                    //cedulaImage.style.display = 'block';
+                //}
 
                 // Botón para ver completo
                 const link = document.createElement("a");
@@ -268,7 +270,8 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
 
     // Modal para foto de perfil
-    window.handleUploadClick = function () {
+    window.handleUploadClick = function (event) {
+        event?.preventDefault();  // ✅ Evita comportamiento por defecto si el evento se pasa
         const fileInput = document.getElementById('file-input');
         if (fileInput.disabled) {
             mostrarAlertaModal("Subida de foto no permitida", "✏️ Primero debes presionar <strong>Editar</strong> para activar este campo.");
@@ -475,5 +478,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         localStorage.removeItem("nombre_usuario");
         window.location.replace("/");
     };
+
+    window.scrollTo(0, 0);
 });
 
