@@ -510,69 +510,89 @@ videoToProcess.requestVideoFrameCallback(processVideo);
 }
 
 // Function to update landmark table
-// Function to update landmark table
 function updateLandmarkTable(processedFrame) {
     let tableBody = document.getElementById('tableBody');
-    
-    // Si la tabla no existe, créala
     if (!tableBody) {
-        const table = document.createElement('table');
-        table.className = 'table table-striped';
-        table.innerHTML = `
-            <thead>
-                <tr>
-                    <th>Índice</th>
-                    <th>Número</th>
-                    <th>Color</th>
-                    <th>X (%)</th>
-                    <th>Y (%)</th>
-                    <th>Visibilidad</th>
-                </tr>
-            </thead>
-            <tbody id="tableBody"></tbody>
-        `;
-        
-        const tableContainer = document.createElement('div');
-        tableContainer.className = 'table-container';
-        tableContainer.style.marginTop = '20px';
-        tableContainer.appendChild(table);
-        
-        document.body.appendChild(tableContainer);
-        tableBody = document.getElementById('tableBody');
+      // Crea la tabla si no existe
+      const table = document.createElement('table');
+      table.className = 'table table-striped';
+      table.innerHTML = `
+        <thead>
+          <tr>
+            <th>Índice</th>
+            <th>Número</th>
+            <th>Color</th>
+            <th>X (%)</th>
+            <th>Y (%)</th>
+            <th>Visibilidad</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      `;
+      const container = document.createElement('div');
+      container.className = 'table-container';
+      container.style.marginTop = '20px';
+      container.appendChild(table);
+      document.body.appendChild(container);
+      tableBody = document.getElementById('tableBody');
     }
     
-    tableBody.innerHTML = ''; // Clear previous data
-
+    tableBody.innerHTML = ''; // Limpiar datos anteriores
+    
     if (processedFrame && processedFrame.landmarks) {
-        processedFrame.landmarks.forEach(landmark => {
-            // Solo agregar a la tabla si la visibilidad supera un umbral mínimo
-            // MediaPipe considera un landmark como "detectado" cuando su visibilidad es mayor a 0.5
-            if (landmark.visibility > 0.5) {
-                const row = document.createElement('tr');
-                row.dataset.point = landmark.name; // Para filtrado
-                
-                row.innerHTML = `
-                    <td>${landmark.index}</td>
-                    <td>${landmark.name}</td>
-                    <td><div style="background-color:${getLandmarkDetails(landmark.index)?.color || '#000000'}; width:20px; height:20px;"></div></td>
-                    <td>${(landmark.x * 100).toFixed(2)}%</td>
-                    <td>${(landmark.y * 100).toFixed(2)}%</td>
-                    <td>${landmark.visibility.toFixed(2)}</td>
-                `;
-                tableBody.appendChild(row);
-            }
-        });
-        
-        // Mostrar mensaje si no hay puntos detectados
-        if (tableBody.children.length === 0) {
-            const noDataRow = document.createElement('tr');
-            noDataRow.innerHTML = `
-                <td colspan="6" class="text-center">No se detectaron puntos con suficiente visibilidad</td>
-            `;
-            tableBody.appendChild(noDataRow);
+      processedFrame.landmarks.forEach(landmark => {
+        // Sólo agregar si la visibilidad supera el umbral (por ejemplo, 0.5)
+        if (landmark.visibility > 0.5) {
+          const row = document.createElement('tr');
+          // Guardamos el identificador del punto en el dataset para el filtrado
+          row.dataset.point = landmark.name;
+          row.innerHTML = `
+            <td>${landmark.index}</td>
+            <td>${landmark.name}</td>
+            <td><div style="background-color:${getLandmarkDetails(landmark.index)?.color || '#000'}; width:20px; height:20px;"></div></td>
+            <td>${(landmark.x * 100).toFixed(2)}%</td>
+            <td>${(landmark.y * 100).toFixed(2)}%</td>
+            <td>${landmark.visibility.toFixed(2)}</td>
+          `;
+          tableBody.appendChild(row);
         }
+      });
+      document.getElementById("tableFilter").addEventListener("keyup", function() {
+        const filterText = this.value.toLowerCase();
+        const rows = document.querySelectorAll("#tableBody tr");
+        rows.forEach(row => {
+          // Comparamos el dataset 'point' (identificador del punto) con el texto del filtro
+          const point = row.dataset.point ? row.dataset.point.toLowerCase() : "";
+          if (point.includes(filterText)) {
+            row.style.display = "";
+          } else {
+            row.style.display = "none";
+          }
+        });
+      });
+
+      document.getElementById("frameSlider").addEventListener("input", function() {
+        const frameIndex = parseInt(this.value, 10);
+        if (processedFrames[frameIndex]) {
+          updateLandmarkTable(processedFrames[frameIndex]);
+          // También puedes actualizar algún label que muestre el frame actual:
+          document.getElementById("frameValue").textContent = frameIndex;
+        }
+      });
+// Después de procesar el video, actualizar el slider
+document.getElementById("totalFrameValue").textContent = processedFrames.length;
+document.getElementById("frameSlider").max = processedFrames.length - 1;
+      
+      
+      // Mensaje si no se detectaron puntos con suficiente visibilidad
+      if (tableBody.children.length === 0) {
+        const noDataRow = document.createElement('tr');
+        noDataRow.innerHTML = `<td colspan="6" class="text-center">No se detectaron puntos con visibilidad suficiente</td>`;
+        tableBody.appendChild(noDataRow);
+      }
     }
-}
+  }
+  
 
 // Agregar un control deslizante para ajustar el umbral de visibilidad
 function addVisibilityThresholdControl() {
@@ -1276,18 +1296,10 @@ function drawLandmark(canvasCtx, landmark, index) {
     }
   }
   
-
-
   // Función para exportar la tabla a CSV
 function exportTableToCSV(filename = 'datos_puntos_pose.csv') {
-    // Selecciona la tabla que deseas exportar
-    const table = document.getElementById('dataTable');
-    if (!table) {
-      alert("La tabla no se encontró.");
-      return;
-    }
-    
     const csv = [];
+    const table = document.getElementById('dataTable');
     const rows = table.querySelectorAll('tr');
   
     // Recorre cada fila de la tabla
@@ -1316,15 +1328,70 @@ function exportTableToCSV(filename = 'datos_puntos_pose.csv') {
     URL.revokeObjectURL(url);
   }
   
-  // Configurar el botón de exportación para activar la función
+  // Asignar el evento de clic al botón de exportación
   document.addEventListener("DOMContentLoaded", () => {
     const exportButton = document.getElementById('exportButton');
-    
-    // Habilita el botón si deseas (por ejemplo, cuando ya haya datos cargados en la tabla)
+    if (exportButton) {
+      exportButton.addEventListener('click', exportTableToCSV);
+    }
+  });
+  document.addEventListener("DOMContentLoaded", () => {
+    const exportButton = document.getElementById("exportButton");
+    let mediaPipeData = []; // Aquí se almacenarán todos los frames
+  
+    // Simulación de datos de MediaPipe (reemplázalo con tus datos reales)
+    function loadMediaPipeData(totalFrames) {
+      for (let i = 0; i < totalFrames; i++) {
+        mediaPipeData[i] = generateFakeLandmarkData(i);
+      }
+    }
+  
+    function generateFakeLandmarkData(frameNumber) {
+      return [
+        { frame: frameNumber, id: 0, x: Math.random().toFixed(3), y: Math.random().toFixed(3), z: Math.random().toFixed(3) },
+        { frame: frameNumber, id: 1, x: Math.random().toFixed(3), y: Math.random().toFixed(3), z: Math.random().toFixed(3) },
+        { frame: frameNumber, id: 2, x: Math.random().toFixed(3), y: Math.random().toFixed(3), z: Math.random().toFixed(3) },
+      ];
+    }
+  
+    // Simulación de carga inicial (esto debe cambiarse por la captura real de MediaPipe)
+    let totalFrames = 100; // Ajusta según la cantidad real de frames
+    loadMediaPipeData(totalFrames);
+  
+    // Habilitar el botón de exportar
     exportButton.disabled = false;
-    
-    exportButton.addEventListener('click', () => {
-      exportTableToCSV();
-    });
+  
+    // Función para exportar todos los datos de MediaPipe a CSV
+    function exportAllMediaPipeDataToCSV(filename = "datos_media_pipe.csv") {
+      if (mediaPipeData.length === 0) {
+        alert("No hay datos para exportar.");
+        return;
+      }
+  
+      const csv = [];
+      csv.push("Frame,ID,X,Y,Z"); // Cabecera del CSV
+  
+      mediaPipeData.forEach((frameData) => {
+        frameData.forEach((landmark) => {
+          csv.push(`${landmark.frame},${landmark.id},${landmark.x},${landmark.y},${landmark.z}`);
+        });
+      });
+  
+      const csvString = csv.join("\n");
+  
+      // Crear un blob con el contenido CSV y generar el enlace de descarga
+      const blob = new Blob([csvString], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+  
+    // Configurar el botón de exportación para activar la función
+    exportButton.addEventListener("click", exportAllMediaPipeDataToCSV);
   });
   
