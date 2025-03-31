@@ -120,6 +120,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     }
 
     function cargarMensajesAnteriores() {
+        messagesContainer.innerHTML = ""; // ✅ Aquí estaba el error tipográfico
         fetch(`/chat/mensajes/${chatId}`)
             .then(res => res.json())
             .then(mensajes => {
@@ -147,6 +148,11 @@ document.addEventListener('DOMContentLoaded', async function () {
     function agregarMensajeUI(remitenteMensaje, texto, idMensaje = null, fechaEnvio = null) {
         const mensajeDiv = document.createElement('div');
         mensajeDiv.classList.add('message', remitenteMensaje === remitente ? 'user-message' : 'system-message');
+
+        // 👉 Detecta si es un nuevo bloque de remitente
+        const ultimo = messagesContainer.lastElementChild;
+        const esBloqueNuevo = !ultimo || !ultimo.classList.contains(remitenteMensaje === remitente ? 'user-message' : 'system-message');
+        if (esBloqueNuevo) mensajeDiv.style.marginTop = "20px";
     
         // ✅ Asegúrate de crear primero este contenedor
         const contenidoDiv = document.createElement('div');
