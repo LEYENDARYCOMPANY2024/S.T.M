@@ -193,29 +193,58 @@ function showMessage(text, type = "success") {
 
 document.addEventListener("DOMContentLoaded", () => {
     const homeButton = document.querySelector(".home-button");
-    if (homeButton) {
-        homeButton.addEventListener("click", async (e) => {
-            e.preventDefault();
-
-            const sesionId = localStorage.getItem("id_sesion");
-
-            if (sesionId) {
-                try {
-                    await fetch(`/dispositivos/desactivar/${sesionId}`, {
-                        method: "PUT"
-                    });
-                    console.log("🔌 Dispositivos desactivados correctamente.");
-                } catch (error) {
-                    console.error("❌ Error al desactivar dispositivos:", error);
-                }
-            }
-
-            console.log("🏠 Limpiando localStorage al volver a principal...");
-            localStorage.removeItem("id_sesion");
-            localStorage.removeItem("nombre_sesion");
-            localStorage.removeItem("sesion_dispositivo_ids");
-
-            window.location.href = "/principal";
-        });
-    }
-});
+    if (!homeButton) return;
+  
+    homeButton.addEventListener("click", (e) => {
+      e.preventDefault(); // ✅ evita redirección inmediata
+  
+      // 🧊 Modal estilo visual dark-glass
+      const overlay = document.createElement("div");
+      overlay.className = "modal-overlay";
+  
+      const modal = document.createElement("div");
+      modal.className = "modal-confirm";
+  
+      modal.innerHTML = `
+        <h2>¿Ir al inicio?</h2>
+        <p>⚠ Al volver al inicio, <strong>se cerrará esta sección</strong> y podrías perder el progreso actual.<br>
+        ¿Deseas continuar?</p>
+        <div class="modal-buttons">
+          <button class="btn-secondary" id="cancelarVolver">Cancelar</button>
+          <button class="btn-danger" id="confirmarVolver">Ir al inicio</button>
+        </div>
+      `;
+  
+      overlay.appendChild(modal);
+      document.body.appendChild(overlay);
+  
+      // ❌ Cerrar modal
+      document.getElementById("cancelarVolver").onclick = () => {
+        overlay.remove();
+      };
+  
+      // ✅ Confirmar salida
+      document.getElementById("confirmarVolver").onclick = async () => {
+        overlay.remove();
+  
+        const sesionId = localStorage.getItem("id_sesion");
+        if (sesionId) {
+          try {
+            await fetch(`/dispositivos/desactivar/${sesionId}`, {
+              method: "PUT"
+            });
+            console.log("🔌 Dispositivos desactivados correctamente.");
+          } catch (error) {
+            console.error("❌ Error al desactivar dispositivos:", error);
+          }
+        }
+  
+        localStorage.removeItem("id_sesion");
+        localStorage.removeItem("nombre_sesion");
+        localStorage.removeItem("sesion_dispositivo_ids");
+  
+        window.location.href = "/principal";
+      };
+    });
+  });
+  

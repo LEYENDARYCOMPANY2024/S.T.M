@@ -114,21 +114,27 @@ function renderSesionesPorTerapeuta(terapeutas) {
     }
 
     terapeutas.forEach((terapeuta) => {
-        const terapeutaDiv = document.createElement("div");
-        terapeutaDiv.classList.add("terapeuta-container");
+        const terapeutaSection = document.createElement("div");
+        terapeutaSection.classList.add("terapeuta-section");
 
         const terapeutaTitle = document.createElement("h3");
         terapeutaTitle.textContent = `Terapeuta: ${terapeuta.terapeuta}`;
-        terapeutaDiv.appendChild(terapeutaTitle);
+        terapeutaSection.appendChild(terapeutaTitle);
 
-        terapeuta.sesiones.forEach((sesion, index) => {
-            const sessionDiv = document.createElement("button");
-            sessionDiv.classList.add("session-button");
+        const sesionesContainer = document.createElement("div");
+        sesionesContainer.classList.add("terapeuta-sessions");
+
+        const primerasSesiones = terapeuta.sesiones.slice(0, 3);
+        primerasSesiones.forEach((sesion, index) => {
+            const sessionDiv = document.createElement("div");
+            sessionDiv.classList.add("session-grid-item");
 
             sessionDiv.innerHTML = `
-                <span>
-                    Sesión ${index + 1}: ${sesion.fecha_inicio} a las ${sesion.hora_inicio}
-                </span>
+                <div class="session-content">
+                    <h4>Sesión ${index + 1}</h4>
+                    <p>Fecha: ${sesion.fecha_inicio}</p>
+                    <p>Hora: ${sesion.hora_inicio}</p>
+                </div>
             `;
 
             sessionDiv.addEventListener("click", () => {
@@ -137,12 +143,66 @@ function renderSesionesPorTerapeuta(terapeutas) {
                 window.location.href = "/detalle_sesiones";
             });
 
-            terapeutaDiv.appendChild(sessionDiv);
+            sesionesContainer.appendChild(sessionDiv);
         });
 
-        sessionContainer.appendChild(terapeutaDiv);
+        terapeutaSection.appendChild(sesionesContainer);
+
+        if (terapeuta.sesiones.length > 3) {
+            const verMasBtn = document.createElement("button");
+            verMasBtn.classList.add("ver-mas-btn", "btn");
+            verMasBtn.textContent = "Ver más sesiones";
+            verMasBtn.addEventListener("click", () => {
+                mostrarModalSesiones(terapeuta);
+            });
+            terapeutaSection.appendChild(verMasBtn);
+        }
+
+        sessionContainer.appendChild(terapeutaSection);
     });
 }
+
+
+
+
+function mostrarModalSesiones(terapeuta) {
+    const overlay = document.createElement("div");
+    overlay.className = "modal-overlay";
+
+    const modal = document.createElement("div");
+    modal.className = "modal-confirm modal-sesiones";
+
+    modal.innerHTML = `
+        <h2>Sesiones de ${terapeuta.terapeuta}</h2>
+        <div class="modal-sesiones-list">
+            ${terapeuta.sesiones.map((sesion, i) => `
+                <button class="modal-sesion-btn" data-id="${sesion.id_sesion}">
+                    <strong>Sesión ${i + 1}</strong><br>
+                    ${sesion.fecha_inicio} - ${sesion.hora_inicio}
+                </button>
+            `).join("")}
+        </div>
+        <div class="modal-buttons">
+            <button class="btn-secondary" id="cerrarModalSesiones">Cerrar</button>
+        </div>
+    `;
+
+    overlay.appendChild(modal);
+    document.body.appendChild(overlay);
+
+    document.getElementById("cerrarModalSesiones").onclick = () => overlay.remove();
+
+    // Redirigir al hacer clic en una sesión
+    modal.querySelectorAll(".modal-sesion-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+            const idSesion = btn.dataset.id;
+            localStorage.setItem("id_sesion", idSesion);
+            localStorage.setItem("nombre_sesion", btn.textContent.trim().split("\n")[0]);
+            window.location.href = "/detalle_sesiones";
+        });
+    });
+}
+
 
 // 📌 Verificar si hay sesión activa al cargar sesiones
 document.addEventListener("DOMContentLoaded", () => {
@@ -334,33 +394,60 @@ fetchSesiones(currentPage);
 
 document.addEventListener("DOMContentLoaded", () => {
     const homeButton = document.querySelector(".home-button");
+
     if (homeButton) {
-        homeButton.addEventListener("click", async (e) => {
-            e.preventDefault(); // ✋ prevenir redirección inmediata
+        homeButton.addEventListener("click", (e) => {
+            e.preventDefault();
 
-            const sesionId = localStorage.getItem("id_sesion");
+            const overlay = document.createElement("div");
+            overlay.className = "modal-overlay";
 
-            if (sesionId) {
-                try {
-                    await fetch(`/dispositivos/desactivar/${sesionId}`, {
-                        method: "PUT"
-                    });
-                    console.log("🔌 Dispositivos desactivados correctamente.");
-                } catch (error) {
-                    console.error("❌ Error al desactivar dispositivos:", error);
+            const modal = document.createElement("div");
+            modal.className = "modal-confirm";
+
+            modal.innerHTML = `
+                <h2>¿Ir al inicio?</h2>
+                <p>⚠ Al volver al inicio, <strong>se cerrará esta sección</strong> y podrías perder el progreso actual.<br>
+                ¿Deseas continuar?</p>
+                <div class="modal-buttons">
+                    <button class="btn-secondary" id="cancelarInicio">Cancelar</button>
+                    <button class="btn-danger" id="confirmarInicio">Ir al inicio</button>
+                </div>
+            `;
+
+            overlay.appendChild(modal);
+            document.body.appendChild(overlay);
+
+            document.getElementById("cancelarInicio").onclick = () => {
+                overlay.remove();
+            };
+
+            document.getElementById("confirmarInicio").onclick = async () => {
+                overlay.remove();
+
+                const sesionId = localStorage.getItem("id_sesion");
+
+                if (sesionId) {
+                    try {
+                        await fetch(`/dispositivos/desactivar/${sesionId}`, {
+                            method: "PUT"
+                        });
+                        console.log("🔌 Dispositivos desactivados correctamente.");
+                    } catch (error) {
+                        console.error("❌ Error al desactivar dispositivos:", error);
+                    }
                 }
-            }
 
-            console.log("🏠 Limpiando localStorage al volver a principal...");
-            localStorage.removeItem("id_sesion");
-            localStorage.removeItem("nombre_sesion");
-            localStorage.removeItem("sesion_dispositivo_ids");
+                localStorage.removeItem("id_sesion");
+                localStorage.removeItem("nombre_sesion");
+                localStorage.removeItem("sesion_dispositivo_ids");
 
-            // ✅ Redirigir luego de limpiar todo
-            window.location.href = "/principal";
+                window.location.href = "/principal";
+            };
         });
     }
 });
+
 
 
 async function fetchSesiones(page = 1) {
@@ -384,53 +471,4 @@ async function fetchSesiones(page = 1) {
         mostrarMensaje("Error al obtener sesiones", "error");
         console.error(error);
     }
-}
-
-function renderSesionesPorTerapeuta(terapeutas) {
-    const sessionContainer = document.getElementById("sessions-container");
-    sessionContainer.innerHTML = "";
-
-    if (terapeutas.length === 0) {
-        sessionContainer.innerHTML = "<p>No hay sesiones registradas.</p>";
-        return;
-    }
-
-    terapeutas.forEach((terapeuta) => {
-        // Crear contenedor para cada terapeuta
-        const terapeutaSection = document.createElement("div");
-        terapeutaSection.classList.add("terapeuta-section");
-
-        // Título del terapeuta
-        const terapeutaTitle = document.createElement("h3");
-        terapeutaTitle.textContent = `Terapeuta: ${terapeuta.terapeuta}`;
-        terapeutaSection.appendChild(terapeutaTitle);
-
-        // Contenedor de sesiones para este terapeuta
-        const sesionesContainer = document.createElement("div");
-        sesionesContainer.classList.add("terapeuta-sessions");
-
-        terapeuta.sesiones.forEach((sesion, index) => {
-            const sessionDiv = document.createElement("div");
-            sessionDiv.classList.add("session-grid-item");
-
-            sessionDiv.innerHTML = `
-                <div class="session-content">
-                    <h4>Sesión ${index + 1}</h4>
-                    <p>Fecha: ${sesion.fecha_inicio}</p>
-                    <p>Hora: ${sesion.hora_inicio}</p>
-                </div>
-            `;
-
-            sessionDiv.addEventListener("click", () => {
-                localStorage.setItem("id_sesion", sesion.id_sesion);
-                localStorage.setItem("nombre_sesion", `Sesión ${index + 1}`);
-                window.location.href = "/detalle_sesiones";
-            });
-
-            sesionesContainer.appendChild(sessionDiv);
-        });
-
-        terapeutaSection.appendChild(sesionesContainer);
-        sessionContainer.appendChild(terapeutaSection);
-    });
 }
