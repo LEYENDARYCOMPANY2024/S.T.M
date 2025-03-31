@@ -49,7 +49,14 @@ async def chat_websocket(chat_id: int, websocket: WebSocket, db: Session = Depen
             # 📡 Enviar a todos los conectados
             for conn in active_connections[chat_id]:
                 try:
-                    await conn.send_text(mensaje_guardado.model_dump_json())  # ✅ Usa model_dump_json
+                    await conn.send_json({
+                    "id_mensaje": mensaje_guardado.id_mensaje,
+                    "mensaje": mensaje_guardado.mensaje,
+                    "remitente": mensaje_guardado.remitente,
+                    "fecha_envio": mensaje_guardado.enviado_en.isoformat() if mensaje_guardado.enviado_en else None
+                })
+
+  # ✅ Usa model_dump_json
                 except Exception as e:
                     print("⚠️ Error enviando mensaje a cliente:", e)
                     continue

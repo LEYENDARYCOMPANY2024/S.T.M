@@ -1,3 +1,8 @@
+const supabase = window.supabase.createClient(
+    'https://hxjmzijhcmhfcrjcptge.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh4am16aWpoY21oZmNyamNwdGdlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDAwODMxODgsImV4cCI6MjA1NTY1OTE4OH0.fZ1QaYkFTfJTdupOUkV7V9a7kIIVHCt_XusnNWxkyqw'
+  );
+
 document.addEventListener('DOMContentLoaded', async function () {
     const messagesContainer = document.getElementById('messagesContainer');
     const messageInput = document.getElementById('messageInput');
@@ -36,6 +41,29 @@ document.addEventListener('DOMContentLoaded', async function () {
         }
     }
 
+      // 👇 Escucha inserts en la tabla de mensajes
+      if (chatId) {
+        supabase.channel('chat_mensajes')
+          .on('postgres_changes', {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'mensajes'
+          }, payload => {
+            const msg = payload.new;
+            if (msg.id_chat_m_fk === parseInt(chatId) && msg.remitente !== remitente) {
+              console.log("📥 Nuevo mensaje (Realtime):", msg);
+              agregarMensajeUI(msg.remitente, msg.mensaje, msg.id_mensaje, msg.enviado_en);
+              scrollAlFinal();
+            }
+          })
+          .subscribe(status => {
+            if (status === 'SUBSCRIBED') {
+              console.log("✅ Subscrito a Realtime de mensajes");
+            }
+          });
+      }
+      
+
     let socket;
     let isSending = false;
     let typingTimeout;
@@ -68,15 +96,16 @@ document.addEventListener('DOMContentLoaded', async function () {
 
         socket.onmessage = (event) => {
             const data = JSON.parse(event.data);
-
+        
             if (data.typing !== undefined) {
                 typingIndicator.style.display = data.typing && data.remitente !== remitente ? 'flex' : 'none';
                 return;
             }
-
-            agregarMensajeUI(data.remitente, data.mensaje, data.id_mensaje);
+        
+            agregarMensajeUI(data.remitente, data.mensaje, data.id_mensaje, data.fecha_envio);
             scrollAlFinal();
         };
+        
 
         socket.onclose = () => {
             sendButton.disabled = true;
@@ -94,7 +123,9 @@ document.addEventListener('DOMContentLoaded', async function () {
         fetch(`/chat/mensajes/${chatId}`)
             .then(res => res.json())
             .then(mensajes => {
-                mensajes.forEach(msg => agregarMensajeUI(msg.remitente, msg.mensaje, msg.id_mensaje));
+                mensajes.forEach(msg => {
+                    agregarMensajeUI(msg.remitente, msg.mensaje, msg.id_mensaje, msg.enviado_en);
+                });
                 scrollAlFinal();
             })
             .catch(err => console.error('❌ Error cargando historial:', err));
@@ -113,43 +144,89 @@ document.addEventListener('DOMContentLoaded', async function () {
         setTimeout(() => isSending = false, 250);
     }
 
-    function agregarMensajeUI(remitenteMensaje, texto, idMensaje = null) {
+    function agregarMensajeUI(remitenteMensaje, texto, idMensaje = null, fechaEnvio = null) {
         const mensajeDiv = document.createElement('div');
         mensajeDiv.classList.add('message', remitenteMensaje === remitente ? 'user-message' : 'system-message');
-
+    
+        // ✅ Asegúrate de crear primero este contenedor
         const contenidoDiv = document.createElement('div');
         contenidoDiv.classList.add('message-content');
-        contenidoDiv.textContent = texto;
-
-        // 🗑️ Agregar botón eliminar si es terapeuta y tiene ID
+    
+        // 🧱 Texto del mensaje
+        const textoDiv = document.createElement('div');
+        textoDiv.textContent = texto;
+        contenidoDiv.appendChild(textoDiv);
+    
+        // 🕒 Mostrar fecha/hora si viene incluida
+        if (fechaEnvio) {
+            const fecha = new Date(fechaEnvio);
+            const opcionesFecha = { year: 'numeric', month: 'long', day: 'numeric' };
+            const opcionesHora = { hour: 'numeric', minute: '2-digit', hour12: true };
+            const textoFecha = fecha.toLocaleDateString('es-MX', opcionesFecha);
+            const textoHora = fecha.toLocaleTimeString('es-MX', opcionesHora);
+    
+            const timeLabel = document.createElement('div');
+            timeLabel.classList.add('message-timestamp');
+            timeLabel.textContent = `${textoFecha} • ${textoHora}`;
+            contenidoDiv.appendChild(timeLabel);
+        }
+    
+        // 🗑️ Botón eliminar si es terapeuta
         if (remitenteMensaje === remitente && idMensaje) {
             const deleteBtn = document.createElement('button');
             deleteBtn.classList.add('delete-btn');
             deleteBtn.textContent = "🗑️";
-            deleteBtn.onclick = async () => {
-                const confirmar = confirm("¿Eliminar este mensaje?");
-                if (!confirmar) return;
-
-                try {
-                    const res = await fetch(`/chat/mensajes/${idMensaje}`, {
-                        method: 'DELETE'
-                    });
-
-                    if (res.ok) {
-                        mensajeDiv.remove(); // Eliminar del DOM
-                    } else {
-                        alert("No se pudo eliminar el mensaje.");
+    
+            deleteBtn.onclick = () => {
+                const overlay = document.createElement("div");
+                overlay.className = "modal-overlay";
+    
+                const modal = document.createElement("div");
+                modal.className = "modal-confirm";
+    
+                modal.innerHTML = `
+                    <h2>¿Eliminar mensaje?</h2>
+                    <p>⚠️ Esta acción no se puede deshacer.<br>¿Deseas continuar?</p>
+                    <div class="modal-buttons">
+                        <button class="btn-secondary" id="cancelarEliminar">Cancelar</button>
+                        <button class="btn-danger" id="confirmarEliminar">Eliminar</button>
+                    </div>
+                `;
+    
+                overlay.appendChild(modal);
+                document.body.appendChild(overlay);
+    
+                document.getElementById("cancelarEliminar").onclick = () => overlay.remove();
+    
+                document.getElementById("confirmarEliminar").onclick = async () => {
+                    try {
+                        const res = await fetch(`/chat/mensajes/${idMensaje}`, {
+                            method: 'DELETE'
+                        });
+    
+                        if (res.ok) {
+                            mensajeDiv.remove();
+                            overlay.remove();
+                        } else {
+                            alert("No se pudo eliminar el mensaje.");
+                            overlay.remove();
+                        }
+                    } catch (err) {
+                        console.error("❌ Error eliminando mensaje:", err);
+                        overlay.remove();
                     }
-                } catch (err) {
-                    console.error("❌ Error eliminando mensaje:", err);
-                }
+                };
             };
+    
             contenidoDiv.appendChild(deleteBtn);
         }
-
+    
+        // Agregar contenido al mensaje y a la vista
         mensajeDiv.appendChild(contenidoDiv);
         messagesContainer.appendChild(mensajeDiv);
     }
+    
+    
 
     function mostrarMensajeSistema(texto) {
         agregarMensajeUI('sistema', texto);

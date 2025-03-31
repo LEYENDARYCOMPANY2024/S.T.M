@@ -472,3 +472,11 @@ body {
 .modal-buttons .btn-danger:hover {
     background: var(--accent-gradient-hover);
 }
+
+
+.message-timestamp {
+    font-size: 12px;
+    color: #ccc;
+    margin-top: 5px;
+    text-align: right;
+}
