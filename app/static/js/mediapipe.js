@@ -40,12 +40,12 @@ const POSE_LANDMARKS = {
     MOUTH_RIGHT: { index: 10, name: '10', color: '#FF0000' },
     
     // Upper Body - Left side red, right side green
-    LEFT_SHOULDER: { index: 11, name: '11', color: '#FF0000' },
+    LEFT_SHOULDER: { index: 11, name: '11', color: '#00FF00' },
     RIGHT_SHOULDER: { index: 12, name: '12', color: '#00FF00' },
-    LEFT_ELBOW: { index: 13, name: '13', color: '#FF0000' },
+    LEFT_ELBOW: { index: 13, name: '13', color: '#800080' },
     RIGHT_ELBOW: { index: 14, name: '14', color: '#00FF00' },
-    LEFT_WRIST: { index: 15, name: '15', color: '#FF0000' },
-    RIGHT_WRIST: { index: 16, name: '16', color: '#00FF00' },
+    LEFT_WRIST: { index: 15, name: '15', color: '#800080' },
+    RIGHT_WRIST: { index: 16, name: '16', color: '#800080' },
     
     // Hands - Purple
     LEFT_PINKY: { index: 17, name: '17', color: '#800080' },
@@ -998,3 +998,207 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 });
+// Variables globales para los controles
+let pointSize = 6;
+let processingSpeed = 3; // Puede interpretarse como un factor para saltar frames
+let showLabels = true;
+let showConnections = true;
+let showHoverInfo = true;
+
+// Inicializar controles de la interfaz
+function initializeControls() {
+  const speedSlider = document.getElementById("speedSlider");
+  const pointSizeSlider = document.getElementById("pointSizeSlider");
+  const speedValue = document.getElementById("speedValue");
+  const pointSizeValue = document.getElementById("pointSizeValue");
+  const checkboxShowLabels = document.getElementById("showLabels");
+  const checkboxShowConnections = document.getElementById("showConnections");
+  const checkboxShowHoverInfo = document.getElementById("showHoverInfo");
+
+  // Actualizar velocidad de procesamiento
+  speedSlider.addEventListener("input", () => {
+    processingSpeed = parseInt(speedSlider.value, 10);
+    speedValue.textContent = processingSpeed;
+    // Aquí puedes ajustar la lógica de procesamiento, por ejemplo,
+    // saltar frames o modificar un delay entre frames.
+  });
+
+  // Actualizar tamaño de puntos
+  pointSizeSlider.addEventListener("input", () => {
+    pointSize = parseInt(pointSizeSlider.value, 10);
+    pointSizeValue.textContent = pointSize + "px";
+  });
+
+  // Actualizar opciones de visualización
+  checkboxShowLabels.addEventListener("change", () => {
+    showLabels = checkboxShowLabels.checked;
+  });
+  checkboxShowConnections.addEventListener("change", () => {
+    showConnections = checkboxShowConnections.checked;
+  });
+  checkboxShowHoverInfo.addEventListener("change", () => {
+    showHoverInfo = checkboxShowHoverInfo.checked;
+  });
+}
+
+// Ejemplo de función modificada para dibujar un landmark
+function drawLandmark(canvasCtx, landmark, index) {
+  const x = landmark.x * canvasElement.width;
+  const y = landmark.y * canvasElement.height;
+
+  // Dibujar el punto usando el tamaño definido por el slider
+  canvasCtx.beginPath();
+  canvasCtx.arc(x, y, pointSize, 0, 2 * Math.PI);
+  canvasCtx.fillStyle = getLandmarkDetails(index)?.color || '#FF0000';
+  canvasCtx.fill();
+
+  // Dibujar la etiqueta si está activado
+  if (showLabels) {
+    canvasCtx.font = 'bold 14px Arial';
+    canvasCtx.fillStyle = 'white';
+    canvasCtx.fillText(index, x + 10, y);
+  }
+}
+
+// Ejemplo de cómo modificar el dibujo de conexiones
+function drawConnections(canvasCtx, poseLandmarks) {
+  if (!showConnections) return;
+
+  POSE_CONNECTIONS.forEach(connection => {
+    const [start, end] = connection;
+    const startLandmark = poseLandmarks[start];
+    const endLandmark = poseLandmarks[end];
+
+    if (startLandmark && endLandmark &&
+        startLandmark.visibility > 0.5 && endLandmark.visibility > 0.5) {
+      canvasCtx.beginPath();
+      canvasCtx.moveTo(startLandmark.x * canvasElement.width, startLandmark.y * canvasElement.height);
+      canvasCtx.lineTo(endLandmark.x * canvasElement.width, endLandmark.y * canvasElement.height);
+      canvasCtx.strokeStyle = '#000000'; // Línea negra
+      canvasCtx.lineWidth = 2;
+      canvasCtx.stroke();
+    }
+  });
+}
+
+// Ejemplo de integración en el proceso de video (usando requestVideoFrameCallback)
+async function processVideoWithMediaPipe() {
+  processedFrames = [];
+  lastPoseLandmarks = null;
+  videoElement.style.display = 'none';
+  recordedVideoElement.style.display = 'none';
+  canvasElement.style.display = 'block';
+
+  const pose = new Pose({
+    locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`
+  });
+
+  pose.setOptions({
+    modelComplexity: 1,
+    smoothLandmarks: true,
+    enableSegmentation: true,
+    smoothSegmentation: true,
+    minDetectionConfidence: 0.6,
+    minTrackingConfidence: 0.6
+  });
+
+  const canvasCtx = canvasElement.getContext('2d');
+  const videoToProcess = recordedVideoElement;
+
+  pose.onResults((results) => {
+    canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+
+    if (results.poseLandmarks) {
+      // Aplicar suavizado (igual que antes)
+      if (lastPoseLandmarks) {
+        results.poseLandmarks.forEach((landmark, i) => {
+          landmark.x = lastPoseLandmarks[i].x * 0.8 + landmark.x * 0.2;
+          landmark.y = lastPoseLandmarks[i].y * 0.8 + landmark.y * 0.2;
+          landmark.z = lastPoseLandmarks[i].z * 0.8 + landmark.z * 0.2;
+        });
+      }
+      lastPoseLandmarks = JSON.parse(JSON.stringify(results.poseLandmarks));
+
+      // Dibujar cada landmark usando la función modificada
+      results.poseLandmarks.forEach((landmark, index) => {
+        if (landmark.visibility > 0.5) {
+          drawLandmark(canvasCtx, landmark, index);
+          // Si se activa la info al pasar mouse, puedes agregar aquí listeners o lógica para mostrar datos.
+          // Ejemplo (simplificado):
+          if (showHoverInfo) {
+            // Podrías asignar un tooltip o manejar el evento mousemove en el canvas.
+          }
+        }
+      });
+
+      // Dibujar conexiones
+      drawConnections(canvasCtx, results.poseLandmarks);
+
+      // Guardar frame procesado (igual que antes)
+      processedFrames.push({
+        landmarks: results.poseLandmarks.map((landmark, index) => ({
+          index: index,
+          name: getLandmarkDetails(index)?.name || index.toString(),
+          x: landmark.x,
+          y: landmark.y,
+          z: landmark.z,
+          visibility: landmark.visibility
+        })),
+        timestamp: videoToProcess.currentTime
+      });
+    }
+  });
+
+  videoToProcess.loop = false;
+  videoToProcess.play();
+  await pose.initialize();
+
+  // Control de velocidad de procesamiento: saltar frames según el valor del slider
+  let frameCount = 0;
+  function processFrame() {
+    frameCount++;
+    // Solo procesamos cada "processingSpeed"-ésimo frame
+    if (frameCount % processingSpeed === 0) {
+      pose.send({ image: videoToProcess });
+    }
+    if (!videoToProcess.ended) {
+      requestAnimationFrame(processFrame);
+    } else {
+      showNotification('Procesamiento completado', 'success');
+      updateLandmarkTable(processedFrames[processedFrames.length - 1]);
+    }
+  }
+  requestAnimationFrame(processFrame);
+}
+
+// Llamar a initializeControls() cuando el DOM esté listo
+document.addEventListener('DOMContentLoaded', () => {
+  initializeElements();      // Función existente para elementos DOM
+  initializeControls();      // Nuevos controles de visualización
+  setupEventListeners();     // Función existente para botones y cámara
+});
+
+
+
+// Botón para reiniciar el video y el procesamiento de MediaPipe
+document.getElementById("resetVideoButton").addEventListener("click", () => {
+    // Asegurarse de que el elemento de video grabado existe
+    if (recordedVideoElement) {
+      // Reiniciar el tiempo del video y reproducir desde el inicio
+      recordedVideoElement.currentTime = 0;
+      recordedVideoElement.play();
+  
+      // Limpiar los datos procesados si es necesario
+      processedFrames = [];
+      lastPoseLandmarks = null;
+  
+      // Reiniciar el procesamiento con MediaPipe
+      // Esto puede ser tan simple como llamar nuevamente a la función de procesamiento.
+      processVideoWithMediaPipe();
+      
+      console.log("Video reiniciado y procesamiento reanudado");
+    } else {
+      console.error("No se encontró el elemento de video para reiniciar");
+    }
+  });
+  
