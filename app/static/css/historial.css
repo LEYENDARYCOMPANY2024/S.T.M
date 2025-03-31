@@ -79,7 +79,7 @@
     left: 50%;
     width: 0;
     height: 2px;
-    background: var(--secondary-color);
+    background: linear-gradient(135deg, #a4f2e1, #cbd3f2);
     transition: width 0.3s ease, left 0.3s ease;
   }
   
@@ -93,7 +93,7 @@
   }
   
   .navigation a.selected {
-    background-color: var(--secondary-color);
+    background: linear-gradient(135deg, #134e5e, #71b280);
     color: black;
   }
   
@@ -363,6 +363,6 @@
   }
   
   .home-button:hover {
-    color: #70c1ff;
+    color: #74ebd5;
   }
   
