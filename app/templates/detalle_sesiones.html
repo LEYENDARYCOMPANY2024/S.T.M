@@ -66,7 +66,8 @@
             <button id="recordButton" class="btn-danger" disabled>Grabar</button>
             <button id="stopButton" class="btn-secondary" disabled>Detener</button>
             <button id="processButton" class="btn-success" disabled>Procesar</button>
-            <button id="playPauseButton" class="btn-warning" disabled>Pausar</button>
+              <div class="control-group-title"></div>
+              <button id="resetVideoButton" class="btn">Reiniciar Video</button>
           </div>
           <div class="control-group">
             <div class="control-group-title">Filtros</div>
@@ -89,10 +90,6 @@
               <label><input type="checkbox" id="showConnections" checked/> Mostrar conexiones</label>
               <label><input type="checkbox" id="showHoverInfo" checked/> Info al pasar mouse</label>
             </div>
-          </div>
-          <div class="control-group">
-            <div class="control-group-title">Leyenda de Colores</div>
-            <div class="color-legend" id="colorLegend"></div>
           </div>
         </div>
       </div>
@@ -272,6 +269,7 @@
         document.getElementById("pauseButton").textContent = "▶️ Iniciar";
       });
   </script>
+  <script src="/static/js/mediapipe.js" defer></script>
   <script src="/static/js/grafica_chart.js" defer></script>
   <script src="/static/js/grafica_smoothie.js" defer></script>
   <script src="/static/js/detalle_sesiones.js"></script>
