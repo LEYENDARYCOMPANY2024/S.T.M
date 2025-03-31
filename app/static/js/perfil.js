@@ -1,4 +1,25 @@
 document.addEventListener("DOMContentLoaded", async function () {
+
+    // Función para mostrar mensajes de forma uniforme
+    function mostrarMensaje(mensaje, tipo = "success") {
+        const alertBox = document.createElement("div");
+        alertBox.classList.add("alert", tipo === "success" ? "success" : "error");
+        alertBox.innerHTML = `
+            <span class="alert-icon">${tipo === "success" ? "✅" : "❌"}</span> 
+            ${mensaje}
+        `;
+        document.body.appendChild(alertBox);
+    
+        setTimeout(() => {
+            alertBox.classList.add("show");
+        }, 100);
+    
+        setTimeout(() => {
+            alertBox.classList.remove("show");
+            setTimeout(() => alertBox.remove(), 300);
+        }, 3000);
+    }
+
     const token = localStorage.getItem("session_token");
 
     // Control del botón de regreso
@@ -244,12 +265,7 @@ document.addEventListener("DOMContentLoaded", async function () {
        
 
         
-        // Mostrar el botón de eliminar cuando hay una imagen o PDF cargado
-        cedulaUpload.addEventListener('change', function() {
-            if (cedulaUpload.files.length > 0) {
-                deleteButton.style.display = 'block';
-            }
-        });
+        
         
         // Función para eliminar la cédula subida
         deleteButton.addEventListener('click', function(e) {
@@ -280,15 +296,51 @@ document.addEventListener("DOMContentLoaded", async function () {
         fileInput.click();
     };
 
-    // Modal para cédula profesional
-    window.handleCedulaClick = function () {
-        const cedulaInput = document.getElementById('cedula-upload');
-        if (cedulaInput.disabled) {
-            mostrarAlertaModal("Subida de cédula no permitida", "✏️ Primero debes presionar <strong>Editar</strong> para activar este campo.");
-            return;
+    const dropZone = document.getElementById("drop-zone");
+    const fileNameDisplay = cedulaPreview.querySelector(".file-name");
+
+    dropZone.addEventListener("click", () => {
+        if (!cedulaUpload.disabled) {
+            cedulaUpload.click();
         }
-        cedulaInput.click();
-    };
+    });
+
+    dropZone.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        dropZone.classList.add("dragover");
+    });
+
+    dropZone.addEventListener("dragleave", () => {
+        dropZone.classList.remove("dragover");
+    });
+
+    dropZone.addEventListener("drop", (e) => {
+        e.preventDefault();
+        dropZone.classList.remove("dragover");
+        if (!cedulaUpload.disabled) {
+            const file = e.dataTransfer.files[0];
+            if (file && file.type === "application/pdf") {
+                cedulaUpload.files = e.dataTransfer.files;
+                fileNameDisplay.textContent = `📄 ${file.name}`;
+            } else {
+                alert("❌ Solo se permite subir archivos PDF.");
+            }
+        }
+    });
+
+    cedulaUpload.addEventListener("change", () => {
+        const file = cedulaUpload.files[0];
+        if (file) {
+            if (file.type !== "application/pdf") {
+                mostrarMensaje("Solo se permite subir archivos PDF.", "error");
+                cedulaUpload.value = "";
+                return;
+            }
+            fileNameDisplay.textContent = `📄 ${file.name}`;
+            document.getElementById("uploadingAlert").style.display = "flex";
+        }
+    });
+
 
     // Función genérica para mostrar el modal
     function mostrarAlertaModal(titulo, mensaje) {
@@ -434,6 +486,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                     }
 
                     console.log("✅ Archivos subidos correctamente");
+                    document.getElementById("uploadingAlert").style.display = "none";
 
                 } catch (error) {
                     console.error(error);

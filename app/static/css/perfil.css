@@ -619,3 +619,38 @@ input[type="file"] {
 }
 
 
+.drop-zone {
+    border: 2px dashed #ccc;
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    color: #fff;
+    background-color: rgba(88, 24, 69, 0.2);
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-bottom: 10px;
+}
+.drop-zone.dragover {
+    background-color: rgba(88, 24, 69, 0.4);
+}
+
+
+
+.alert.uploading {
+    background-color: #fff3cd;
+    border-left: 6px solid #ffeeba;
+    color: #856404;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.alert-icon.loading::after {
+    content: "⏳";
+    animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.4; }
+    100% { opacity: 1; }
+}

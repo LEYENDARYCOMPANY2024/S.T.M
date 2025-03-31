@@ -47,14 +47,16 @@
                     <div class="professional-id">
                         <div class="professional-id-input">
                             <div>Cedula Profesional</div>
-                            <input type="file" id="cedula-upload" accept="image/*,.pdf">
-                            <button type="button" class="add-button" onclick="handleCedulaClick()">📎</button>
+                            <input type="file" id="cedula-upload" accept=".pdf" hidden>
+                            <div id="drop-zone" class="drop-zone">
+                                Arrastra tu cédula profesional aquí o haz clic para seleccionarla.
+                            </div>
+
                         </div>
                         <div id="cedula-preview" class="cedula-preview">
                             <img id="cedula-image" src="" alt="Vista previa de cédula">
                         </div>
                     </div>
-                    
                     <div class="action-buttons">
                         <button type="button" id="edit-btn" class="action-btn edit-btn">✏️ Editar</button><button type="button" id="save-btn" class="action-btn save-btn" disabled>
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-floppy" viewBox="0 0 16 16">
@@ -78,6 +80,10 @@
                             <span class="alert-icon">✅</span>
                             <span>¡Cambios guardados correctamente!</span>
                         </div>
+                        <div class="alert uploading" id="uploadingAlert" style="display: none;">
+                            <span class="alert-icon loading"></span>
+                            <span id="uploadingText">Subiendo cédula profesional...</span>
+                        </div>                        
                     </div>
                 </div>
             </div>
