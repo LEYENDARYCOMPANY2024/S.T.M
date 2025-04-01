@@ -43,7 +43,7 @@ const POSE_LANDMARKS = {
     LEFT_SHOULDER: { index: 11, name: '11', color: '#00FF00' },
     RIGHT_SHOULDER: { index: 12, name: '12', color: '#00FF00' },
     LEFT_ELBOW: { index: 13, name: '13', color: '#800080' },
-    RIGHT_ELBOW: { index: 14, name: '14', color: '#00FF00' },
+    RIGHT_ELBOW: { index: 14, name: '14', color: '#800080' },
     LEFT_WRIST: { index: 15, name: '15', color: '#800080' },
     RIGHT_WRIST: { index: 16, name: '16', color: '#800080' },
     
@@ -63,7 +63,7 @@ const POSE_LANDMARKS = {
     LEFT_KNEE: { index: 25, name: '25', color: '#FFA500' },
     RIGHT_KNEE: { index: 26, name: '26', color: '#FFA500' },
     LEFT_ANKLE: { index: 27, name: '27', color: '#FFA500' },
-    RIGHT_ANKLE: { index: 28, name: '28', color: '#800080' },
+    RIGHT_ANKLE: { index: 28, name: '28', color: '#FFA500' },
     
     // Feet
     LEFT_HEEL: { index: 29, name: '29', color: '#FFA500' },
@@ -970,9 +970,9 @@ document.addEventListener("DOMContentLoaded", function () {
     // Definimos los grupos de puntos de pose y sus colores
     const filters = [
         { name: "Cabeza", color: "#FF5733", points: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"] },
-        { name: "Tronco", color: "#33FF57", points: ["11", "12", "13", "14", "15", "16"] },
-        { name: "Brazos", color: "#9D00FF", points: ["17", "18", "19", "20", "21", "22"] },
-        { name: "Piernas", color: "#ffa400", points: ["23", "24", "25", "26", "27", "28", "29", "30", "31", "32"] }
+        { name: "Tronco", color: "#33FF57", points: ["11", "12", "23", "24"] },
+        { name: "Brazos", color: "#9D00FF", points: ["13", "14", "15", "16", "17", "18","19","20","21","22"] },
+        { name: "Piernas", color: "#ffa400", points: ["25", "26", "27", "28", "29", "30", "31", "32"] }
     ];
     
     // Crear botones de filtro
