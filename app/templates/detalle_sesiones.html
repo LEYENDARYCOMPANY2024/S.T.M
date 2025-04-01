@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="/static/css/detalle_sesiones.css" />
   <link rel="stylesheet" href="/static/css/graficas_realtime.css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
   <!-- Librerías -->
   <script src="/static/libs/supabase.min.js"></script>
@@ -62,13 +63,27 @@
             <div class="placeholder">La previsualización aparecerá aquí</div>
           </div>
           <div class="button-row">
-            <button id="startButton" class="btn-primary">Iniciar Cámara</button>
-            <button id="recordButton" class="btn-danger" disabled>Grabar</button>
-            <button id="stopButton" class="btn-secondary" disabled>Detener</button>
-            <button id="processButton" class="btn-success" disabled>Procesar</button>
-              <div class="control-group-title"></div>
-              <button id="resetVideoButton" class="btn">Reiniciar Video</button>
-          </div>
+            <button id="startButton" class="btn-primary">
+                <i class="fas fa-video"></i> Iniciar Cámara
+            </button>
+        
+            <button id="recordButton" class="btn-danger" disabled>
+                <i class="fas fa-circle"></i> Grabar
+            </button>
+        
+            <button id="stopButton" class="btn-secondary" disabled>
+                <i class="fas fa-stop"></i> Detener
+            </button>
+        
+            <button id="processButton" class="btn-success" disabled>
+                <i class="fas fa-cogs"></i> Procesar
+            </button>
+        
+            <button id="resetVideoButton" class="btn">
+                <i class="fas fa-redo"></i> Reiniciar Video
+            </button>
+        </div>
+        
           <div class="control-group">
             <div class="control-group-title">Filtros</div>
             <div class="filter-buttons" id="groupFilter"></div>
