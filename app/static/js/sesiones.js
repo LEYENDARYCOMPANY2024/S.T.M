@@ -113,9 +113,23 @@ function renderSesionesPorTerapeuta(terapeutas) {
         return;
     }
 
+    const idTerapeutaActual = localStorage.getItem("id_terapeuta");
+
+    // 🔄 Reordenar para que el terapeuta actual esté primero
+    terapeutas.sort((a, b) => {
+        if (a.id_terapeuta == idTerapeutaActual) return -1;
+        if (b.id_terapeuta == idTerapeutaActual) return 1;
+        return 0;
+    });
+
     terapeutas.forEach((terapeuta) => {
         const terapeutaSection = document.createElement("div");
         terapeutaSection.classList.add("terapeuta-section");
+
+        // 🎨 Si es el terapeuta actual, agregar clase especial
+        if (terapeuta.id_terapeuta == idTerapeutaActual) {
+            terapeutaSection.classList.add("mis-sesiones");
+        }
 
         const terapeutaTitle = document.createElement("h3");
         terapeutaTitle.textContent = `Terapeuta: ${terapeuta.terapeuta}`;
@@ -161,6 +175,7 @@ function renderSesionesPorTerapeuta(terapeutas) {
         sessionContainer.appendChild(terapeutaSection);
     });
 }
+
 
 
 

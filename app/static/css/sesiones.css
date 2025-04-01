@@ -784,3 +784,9 @@ body {
     border-radius: 12px;
     margin-bottom: 30px; /* 👈 Espacio entre terapeutas */
 }
+
+.mis-sesiones {
+    background: rgba(0, 188, 212, 0.15);
+    border: 2px solid var(--accent-purple);
+    box-shadow: 0 0 20px rgba(0, 188, 212, 0.3);
+}
