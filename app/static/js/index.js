@@ -330,62 +330,59 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Testimonial slider
-        const testimonials = document.querySelectorAll('.testimonial');
-        const dotsContainer = document.querySelector('.pagination-dots');
-        let currentSlide = 0;
-        let slideInterval;
-    
-        function showSlide(index) {
-            const dots = document.querySelectorAll('.dot');
-    
-            testimonials.forEach((testimonial, i) => {
-                testimonial.style.display = i === index ? 'block' : 'none';
-            });
-    
-            dots.forEach((dot, i) => {
-                dot.classList.toggle('active', i === index);
-            });
-    
-            currentSlide = index;
-        }
-    
-        function autoSlide() {
+    const testimonials = document.querySelectorAll('.testimonial');
+    const dotsContainer = document.querySelector('.pagination-dots');
+    let currentSlide = 0;
+    let slideInterval = null;
+
+    function showSlide(index) {
+        const dots = document.querySelectorAll('.dot');
+
+        testimonials.forEach((testimonial, i) => {
+            testimonial.style.display = i === index ? 'block' : 'none';
+        });
+
+        dots.forEach((dot, i) => {
+            dot.classList.toggle('active', i === index);
+        });
+
+        currentSlide = index;
+    }
+
+    function startAutoSlide() {
+        clearInterval(slideInterval); // Previene múltiples intervalos
+        slideInterval = setInterval(() => {
             const nextSlide = (currentSlide + 1) % testimonials.length;
             showSlide(nextSlide);
-        }
-    
-        if (testimonials.length > 0 && dotsContainer) {
-            // Limpiar dots existentes y generar según testimonios
-            dotsContainer.innerHTML = '';
-            testimonials.forEach((_, index) => {
-                const dot = document.createElement('span');
-                dot.classList.add('dot');
-                if (index === 0) dot.classList.add('active');
-    
-                dot.addEventListener('click', () => {
-                    clearInterval(slideInterval); // Reiniciar intervalo si el usuario hace clic
-                    showSlide(index);
-                    slideInterval = setInterval(autoSlide, 5000); // Reiniciar autoplay
-                });
-    
-                dotsContainer.appendChild(dot);
+        }, 5000);
+    }
+
+    if (testimonials.length > 0 && dotsContainer) {
+        // Limpiar y generar dots según testimonios
+        dotsContainer.innerHTML = '';
+        testimonials.forEach((_, index) => {
+            const dot = document.createElement('span');
+            dot.classList.add('dot');
+            if (index === 0) dot.classList.add('active');
+
+            dot.addEventListener('click', () => {
+                showSlide(index);
+                startAutoSlide(); // Reinicia correctamente
             });
-    
-            // Mostrar el primer testimonio
-            showSlide(0);
-    
-            // Iniciar autoplay
-            slideInterval = setInterval(autoSlide, 5000);
-    
-            // Pausar autoplay en hover
-            const slider = document.querySelector('.testimonials-slider');
-            if (slider) {
-                slider.addEventListener('mouseenter', () => clearInterval(slideInterval));
-                slider.addEventListener('mouseleave', () => {
-                    slideInterval = setInterval(autoSlide, 5000);
-                });
-            }
+
+            dotsContainer.appendChild(dot);
+        });
+
+        showSlide(0);         // Mostrar el primero
+        startAutoSlide();     // Iniciar autoplay correctamente
+
+        const slider = document.querySelector('.testimonials-slider');
+        if (slider) {
+            slider.addEventListener('mouseenter', () => clearInterval(slideInterval));
+            slider.addEventListener('mouseleave', startAutoSlide);
         }
+    }
+
     
 
     // Contact form submission
