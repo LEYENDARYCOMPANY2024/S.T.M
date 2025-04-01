@@ -330,52 +330,63 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Testimonial slider
-    const testimonials = document.querySelectorAll('.testimonial');
-    const dots = document.querySelectorAll('.dot');
-    let currentSlide = 0;
+        const testimonials = document.querySelectorAll('.testimonial');
+        const dotsContainer = document.querySelector('.pagination-dots');
+        let currentSlide = 0;
+        let slideInterval;
     
-    if (testimonials.length > 0 && dots.length > 0) {
         function showSlide(index) {
+            const dots = document.querySelectorAll('.dot');
+    
             testimonials.forEach((testimonial, i) => {
                 testimonial.style.display = i === index ? 'block' : 'none';
             });
-            
+    
             dots.forEach((dot, i) => {
                 dot.classList.toggle('active', i === index);
             });
-            
+    
             currentSlide = index;
         }
-        
-        // Initialize slider
-        showSlide(0);
-        
-        // Add click event to dots
-        dots.forEach((dot, i) => {
-            dot.addEventListener('click', () => showSlide(i));
-        });
-        
-        // Auto-slide functionality
+    
         function autoSlide() {
             const nextSlide = (currentSlide + 1) % testimonials.length;
             showSlide(nextSlide);
         }
-        
-        // Change slides every 5 seconds
-        const slideInterval = setInterval(autoSlide, 5000);
-        
-        // Pause auto-slide on hover
-        const testimonialsContainer = document.querySelector('.testimonials-slider');
-        if (testimonialsContainer) {
-            testimonialsContainer.addEventListener('mouseenter', () => {
-                clearInterval(slideInterval);
+    
+        if (testimonials.length > 0 && dotsContainer) {
+            // Limpiar dots existentes y generar según testimonios
+            dotsContainer.innerHTML = '';
+            testimonials.forEach((_, index) => {
+                const dot = document.createElement('span');
+                dot.classList.add('dot');
+                if (index === 0) dot.classList.add('active');
+    
+                dot.addEventListener('click', () => {
+                    clearInterval(slideInterval); // Reiniciar intervalo si el usuario hace clic
+                    showSlide(index);
+                    slideInterval = setInterval(autoSlide, 5000); // Reiniciar autoplay
+                });
+    
+                dotsContainer.appendChild(dot);
             });
-            
-            testimonialsContainer.addEventListener('mouseleave', () => {
-                setInterval(autoSlide, 5000);
-            });
+    
+            // Mostrar el primer testimonio
+            showSlide(0);
+    
+            // Iniciar autoplay
+            slideInterval = setInterval(autoSlide, 5000);
+    
+            // Pausar autoplay en hover
+            const slider = document.querySelector('.testimonials-slider');
+            if (slider) {
+                slider.addEventListener('mouseenter', () => clearInterval(slideInterval));
+                slider.addEventListener('mouseleave', () => {
+                    slideInterval = setInterval(autoSlide, 5000);
+                });
+            }
         }
-    }
+    
 
     // Contact form submission
     const contactForm = document.getElementById('contact-form');
