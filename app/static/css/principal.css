@@ -445,7 +445,7 @@ body {
 }
 
 .submit-btn {
-    background: linear-gradient(135deg, #134e5e, #71b280);
+    background: linear-gradient(135deg, #00bcd4, #009688);
     color: white;
     border: none;
     padding: 1rem;
@@ -457,7 +457,7 @@ body {
 }
 
 .submit-btn:hover {
-    background: linear-gradient(135deg, #1e6776, #8fd7a0);
+    background: linear-gradient(135deg, #00acc1, #00796b);
     transform: translateY(-2px);
 }
 
@@ -895,7 +895,7 @@ body {
     margin-bottom: 0.5rem; /* 🔹 Agrega margen abajo */
     border: none;
     border-radius: 10px;
-    background: linear-gradient(135deg, #134e5e, #71b280);
+    background: linear-gradient(135deg, #00bcd4, #009688);
     color: white;
     font-size: 0.9rem;
     cursor: pointer;
@@ -907,7 +907,7 @@ body {
 }
 
 #searchPacienteBtn:hover {
-    background: linear-gradient(135deg, #1e6776, #8fd7a0);
+    background: linear-gradient(135deg, #00acc1, #00796b);
     transform: translateY(-2px);
 }
 

@@ -78,7 +78,7 @@ body {
 .register-container button {
     width: 100%;
     padding: 14px;
-    background: linear-gradient(135deg, #134e5e, #71b280);
+    background: linear-gradient(135deg, #00bcd4, #009688);
     border: none;
     border-radius: 10px;
     color: white;
@@ -89,7 +89,7 @@ body {
 }
 
 .register-container button:hover {
-    background: linear-gradient(135deg, #1e6776, #8fd7a0);
+    background: linear-gradient(135deg, #00acc1, #00796b);
     transform: scale(1.07);
 }
 
