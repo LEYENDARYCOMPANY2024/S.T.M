@@ -65,7 +65,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         console.warn("⚠️ Mostrando alerta de sesión expirada");
     
         setTimeout(() => {
-            localStorage.removeItem("session_token");
+            localStorage.clear();
             window.location.href = "/";
         }, 3000);
     }
@@ -134,7 +134,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             console.error(`❌ Error en la solicitud: ${response.status}`);
             if (response.status === 401) {
                 console.error("❌ Token inválido o expirado. Redirigiendo al login...");
-                localStorage.removeItem("session_token");
+                localStorage.clear();
                 return;
             }
             throw new Error("Error al obtener los datos del perfil");
@@ -545,10 +545,11 @@ document.addEventListener("DOMContentLoaded", async function () {
     // ===== CERRAR SESIÓN =====
     window.cerrarSesion = function () {
         console.warn("⚠️ Cerrando sesión...");
-        localStorage.removeItem("session_token");
-        localStorage.removeItem("nombre_usuario");
-        window.location.replace("/");
+
+        localStorage.clear(); // borra absolutamente todo
+        window.location.replace("/"); // redirige al inicio
     };
+
 
     window.scrollTo(0, 0);
 });

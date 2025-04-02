@@ -1,4 +1,8 @@
+import { verificarSesionYRedirigir } from "./verificar_sesion.js";
+
 document.addEventListener("DOMContentLoaded", async function () {
+
+    if (!verificarSesionYRedirigir()) return; // ✅ aquí la usas
     // ──────────────────────────────────────────
     //  Mensajes de retroalimentación
     function mostrarMensaje(mensaje, tipo = "success") {

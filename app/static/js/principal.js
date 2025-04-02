@@ -367,6 +367,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
     
     // 🔹 Función para seleccionar un paciente y cargar su historial clínico (con validación de estado)
+    // 🔹 Función para seleccionar un paciente y cargar su historial clínico (con validación de estado)
     async function seleccionarPaciente(id_paciente) {
         try {
             const response = await fetch(`/pacientes/estado/${id_paciente}`, {
@@ -387,7 +388,15 @@ document.addEventListener("DOMContentLoaded", async function () {
                 return;
             }
 
-            localStorage.setItem("id_paciente", id_paciente);
+            // 🔥 Limpieza completa del localStorage antes de cambiar de paciente
+            const tokenBackup = localStorage.getItem("session_token");
+            const terapeutaBackup = localStorage.getItem("id_terapeuta");
+
+            localStorage.clear(); // borra todo
+            localStorage.setItem("session_token", tokenBackup); // recupera sesión
+            localStorage.setItem("id_terapeuta", terapeutaBackup); // recupera terapeuta
+
+            localStorage.setItem("id_paciente", id_paciente); // guarda paciente nuevo
             window.location.href = "/historial_clinico";
 
         } catch (error) {
@@ -395,6 +404,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             mostrarMensaje("Error al validar el estado del paciente.", "error");
         }
     }
+
 
 
     function actualizarPaginacion(totalPages, currentPage, cargarFuncion, selector) {
@@ -679,8 +689,9 @@ document.addEventListener("DOMContentLoaded", async function () {
     const logoutBtn = document.getElementById("logoutBtn");
     if (logoutBtn) {
         logoutBtn.addEventListener("click", () => {
-            localStorage.removeItem("session_token");
-            window.location.href = "/login";
-        });
+            console.warn("⚠️ Cierre de sesión desde botón.");
+            localStorage.clear();
+            window.location.href = "/";
+        });        
     }
 });
