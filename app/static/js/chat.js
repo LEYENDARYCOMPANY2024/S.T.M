@@ -87,7 +87,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     });
 
     function conectarWebSocket() {
-        socket = new WebSocket(`ws://${window.location.host}/chat/ws/${chatId}`);
+        socket = new WebSocket(`${window.location.protocol === 'https:' ? 'wss' : 'ws'}://${window.location.host}/chat/ws/${chatId}`);
 
         socket.onopen = () => {
             console.log('✅ WebSocket conectado');

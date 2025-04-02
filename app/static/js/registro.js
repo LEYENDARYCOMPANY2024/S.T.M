@@ -1,129 +1,34 @@
-document.addEventListener('DOMContentLoaded', function() {
-    // Toggle de visibilidad de la contraseña
+document.addEventListener('DOMContentLoaded', function () {
+    // Elementos principales
     const togglePassword = document.getElementById('togglePassword');
-    
-    if (togglePassword) {
-        togglePassword.addEventListener('click', function() {
-            const passwordField = document.getElementById('contrasena');
-            
-            // Cambiar tipo de input
-            if (passwordField.type === 'password') {
-                passwordField.type = 'text';
-                // Cambiar icono a ojo tachado
-                this.classList.remove('fa-eye');
-                this.classList.add('fa-eye-slash');
-            } else {
-                passwordField.type = 'password';
-                // Cambiar icono a ojo normal
-                this.classList.remove('fa-eye-slash');
-                this.classList.add('fa-eye');
-            }
-        });
-    }
-    
-    // El resto de tu código para el formulario
-    document.getElementById('registerForm').addEventListener('submit', async function(event) {
-        event.preventDefault();  // Evitar envío tradicional del formulario
-
-        const alert = document.getElementById('successAlert');
-        const formData = new FormData(this); // Obtener los datos del formulario
-
-        try {
-            // Enviar los datos al backend con Fetch (AJAX)
-            const response = await fetch("/registro", {
-                method: "POST",
-                body: formData,  // Enviar los datos como FormData
-            });
-
-            const result = await response.json();
-
-            if (!response.ok) {
-                throw new Error(result.detail || "Error al registrar");
-            }
-
-            // Mostrar alerta de éxito
-            alert.textContent = result.message;  // Mostrar mensaje del backend
-            alert.classList.add('show');  // Hacer visible la alerta
-
-            // Esperamos 3 segundos, mostramos la alerta y redirigimos
-            setTimeout(() => {
-                alert.classList.remove('show');  // Ocultar la alerta
-                window.location.href = "/login";  // Redirigir al login
-            }, 3000);  // 3 segundos antes de redirigir
-
-            // Limpiar el formulario
-            this.reset();
-
-        } catch (error) {
-            console.error("Error al registrar:", error.message);
-            alert.textContent = "❌ Error al registrar: " + error.message;  // Mostrar error en la alerta
-            alert.classList.add('show');
-            
-            // Ocultar alerta después de 3 segundos
-            setTimeout(() => {
-                alert.classList.remove('show');
-            }, 1000);
-        }
-    });
-});
-
-$(document).ready(function () {
-    // Mostrar/ocultar términos y condiciones
-    $('#toggleTerms').on('click', function () {
-        $('#termsBox').slideToggle();
-        $(this).text($(this).text() === 'Ver Términos y Condiciones' ? 'Ocultar Términos y Condiciones' : 'Ver Términos y Condiciones');
-    });
-
-    // Habilitar/deshabilitar botón de registro al aceptar los términos
-    $('#termsCheckbox').on('change', function () {
-        $('#registerButton').prop('disabled', !this.checked);
-    });
-
-    // Mostrar/ocultar contraseña
-    $('#togglePassword').on('click', function () {
-        let passwordField = $('#contrasena');
-        let type = passwordField.attr('type') === 'password' ? 'text' : 'password';
-        passwordField.attr('type', type);
-        $(this).toggleClass('fa-eye fa-eye-slash');
-    });
-});
-
-   // Modal de términos y condiciones
-   const modal = $('#termsModal');
-   const btn = $('#toggleTerms');
-   const span = $('.close-button');
-   const acceptBtn = $('#acceptTermsBtn');
-
-   // Abrir modal al hacer clic en el botón
-   btn.click(function() {
-       modal.css('display', 'block');
-   });
-
-   // Cerrar modal al hacer clic en X
-   span.click(function() {
-       modal.css('display', 'none');
-   });
-
-   // Cerrar modal al hacer clic fuera del contenido
-   $(window).click(function(event) {
-       if (event.target === modal[0]) {
-           modal.css('display', 'none');
-       }
-   });
-
-   // Aceptar términos desde el modal
-   acceptBtn.click(function() {
-       $('#termsCheckbox').prop('checked', true);
-       updateRegisterButton();
-       modal.css('display', 'none');
-   });
-
-   document.addEventListener("DOMContentLoaded", function() {
     const passwordInput = document.getElementById("contrasena");
     const strengthIndicator = document.getElementById("strengthIndicator");
     const strengthText = document.getElementById("strengthText");
+    const registerForm = document.getElementById("registerForm");
+    const registerButton = document.getElementById("registerButton");
+    registerButton.disabled = true; // Asegura que esté deshabilitado al inicio
+    const termsCheckbox = document.getElementById("termsCheckbox");
+    const termsError = document.getElementById("termsError");
+    const modal = document.getElementById("termsModal");
+    const closeButton = document.querySelector(".close-button");
+    const toggleTermsLink = document.getElementById("toggleTerms");
 
-    passwordInput.addEventListener("input", function() {
+    // Reiniciar barra de seguridad al cargar
+    strengthIndicator.style.width = "0%";
+    strengthText.innerText = "Seguridad: Ninguna";
+
+    // Mostrar/ocultar contraseña
+    if (togglePassword) {
+        togglePassword.addEventListener('click', function () {
+            const type = passwordInput.type === 'password' ? 'text' : 'password';
+            passwordInput.type = type;
+            this.classList.toggle('fa-eye');
+            this.classList.toggle('fa-eye-slash');
+        });
+    }
+
+    // Verificar fortaleza de contraseña
+    passwordInput.addEventListener("input", function () {
         const password = passwordInput.value;
         const strength = checkPasswordStrength(password);
 
@@ -133,8 +38,10 @@ $(document).ready(function () {
     });
 
     function checkPasswordStrength(password) {
+        if (password.length === 0) {
+            return { text: "Ninguna", color: "transparent", percentage: "0%" };
+        }
         let strength = 0;
-
         if (password.length >= 8) strength += 1;
         if (password.match(/[A-Z]/)) strength += 1;
         if (password.match(/[0-9]/)) strength += 1;
@@ -149,4 +56,81 @@ $(document).ready(function () {
 
         return levels[strength] || levels[0];
     }
+
+    // Mostrar modal desde el link
+    toggleTermsLink.addEventListener('click', function (e) {
+        e.preventDefault();
+        modal.style.display = 'block';
+    });
+
+    // Cerrar modal con botón X
+    closeButton.addEventListener('click', function () {
+        modal.style.display = 'none';
+    });
+
+    // Cerrar modal si se hace clic fuera del contenido
+    window.addEventListener('click', function (event) {
+        if (event.target === modal) {
+            modal.style.display = 'none';
+        }
+    });
+
+    // Habilitar botón de registro al marcar el checkbox
+    termsCheckbox.addEventListener('change', function () {
+        registerButton.disabled = !this.checked;
+        if (this.checked) {
+            termsError.style.display = "none";
+        }
+    });
+
+    // Validación extra antes de enviar
+    registerForm.addEventListener('submit', async function (event) {
+        event.preventDefault();
+
+        const alert = document.getElementById('successAlert');
+        const formData = new FormData(this);
+
+        if (!termsCheckbox.checked) {
+            termsError.style.display = "block";
+            setTimeout(() => {
+                termsError.style.display = "none";
+            }, 3000);
+            return;
+        }
+
+        try {
+            const response = await fetch("/registro", {
+                method: "POST",
+                body: formData,
+            });
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                throw new Error(result.detail || "Error al registrar");
+            }
+
+            alert.textContent = result.message;
+            alert.classList.add('show');
+
+            setTimeout(() => {
+                alert.classList.remove('show');
+                window.location.href = "/login";
+            }, 3000);
+
+            this.reset();
+
+            // Reiniciar barra de seguridad
+            strengthIndicator.style.width = "0%";
+            strengthText.innerText = "Seguridad: Ninguna";
+            registerButton.disabled = true;
+
+        } catch (error) {
+            alert.textContent = "❌ Error al registrar: " + error.message;
+            alert.classList.add('show');
+            setTimeout(() => {
+                alert.classList.remove('show');
+            }, 3000);
+        }
+    });
 });

@@ -89,7 +89,7 @@ h2 {
 
 /* Botón de inicio de sesión */
 button {
-    background: #c0c6f0;
+    background: linear-gradient(135deg, #00bcd4, #009688);
     color: black;
     font-weight: bold;
     border: none;
@@ -104,7 +104,7 @@ button {
 }
 
 button:hover {
-    background: linear-gradient(135deg, #dcdcdc, #bfbfbf);
+    background: linear-gradient(135deg, #00acc1, #00796b);
     transform: scale(1.05);
 }
 
@@ -121,6 +121,8 @@ button:hover {
     text-decoration: none;
     transition: color 0.3s;
 }
+
+
 
 .login-link a:hover {
     color: #ffcc00;

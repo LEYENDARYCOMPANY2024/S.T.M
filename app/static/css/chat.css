@@ -18,8 +18,8 @@
     --accent-green: #33ff33;
     --accent-red: #ff3333;
     --accent-blue: #71b7e6;
-    --accent-gradient: linear-gradient(135deg, #134e5e, #71b280);
-    --accent-gradient-hover: linear-gradient(135deg, #1e6776, #8fd7a0);
+    --accent-gradient: linear-gradient(135deg, #00bcd4, #009688);
+    --accent-gradient-hover: linear-gradient(135deg, #00acc1, #00796b);
 }
 
 body {
@@ -106,12 +106,12 @@ body {
 }
 
 .navigation a.selected {
-    background: var(--accent-gradient);
+    background: linear-gradient(135deg, #134e5e, #71b280);
     color: black;
 }
 
 .navigation a.selected:hover {
-    background: var(--accent-gradient-hover);
+    background: linear-gradient(135deg, #1e6776, #8fd7a0);
 }
 
 .container {

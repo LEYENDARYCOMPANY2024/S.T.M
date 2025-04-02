@@ -78,7 +78,7 @@ body {
 .register-container button {
     width: 100%;
     padding: 14px;
-    background: #c0c6f0;
+    background: linear-gradient(135deg, #00bcd4, #009688);
     border: none;
     border-radius: 10px;
     color: white;
@@ -89,7 +89,7 @@ body {
 }
 
 .register-container button:hover {
-    background: #c0c6f0;
+    background: linear-gradient(135deg, #00acc1, #00796b);
     transform: scale(1.07);
 }
 
@@ -202,7 +202,7 @@ body {
 
         /* Estilos para el botón de aceptar en el modal */
         .accept-terms-btn {
-            background-color: #4CAF50;
+            background-color: gray;
             color: transparent;
             padding: 10px 15px;
             border: none;
@@ -214,7 +214,7 @@ body {
         }
 
         .accept-terms-btn:hover {
-            background-color: #45a049;
+            background-color: #dde0f4;
         }
         .password-strength-container {
             width: 100%;
@@ -237,5 +237,13 @@ body {
             background: linear-gradient(90deg, #ff4d4d, #ffa94d, #ffeb3b, #4caf50);
             border-radius: 6px;
             transition: width 0.4s ease-in-out;
+        }
+        
+
+        #registerButton:disabled {
+            background-color: #999 !important;
+            cursor: not-allowed;
+            opacity: 0.6;
+            transform: none !important;
         }
         

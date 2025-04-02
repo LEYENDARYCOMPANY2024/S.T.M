@@ -1,3 +1,8 @@
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> pruebas
 // Enhanced MediaPipe Processing Script
 let processedFrames = [];
 let mediaRecorder;

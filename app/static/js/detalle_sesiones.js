@@ -175,26 +175,13 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
 
 
-
-
-
-
     } catch (error) {
         console.error(error);
         mostrarMensaje("Error cargando la sesión", "error");
     }
-
-    document.getElementById("btn-grafica").addEventListener("click", () => {
-        cargarGrafica(); // 📌 Llamará a la función de grafica.js
-    });
-
-    document.getElementById("btn-tabla").addEventListener("click", () => {
-        cargarTablaMediapipe(); // 📌 Llamará a la función de tabla_mediapipe.js
-    });
-      
-
 });
 
+<<<<<<< HEAD
       
     
 
@@ -409,6 +396,8 @@ tableBody.addEventListener('mouseout', function(event) {
 
 
 
+=======
+>>>>>>> pruebas
 document.addEventListener("DOMContentLoaded", () => {
     const irInicioBtn = document.querySelector(".home-button");
 

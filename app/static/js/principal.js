@@ -5,9 +5,15 @@ document.addEventListener("DOMContentLoaded", async function () {
     // Función para mostrar mensajes de forma uniforme
     function mostrarMensaje(mensaje, tipo = "success") {
         const alertBox = document.createElement("div");
-        alertBox.classList.add("alert", tipo === "success" ? "success" : "error");
+        let icono = "✅";
+    
+        if (tipo === "error") icono = "❌";
+        else if (tipo === "alert") icono = "⚠️";
+    
+        alertBox.classList.add("alert");
+        alertBox.classList.add(tipo); // Esto aplicará clase .success, .error o .alert
         alertBox.innerHTML = `
-            <span class="alert-icon">${tipo === "success" ? "✅" : "❌"}</span> 
+            <span class="alert-icon">${icono}</span> 
             ${mensaje}
         `;
         document.body.appendChild(alertBox);
@@ -21,6 +27,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             setTimeout(() => alertBox.remove(), 300);
         }, 3000);
     }
+    
 
     // 📌 Función para mostrar mensajes de error antes de redirigir
     function mostrarMensajeYRedirigir(mensaje) {
@@ -103,7 +110,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             document.getElementById("confirmMotivo").addEventListener("click", () => {
                 const motivo = document.getElementById("motivoReactivacionInput").value.trim();
                 if (!motivo) {
-                    mostrarMensaje("Debes proporcionar un motivo para la reactivación.", "error");
+                    mostrarMensaje("Debes proporcionar un motivo para la reactivación.", "alert");
                     return;
                 }
                 resolve(motivo);
@@ -120,7 +127,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     if (!token) {
         console.warn("⚠️ No hay token en localStorage, redirigiendo a login...");
-        mostrarMensajeYRedirigir("⚠️ Tu sesión ha expirado. Inicia sesión nuevamente.");
+        mostrarMensajeYRedirigir("Tu sesión ha expirado. Inicia sesión nuevamente.", "alert");
         return;
     }
 
@@ -139,7 +146,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     const decodedToken = parseJwt(token);
     if (!decodedToken || !decodedToken.sub || !decodedToken.exp) {
         console.warn("⚠️ Token inválido o corrupto, eliminando...");
-        mostrarMensajeYRedirigir("⚠️ Tu sesión es inválida. Inicia sesión nuevamente.");
+        mostrarMensajeYRedirigir("Tu sesión es inválida. Inicia sesión nuevamente.", "alert");
         return;
     }
 
@@ -147,7 +154,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     const currentTime = Math.floor(Date.now() / 1000);
     if (decodedToken.exp < currentTime) {
         console.warn("⏳ Token expirado, redirigiendo a login...");
-        mostrarMensajeYRedirigir("⏳ Tu sesión ha expirado. Inicia sesión nuevamente.");
+        mostrarMensajeYRedirigir("Tu sesión ha expirado. Inicia sesión nuevamente.", "alert");
         return;
     }
     const idTerapeuta = decodedToken.sub;
@@ -359,18 +366,36 @@ document.addEventListener("DOMContentLoaded", async function () {
         });
     }
     
-    // 🔹 Función para seleccionar un paciente y cargar su historial clínico
+    // 🔹 Función para seleccionar un paciente y cargar su historial clínico (con validación de estado)
     async function seleccionarPaciente(id_paciente) {
         try {
-            // Guardar el ID del paciente en localStorage
-            localStorage.setItem("id_paciente", id_paciente);
+            const response = await fetch(`/pacientes/estado/${id_paciente}`, {
+                method: "GET",
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            });
 
-            // 🔹 Redirigir a la página de historial clínico
+            if (!response.ok) {
+                throw new Error("No se pudo obtener la información del paciente.");
+            }
+
+            const data = await response.json();
+
+            if (data.estado_paciente !== "activo") {
+                mostrarMensaje("El paciente debe estar activo para ver su detalle de sesión.", "alert");
+                return;
+            }
+
+            localStorage.setItem("id_paciente", id_paciente);
             window.location.href = "/historial_clinico";
+
         } catch (error) {
-            console.error("❌ Error al obtener historial clínico:", error);
+            console.error("❌ Error al validar estado del paciente:", error);
+            mostrarMensaje("Error al validar el estado del paciente.", "error");
         }
     }
+
 
     function actualizarPaginacion(totalPages, currentPage, cargarFuncion, selector) {
         const paginationContainer = document.querySelector(selector);
@@ -450,7 +475,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     searchPacienteBtn.addEventListener("click", async function () {
         const codigo = codigoPacienteInput.value.trim();
         if (!codigo) {
-            mostrarMensaje("Introduce un código de paciente.", "error");
+            mostrarMensaje("Introduce un código de paciente.", "alert");
             return;
         }
     
@@ -505,7 +530,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             modal.style.display = "none";
     
         } catch (error) {
-            console.error("❌ Error en la búsqueda:", error);
+            console.error("Error en la búsqueda:", error);
             mostrarMensaje(error.message, "error");
         }
     });
@@ -567,7 +592,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                 modal.style.display = "none";
     
             } catch (error) {
-                console.error("❌ Error en la búsqueda:", error);
+                console.error("Error en la búsqueda:", error);
                 mostrarMensaje(error.message, "error");
             }
     
@@ -600,8 +625,8 @@ document.addEventListener("DOMContentLoaded", async function () {
                 modal.style.display = "none";
     
             } catch (error) {
-                console.error("❌ Error en la solicitud:", error);
-                mostrarMensaje("❌ " + error.message, "error");
+                console.error("Error en la solicitud:", error);
+                mostrarMensaje("" + error.message, "error");
             }
         }
     });
@@ -634,7 +659,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             await cargarPacientesInactivos();
 
         } catch (error) {
-            console.error("❌ Error al reactivar:", error);
+            console.error("Error al reactivar:", error);
             mostrarMensaje(error.message, "error");
         }
     }

@@ -50,7 +50,9 @@
             
 
             <!-- Botón para mostrar/ocultar Términos y Condiciones -->
-            <button type="button" id="toggleTerms">Ver Términos y Condiciones</button>
+            <p style="margin-top: 10px;">
+                <a href="#" id="toggleTerms" style="color: #c0c6f0; text-decoration: underline;">Ver Términos y Condiciones</a>
+              </p>              
 
             <!-- Checkbox de aceptación -->
             <div class="terms-container">
@@ -75,7 +77,7 @@
             <h3>Términos y Condiciones de Uso</h3>
             <p>Bienvenido a <strong>Sistema de Monitoreo de la Marcha</strong> operado por <em>Leyendary Inc.</em>. Al registrarse en la aplicación, usted acepta los siguientes términos y condiciones:</p>
             
-            <p><strong>1. Recopilación y Uso de Datos:</strong> Se recopilan datos personales, conversaciones y registros de rehabilitación para mejorar la experiencia del usuario.</p>
+            <p><strong>1. Recopilación y Uso ade Datos:</strong> Se recopilan datos personales, conversaciones y registros de rehabilitación para mejorar la experiencia del usuario.</p>
             
             <p><strong>2. Protección de Datos:</strong> Implementamos medidas de seguridad, pero el usuario es responsable de la seguridad de su cuenta.</p>
             
@@ -94,6 +96,8 @@
             <p><strong>9. Contacto:</strong> Para cualquier consulta sobre estos Términos y Condiciones, puede contactarnos a través del correo electrónico <strong>leyendary2024@gmail.com</strong>.</p>
         </div>
     </div>
+
+    <div id="termsError" class="alert" style="background: #a00; display: none;">❌ Debes aceptar los Términos y Condiciones</div>
 
     <script src="/static/js/registro.js"></script>
 </body>
