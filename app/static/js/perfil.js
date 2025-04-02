@@ -1,39 +1,34 @@
-document.addEventListener("DOMContentLoaded", async function () {
+import { verificarSesionYRedirigir } from "./verificar_sesion.js";
 
-    // Función para mostrar mensajes de forma uniforme
-    function mostrarMensaje(mensaje, tipo = "success") {
-        const alertBox = document.createElement("div");
-        
-        // Agregar clases según el tipo
-        alertBox.classList.add("alert");
-        if (tipo === "success") {
-            alertBox.classList.add("success");
-        } else if (tipo === "error") {
-            alertBox.classList.add("error");
-        } else if (tipo === "alert") {
-            alertBox.classList.add("warning");
+document.addEventListener("DOMContentLoaded", async function () {
+    if (!verificarSesionYRedirigir()) return; // ⛔ Si no hay sesión, no continúa
+
+    // 📌 Función para mostrar mensajes de éxito o error
+    function showMessage(text, type = "success") {
+        // 🔧 Crear el contenedor si no existe
+        let container = document.getElementById("message-container");
+        if (!container) {
+            container = document.createElement("div");
+            container.id = "message-container";
+            document.body.appendChild(container);
         }
     
-        // Íconos según el tipo
-        const icon = tipo === "success" ? "✅" :
-                     tipo === "error"   ? "❌" :
-                     tipo === "alert"   ? "⚠️" :
-                     "";
+        // 🧊 Crear el mensaje
+        const message = document.createElement("div");
+        message.className = `message ${type}`;
     
-        alertBox.innerHTML = `
-            <span class="alert-icon">${icon}</span> 
-            ${mensaje}
-        `;
+        const icon = {
+            success: "✅",
+            error: "❌",
+            warning: "⚠️"
+        }[type] || "";
     
-        document.body.appendChild(alertBox);
+        message.innerHTML = `<span class="message-icon">${icon}</span> ${text}`;
     
-        setTimeout(() => {
-            alertBox.classList.add("show");
-        }, 100);
+        container.appendChild(message);
     
         setTimeout(() => {
-            alertBox.classList.remove("show");
-            setTimeout(() => alertBox.remove(), 300);
+            message.remove();
         }, 3000);
     }
     
@@ -52,23 +47,14 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
 
     function showSessionExpiredMessage() {
-        const sessionAlert = document.getElementById("session-alert");
-        
-        if (!sessionAlert) {
-            console.error("⚠️ No se encontró el elemento #session-alert");
-            return;
-        }
-    
-        sessionAlert.classList.remove("hidden");
-        sessionAlert.classList.add("show");  
-    
-        console.warn("⚠️ Mostrando alerta de sesión expirada");
+        showMessage("⚠️ Tu sesión ha expirado. Serás redirigido a la página principal.", "warning");
     
         setTimeout(() => {
             localStorage.clear();
             window.location.href = "/";
         }, 3000);
     }
+    
     
     // Verificación de token y autenticación (código mantenido igual)
     if (!token) {
@@ -341,7 +327,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                 cedulaUpload.files = e.dataTransfer.files;
                 fileNameDisplay.textContent = `📄 ${file.name}`;
             } else {
-                mostrarMensaje("Solo se permite subir archivos PDF.", "alert");
+                showMessage("Solo se permite subir archivos PDF.", "warning");
             }
         }
     });
@@ -350,7 +336,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         const file = cedulaUpload.files[0];
         if (file) {
             if (file.type !== "application/pdf") {
-                mostrarMensaje("Solo se permite subir archivos PDF.", "alert");
+                showMessage("Solo se permite subir archivos PDF.", "warning");
                 cedulaUpload.value = "";
                 return;
             }
@@ -474,7 +460,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             if (fileInput.files.length > 0) {
                 const img = fileInput.files[0];
                 if (!img.type.startsWith("image/")) {
-                    mostrarMensaje("Solo se permiten imágenes para la foto de perfil", "alert");
+                    showMessage("Solo se permiten imágenes para la foto de perfil", "warning");
                     return;
                 }
                 formData.append("imagen", img);
@@ -483,7 +469,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             if (cedulaUpload.files.length > 0) {
                 const pdf = cedulaUpload.files[0];
                 if (pdf.type !== "application/pdf") {
-                    mostrarMensaje("Solo se permite PDF para la cédula profesional", "alert");
+                    showMessage("Solo se permite PDF para la cédula profesional", "warning");
                     return;
                 }
                 formData.append("cedula", pdf);
@@ -508,7 +494,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
                 } catch (error) {
                     console.error(error);
-                    mostrarMensaje("Error al subir imagen o PDF", "error");
+                    showMessage("Error al subir imagen o PDF", "error");
                 }
             }
 
@@ -528,14 +514,14 @@ document.addEventListener("DOMContentLoaded", async function () {
                 }, 3000);
             } else {
                 console.warn("⚠️ Elemento #successAlert no encontrado");
-                mostrarMensaje("¡Perfil actualizado correctamente!", "success");
+                showMessage("¡Perfil actualizado correctamente!", "success");
             }
             
             console.log("✅ Perfil actualizado correctamente");
     
         } catch (error) {
             console.error("❌ Error al actualizar perfil:", error);
-            mostrarMensaje("Error al actualizar el perfil. Intente nuevamente.","error");
+            showMessage("Error al actualizar el perfil. Intente nuevamente.","error");
         }
     
         // Volver al modo de solo lectura después de guardar

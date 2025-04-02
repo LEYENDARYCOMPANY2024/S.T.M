@@ -76,20 +76,16 @@
                           </button>                       
                     </div>
                 </div>
-            </div>
-            <div id="session-alert" class="session-alert">
-                <p>⚠️ Tu sesión ha expirado. Serás redirigido a la página principal.</p>
-            </div>            
+            </div>       
         </form>
     </main>
-    <div class="alert" id="successAlert">
-        <span class="alert-icon">✅</span>
-        <span>¡Cambios guardados correctamente!</span>
-    </div>
     <div class="alert uploading" id="uploadingAlert" style="display: none;">
         <span class="alert-icon loading"></span>
         <span id="uploadingText">Subiendo cédula profesional...</span>
     </div> 
-    <script src="/static/js/perfil.js"></script>
+
+    <div id="message-container"></div>
+    <script type="module" src="/static/js/verificar_sesion.js"></script>
+    <script type="module" src="/static/js/perfil.js"></script>
 </body>
 </html>

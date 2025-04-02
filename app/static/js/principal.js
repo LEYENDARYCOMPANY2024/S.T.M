@@ -2,36 +2,39 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     const token = localStorage.getItem("session_token");
 
-    // Función para mostrar mensajes de forma uniforme
-    function mostrarMensaje(mensaje, tipo = "success") {
-        const alertBox = document.createElement("div");
-        let icono = "✅";
+    // 📌 Función para mostrar mensajes de éxito o error
+    function showMessage(text, type = "success") {
+        // 🔧 Crear el contenedor si no existe
+        let container = document.getElementById("message-container");
+        if (!container) {
+            container = document.createElement("div");
+            container.id = "message-container";
+            document.body.appendChild(container);
+        }
     
-        if (tipo === "error") icono = "❌";
-        else if (tipo === "alert") icono = "⚠️";
+        // 🧊 Crear el mensaje
+        const message = document.createElement("div");
+        message.className = `message ${type}`;
     
-        alertBox.classList.add("alert");
-        alertBox.classList.add(tipo); // Esto aplicará clase .success, .error o .alert
-        alertBox.innerHTML = `
-            <span class="alert-icon">${icono}</span> 
-            ${mensaje}
-        `;
-        document.body.appendChild(alertBox);
+        const icon = {
+            success: "✅",
+            error: "❌",
+            warning: "⚠️"
+        }[type] || "";
+    
+        message.innerHTML = `<span class="message-icon">${icon}</span> ${text}`;
+    
+        container.appendChild(message);
     
         setTimeout(() => {
-            alertBox.classList.add("show");
-        }, 100);
-    
-        setTimeout(() => {
-            alertBox.classList.remove("show");
-            setTimeout(() => alertBox.remove(), 300);
+            message.remove();
         }, 3000);
     }
     
 
     // 📌 Función para mostrar mensajes de error antes de redirigir
     function mostrarMensajeYRedirigir(mensaje) {
-        mostrarMensaje(mensaje, "error"); // 🔥 Muestra el mensaje en pantalla
+        showMessage(mensaje, "error"); // 🔥 Muestra el mensaje en pantalla
 
         setTimeout(() => {
             localStorage.removeItem("session_token");
@@ -110,7 +113,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             document.getElementById("confirmMotivo").addEventListener("click", () => {
                 const motivo = document.getElementById("motivoReactivacionInput").value.trim();
                 if (!motivo) {
-                    mostrarMensaje("Debes proporcionar un motivo para la reactivación.", "alert");
+                    showMessage("Debes proporcionar un motivo para la reactivación.", "warning");
                     return;
                 }
                 resolve(motivo);
@@ -118,7 +121,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             });
 
             document.getElementById("cancelMotivo").addEventListener("click", () => {
-                mostrarMensaje("Cancelaste la reactivación. El paciente permanecerá inactivo.", "error");
+                showMessage("Cancelaste la reactivación. El paciente permanecerá inactivo.", "error");
                 resolve(null);
                 overlay.remove();
             });
@@ -127,7 +130,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     if (!token) {
         console.warn("⚠️ No hay token en localStorage, redirigiendo a login...");
-        mostrarMensajeYRedirigir("Tu sesión ha expirado. Inicia sesión nuevamente.", "alert");
+        mostrarMensajeYRedirigir("Tu sesión ha expirado. Inicia sesión nuevamente.", "warning");
         return;
     }
 
@@ -146,7 +149,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     const decodedToken = parseJwt(token);
     if (!decodedToken || !decodedToken.sub || !decodedToken.exp) {
         console.warn("⚠️ Token inválido o corrupto, eliminando...");
-        mostrarMensajeYRedirigir("Tu sesión es inválida. Inicia sesión nuevamente.", "alert");
+        mostrarMensajeYRedirigir("Tu sesión es inválida. Inicia sesión nuevamente.", "warning");
         return;
     }
 
@@ -154,7 +157,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     const currentTime = Math.floor(Date.now() / 1000);
     if (decodedToken.exp < currentTime) {
         console.warn("⏳ Token expirado, redirigiendo a login...");
-        mostrarMensajeYRedirigir("Tu sesión ha expirado. Inicia sesión nuevamente.", "alert");
+        mostrarMensajeYRedirigir("Tu sesión ha expirado. Inicia sesión nuevamente.", "warning");
         return;
     }
     const idTerapeuta = decodedToken.sub;
@@ -306,10 +309,10 @@ document.addEventListener("DOMContentLoaded", async function () {
                 cargarPacientesInactivos(1);
             }, 500);
     
-            mostrarMensaje("Paciente desactivado correctamente.", "success");
+            showMessage("Paciente desactivado correctamente.", "success");
     
         } catch (error) {
-            mostrarMensaje(error.message, "error");
+            showMessage(error.message, "error");
         }
     }
     
@@ -384,7 +387,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             const data = await response.json();
 
             if (data.estado_paciente !== "activo") {
-                mostrarMensaje("El paciente debe estar activo para ver su detalle de sesión.", "alert");
+                showMessage("El paciente debe estar activo para ver su detalle de sesión.", "warning");
                 return;
             }
 
@@ -401,7 +404,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
         } catch (error) {
             console.error("❌ Error al validar estado del paciente:", error);
-            mostrarMensaje("Error al validar el estado del paciente.", "error");
+            showMessage("Error al validar el estado del paciente.", "error");
         }
     }
 
@@ -485,7 +488,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     searchPacienteBtn.addEventListener("click", async function () {
         const codigo = codigoPacienteInput.value.trim();
         if (!codigo) {
-            mostrarMensaje("Introduce un código de paciente.", "alert");
+            showMessage("Introduce un código de paciente.", "warning");
             return;
         }
     
@@ -505,7 +508,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             console.log("📥 Paciente encontrado:", data);
     
             if (data.estado_paciente === "activo") {
-                mostrarMensaje("Este paciente ya está activo con otro terapeuta.", "error");
+                showMessage("Este paciente ya está activo con otro terapeuta.", "error");
                 return;
             }
     
@@ -526,7 +529,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                 throw new Error(errorMessage.detail || "Error al asignar paciente.");
             }
     
-            mostrarMensaje(`Paciente ${data.nombre} ${data.primer_apellido} agregado como inactivo.`, "success");
+            showMessage(`Paciente ${data.nombre} ${data.primer_apellido} agregado como inactivo.`, "success");
     
             cargarPacientesInactivos();
             
@@ -541,7 +544,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     
         } catch (error) {
             console.error("Error en la búsqueda:", error);
-            mostrarMensaje(error.message, "error");
+            showMessage(error.message, "error");
         }
     });
     
@@ -571,7 +574,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                 console.log("📥 Paciente encontrado:", data);
     
                 if (data.estado_paciente === "activo") {
-                    mostrarMensaje("Este paciente ya está activo con otro terapeuta y no puede ser reasignado.", "error");
+                    showMessage("Este paciente ya está activo con otro terapeuta y no puede ser reasignado.", "error");
                     return;
                 }
     
@@ -592,7 +595,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                     throw new Error(errorMessage.detail || "Error al asignar paciente.");
                 }
     
-                mostrarMensaje("Paciente asignado con éxito.", "success");
+                showMessage("Paciente asignado con éxito.", "success");
     
                 const confirmMotivo = await solicitarMotivoReactivacion(`El paciente ${data.nombre} ${data.primer_apellido} está inactivo. ¿Deseas activarlo?`);
                 if (confirmMotivo) {
@@ -603,7 +606,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     
             } catch (error) {
                 console.error("Error en la búsqueda:", error);
-                mostrarMensaje(error.message, "error");
+                showMessage(error.message, "error");
             }
     
         } else {
@@ -631,12 +634,12 @@ document.addEventListener("DOMContentLoaded", async function () {
                 const searchValue = searchInput.value.trim();
                 cargarPacientesActivos(1, searchValue);
     
-                mostrarMensaje("Paciente registrado con éxito.", "success");
+                showMessage("Paciente registrado con éxito.", "success");
                 modal.style.display = "none";
     
             } catch (error) {
                 console.error("Error en la solicitud:", error);
-                mostrarMensaje("" + error.message, "error");
+                showMessage("" + error.message, "error");
             }
         }
     });
@@ -662,7 +665,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             if (!response.ok) throw new Error("❌ Error al reactivar paciente.");
             await response.json();
 
-            mostrarMensaje("Paciente reactivado exitosamente.", "success");
+            showMessage("Paciente reactivado exitosamente.", "success");
 
             // Recargar listas
             await cargarPacientesActivos();
