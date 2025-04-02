@@ -19,7 +19,6 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     // 📌 Función para mostrar mensajes de éxito o error
     function showMessage(text, type = "success") {
-        // 🔧 Crear el contenedor si no existe
         let container = document.getElementById("message-container");
         if (!container) {
             container = document.createElement("div");
@@ -27,9 +26,8 @@ document.addEventListener('DOMContentLoaded', async function () {
             document.body.appendChild(container);
         }
     
-        // 🧊 Crear el mensaje
         const message = document.createElement("div");
-        message.className = `message ${type}`;
+        message.className = `alert-message ${type}`;
     
         const icon = {
             success: "✅",
@@ -38,13 +36,13 @@ document.addEventListener('DOMContentLoaded', async function () {
         }[type] || "";
     
         message.innerHTML = `<span class="message-icon">${icon}</span> ${text}`;
-    
         container.appendChild(message);
     
         setTimeout(() => {
             message.remove();
         }, 3000);
     }
+    
 
     // 🧠 Crear chat si no existe
     if (!chatId) {
