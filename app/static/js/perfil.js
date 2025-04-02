@@ -18,9 +18,9 @@ document.addEventListener("DOMContentLoaded", async function () {
         message.className = `message ${type}`;
     
         const icon = {
-            success: "✅",
-            error: "❌",
-            warning: "⚠️"
+            success: "",
+            error: "",
+            warning: ""
         }[type] || "";
     
         message.innerHTML = `<span class="message-icon">${icon}</span> ${text}`;
@@ -47,7 +47,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
 
     function showSessionExpiredMessage() {
-        showMessage("⚠️ Tu sesión ha expirado. Serás redirigido a la página principal.", "warning");
+        showMessage("Tu sesión ha expirado. Serás redirigido a la página principal.", "warning");
     
         setTimeout(() => {
             localStorage.clear();

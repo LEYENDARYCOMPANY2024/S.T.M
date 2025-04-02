@@ -407,33 +407,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Cookie consent banner
-    const cookieBanner = document.getElementById('cookie-banner');
-    const acceptCookiesButton = document.getElementById('accept-cookies');
-    const declineCookiesButton = document.getElementById('decline-cookies');
-    
-    if (cookieBanner && acceptCookiesButton && declineCookiesButton) {
-        // Check if user has already made a choice
-        const cookieChoice = localStorage.getItem('cookieChoice');
-        
-        if (!cookieChoice) {
-            // Show the banner if no choice has been made
-            cookieBanner.classList.add('active');
-        }
-        
-        acceptCookiesButton.addEventListener('click', function() {
-            localStorage.setItem('cookieChoice', 'accepted');
-            cookieBanner.classList.remove('active');
-            // Here you would enable any cookie-dependent features
-        });
-        
-        declineCookiesButton.addEventListener('click', function() {
-            localStorage.setItem('cookieChoice', 'declined');
-            cookieBanner.classList.remove('active');
-            // Here you would ensure cookies are not used
-        });
-    }
-
     // Animated elements on scroll
     function revealOnScroll() {
         const sections = document.querySelectorAll('.section');

@@ -1,4 +1,33 @@
 $(document).ready(function () {
+
+    // 📌 Función para mostrar mensajes de éxito o error
+    function showMessage(text, type = "success") {
+        // 🔧 Crear el contenedor si no existe
+        let container = document.getElementById("message-container");
+        if (!container) {
+            container = document.createElement("div");
+            container.id = "message-container";
+            document.body.appendChild(container);
+        }
+    
+        // 🧊 Crear el mensaje
+        const message = document.createElement("div");
+        message.className = `message ${type}`;
+    
+        const icon = {
+            success: "",
+            error: "",
+            warning: ""
+        }[type] || "";
+    
+        message.innerHTML = `<span class="message-icon">${icon}</span> ${text}`;
+    
+        container.appendChild(message);
+    
+        setTimeout(() => {
+            message.remove();
+        }, 3000);
+    }
     // Verificar si jQuery se cargó correctamente
     if (typeof jQuery === "undefined") {
         console.error("jQuery no se ha cargado correctamente.");
@@ -53,7 +82,7 @@ $(document).ready(function () {
             console.log("📌 Token guardado correctamente:", data.token);
             window.location.replace("/principal");
         } catch (error) {
-            alert(error.message);
+            showMessage(error.message, "error");
         }
     });
 });

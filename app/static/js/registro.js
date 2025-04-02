@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const strengthText = document.getElementById("strengthText");
     const registerForm = document.getElementById("registerForm");
     const registerButton = document.getElementById("registerButton");
-    registerButton.disabled = true; // Asegura que esté deshabilitado al inicio
+    registerButton.disabled = true;
     const termsCheckbox = document.getElementById("termsCheckbox");
     const termsError = document.getElementById("termsError");
     const modal = document.getElementById("termsModal");
@@ -16,6 +16,28 @@ document.addEventListener('DOMContentLoaded', function () {
     // Reiniciar barra de seguridad al cargar
     strengthIndicator.style.width = "0%";
     strengthText.innerText = "Seguridad: Ninguna";
+
+    // ✅ Mensajes unificados
+    function showMessage(text, type = "success") {
+        let container = document.getElementById("message-container");
+        if (!container) {
+            container = document.createElement("div");
+            container.id = "message-container";
+            document.body.appendChild(container);
+        }
+
+        const message = document.createElement("div");
+        message.className = `message ${type}`;
+        const icon = {
+            success: "",
+            error: "",
+            warning: ""
+        }[type] || "";
+
+        message.innerHTML = `<span class="message-icon">${icon}</span> ${text}`;
+        container.appendChild(message);
+        setTimeout(() => message.remove(), 3000);
+    }
 
     // Mostrar/ocultar contraseña
     if (togglePassword) {
@@ -31,16 +53,13 @@ document.addEventListener('DOMContentLoaded', function () {
     passwordInput.addEventListener("input", function () {
         const password = passwordInput.value;
         const strength = checkPasswordStrength(password);
-
         strengthIndicator.style.width = strength.percentage;
         strengthIndicator.style.backgroundColor = strength.color;
         strengthText.innerText = "Seguridad: " + strength.text;
     });
 
     function checkPasswordStrength(password) {
-        if (password.length === 0) {
-            return { text: "Ninguna", color: "transparent", percentage: "0%" };
-        }
+        if (password.length === 0) return { text: "Ninguna", color: "transparent", percentage: "0%" };
         let strength = 0;
         if (password.length >= 8) strength += 1;
         if (password.match(/[A-Z]/)) strength += 1;
@@ -63,38 +82,25 @@ document.addEventListener('DOMContentLoaded', function () {
         modal.style.display = 'block';
     });
 
-    // Cerrar modal con botón X
-    closeButton.addEventListener('click', function () {
-        modal.style.display = 'none';
+    // Cerrar modal
+    closeButton.addEventListener('click', () => modal.style.display = 'none');
+    window.addEventListener('click', e => {
+        if (e.target === modal) modal.style.display = 'none';
     });
 
-    // Cerrar modal si se hace clic fuera del contenido
-    window.addEventListener('click', function (event) {
-        if (event.target === modal) {
-            modal.style.display = 'none';
-        }
-    });
-
-    // Habilitar botón de registro al marcar el checkbox
+    // Habilitar botón si acepta términos
     termsCheckbox.addEventListener('change', function () {
         registerButton.disabled = !this.checked;
-        if (this.checked) {
-            termsError.style.display = "none";
-        }
+        if (this.checked) termsError.style.display = "none";
     });
 
-    // Validación extra antes de enviar
+    // Envío del formulario
     registerForm.addEventListener('submit', async function (event) {
         event.preventDefault();
-
-        const alert = document.getElementById('successAlert');
         const formData = new FormData(this);
 
         if (!termsCheckbox.checked) {
-            termsError.style.display = "block";
-            setTimeout(() => {
-                termsError.style.display = "none";
-            }, 3000);
+            showMessage("Debes aceptar los términos y condiciones.", "warning");
             return;
         }
 
@@ -107,30 +113,35 @@ document.addEventListener('DOMContentLoaded', function () {
             const result = await response.json();
 
             if (!response.ok) {
-                throw new Error(result.detail || "Error al registrar");
+                throw new Error(result.detail || "Error al registrar. Intenta nuevamente.");
             }
 
-            alert.textContent = result.message;
-            alert.classList.add('show');
+            showMessage(result.message, "success");
 
             setTimeout(() => {
-                alert.classList.remove('show');
                 window.location.href = "/login";
             }, 3000);
 
             this.reset();
-
-            // Reiniciar barra de seguridad
             strengthIndicator.style.width = "0%";
             strengthText.innerText = "Seguridad: Ninguna";
             registerButton.disabled = true;
 
         } catch (error) {
-            alert.textContent = "❌ Error al registrar: " + error.message;
-            alert.classList.add('show');
-            setTimeout(() => {
-                alert.classList.remove('show');
-            }, 3000);
+            let message = "Ocurrió un error al registrar.";
+
+            if (error instanceof Error) {
+                const msg = error.message.toLowerCase();
+                if (msg.includes("networkerror") || msg.includes("failed to fetch")) {
+                    message = "No se pudo conectar con el servidor. Revisa tu conexión.";
+                } else if (msg.includes("correo ya registrado")) {
+                    message = "Este correo ya está registrado.";
+                } else {
+                    message = error.message;
+                }
+            }
+
+            showMessage(message, "error");
         }
     });
 });
