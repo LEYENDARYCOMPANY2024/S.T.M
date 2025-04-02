@@ -3,7 +3,10 @@ const supabase = window.supabase.createClient(
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh4am16aWpoY21oZmNyamNwdGdlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDAwODMxODgsImV4cCI6MjA1NTY1OTE4OH0.fZ1QaYkFTfJTdupOUkV7V9a7kIIVHCt_XusnNWxkyqw'
   );
 
+  import { verificarSesionYRedirigir } from "./verificar_sesion.js";
+
 document.addEventListener('DOMContentLoaded', async function () {
+    if (!verificarSesionYRedirigir()) return; // ⛔ Si no hay sesión, no continúa
     const messagesContainer = document.getElementById('messagesContainer');
     const messageInput = document.getElementById('messageInput');
     const sendButton = document.getElementById('sendButton');
@@ -14,10 +17,33 @@ document.addEventListener('DOMContentLoaded', async function () {
     const pacienteId = localStorage.getItem("id_paciente");
     let chatId = localStorage.getItem("chat_id");
 
-    if (!idTerapeuta || !pacienteId) {
-        console.error("❌ Faltan id_terapeuta o id_paciente en localStorage.");
-        mostrarMensajeSistema("No se pudo iniciar el chat. Selecciona un paciente primero.");
-        return;
+    // 📌 Función para mostrar mensajes de éxito o error
+    function showMessage(text, type = "success") {
+        // 🔧 Crear el contenedor si no existe
+        let container = document.getElementById("message-container");
+        if (!container) {
+            container = document.createElement("div");
+            container.id = "message-container";
+            document.body.appendChild(container);
+        }
+    
+        // 🧊 Crear el mensaje
+        const message = document.createElement("div");
+        message.className = `message ${type}`;
+    
+        const icon = {
+            success: "✅",
+            error: "❌",
+            warning: "⚠️"
+        }[type] || "";
+    
+        message.innerHTML = `<span class="message-icon">${icon}</span> ${text}`;
+    
+        container.appendChild(message);
+    
+        setTimeout(() => {
+            message.remove();
+        }, 3000);
     }
 
     // 🧠 Crear chat si no existe
@@ -36,7 +62,7 @@ document.addEventListener('DOMContentLoaded', async function () {
             console.log("✅ Chat creado:", chatId);
         } catch (err) {
             console.error("❌ Error creando chat:", err);
-            mostrarMensajeSistema("No se pudo crear el chat.");
+            showMessage("No se pudo crear el chat.", "error");
             return;
         }
     }
@@ -109,13 +135,13 @@ document.addEventListener('DOMContentLoaded', async function () {
 
         socket.onclose = () => {
             sendButton.disabled = true;
-            mostrarMensajeSistema("Conexión cerrada. Reconectando...");
+            showMessage("Conexión cerrada. Reconectando...", "warning");
             setTimeout(() => location.reload(), 3000);
         };
 
         socket.onerror = (error) => {
             console.error('❌ Error WebSocket:', error.message);
-            mostrarMensajeSistema("Error de conexión. Esperando reconexión...");
+            showMessage("Error de conexión. Esperando reconexión...", "error");
         };
     }
 
@@ -214,7 +240,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                             mensajeDiv.remove();
                             overlay.remove();
                         } else {
-                            alert("No se pudo eliminar el mensaje.");
+                            showMessage("No se pudo eliminar el mensaje.", "error");
                             overlay.remove();
                         }
                     } catch (err) {
@@ -230,12 +256,6 @@ document.addEventListener('DOMContentLoaded', async function () {
         // Agregar contenido al mensaje y a la vista
         mensajeDiv.appendChild(contenidoDiv);
         messagesContainer.appendChild(mensajeDiv);
-    }
-    
-    
-
-    function mostrarMensajeSistema(texto) {
-        agregarMensajeUI('sistema', texto);
     }
 
     function scrollAlFinal() {

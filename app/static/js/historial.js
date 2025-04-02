@@ -4,20 +4,32 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     if (!verificarSesionYRedirigir()) return; // ✅ aquí la usas
     // ──────────────────────────────────────────
-    //  Mensajes de retroalimentación
-    function mostrarMensaje(mensaje, tipo = "success") {
-        const alertBox = document.createElement("div");
-        alertBox.classList.add("alert", tipo === "success" ? "success" : "error");
-        alertBox.innerHTML = `
-            <span class="alert-icon">${tipo === "success" ? "✅" : "❌"}</span> 
-            ${mensaje}
-        `;
-        document.body.appendChild(alertBox);
-
-        setTimeout(() => alertBox.classList.add("show"), 100);
+    // 📌 Función para mostrar mensajes de éxito o error
+    function showMessage(text, type = "success") {
+        // 🔧 Crear el contenedor si no existe
+        let container = document.getElementById("message-container");
+        if (!container) {
+            container = document.createElement("div");
+            container.id = "message-container";
+            document.body.appendChild(container);
+        }
+    
+        // 🧊 Crear el mensaje
+        const message = document.createElement("div");
+        message.className = `message ${type}`;
+    
+        const icon = {
+            success: "✅",
+            error: "❌",
+            warning: "⚠️"
+        }[type] || "";
+    
+        message.innerHTML = `<span class="message-icon">${icon}</span> ${text}`;
+    
+        container.appendChild(message);
+    
         setTimeout(() => {
-            alertBox.classList.remove("show");
-            setTimeout(() => alertBox.remove(), 300);
+            message.remove();
         }, 3000);
     }
 
@@ -25,7 +37,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     //  Verificar id del paciente en localStorage
     const idPaciente = localStorage.getItem("id_paciente");
     if (!idPaciente) {
-        mostrarMensaje("No hay paciente seleccionado.", "error");
+        showMessage("No hay paciente seleccionado.", "error");
         window.location.href = "/principal";
         return;
     }
@@ -44,7 +56,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         try {
             const response = await fetch(`/historial/paciente/${idPaciente}`);
             if (!response.ok) {
-                mostrarMensaje("No se encontraron datos del paciente.", "error");
+                showMessage("No se encontraron datos del paciente.", "error");
                 return;
             }
             const pacienteData = await response.json();
@@ -62,7 +74,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             // Mostrar u ocultar sección de mujeres
             actualizarSeccionMujeres();
         } catch (error) {
-            mostrarMensaje("Error al cargar datos del paciente.", "error");
+            showMessage("Error al cargar datos del paciente.", "error");
             console.error("❌ Error al cargar datos del paciente:", error);
         }
     }
@@ -75,7 +87,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         try {
             const response = await fetch(`/historial/${idPaciente}`);
             if (!response.ok) {
-                mostrarMensaje("No se encontró historial para este paciente.", "error");
+                showMessage("No se encontró historial para este paciente.", "error");
                 return;
             }
             const data = await response.json();
@@ -102,7 +114,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             configurarCamposCondicionales();
 
         } catch (error) {
-            mostrarMensaje("Error al cargar historial clínico.", "error");
+            showMessage("Error al cargar historial clínico.", "error");
             console.error("❌ Error al cargar historial clínico:", error);
         }
     }
@@ -131,12 +143,12 @@ document.addEventListener("DOMContentLoaded", async function () {
             });
 
             if (!res.ok) {
-                mostrarMensaje("Error al guardar los datos del paciente.", "error");
+                showMessage("Error al guardar los datos del paciente.", "error");
                 return;
             }
-            mostrarMensaje("Datos del paciente guardados con éxito.");
+            showMessage("Datos del paciente guardados con éxito.", "success");
         } catch (error) {
-            mostrarMensaje("Error al guardar los datos del paciente.", "error");
+            showMessage("Error al guardar los datos del paciente.", "error");
             console.error("❌ Error al guardar los datos del paciente:", error);
         }
     }
@@ -209,12 +221,12 @@ document.addEventListener("DOMContentLoaded", async function () {
             });
 
             if (!res.ok) {
-                mostrarMensaje("Error al guardar el historial clínico.", "error");
+                showMessage("Error al guardar el historial clínico.", "error");
                 return;
             }
-            mostrarMensaje("Historial clínico guardado con éxito.");
+            showMessage("Historial clínico guardado con éxito.", "success");
         } catch (error) {
-            mostrarMensaje("Error al guardar historial clínico.", "error");
+            showMessage("Error al guardar historial clínico.", "error");
             console.error("❌ Error al guardar historial clínico:", error);
         }
     }

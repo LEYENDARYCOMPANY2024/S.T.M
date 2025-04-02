@@ -9,29 +9,39 @@ document.addEventListener("DOMContentLoaded", () => {
     let contadorPorTerapeuta = {}; // 🔥 Mantendrá el conteo aunque cambie de página
 
     // 📌 Función para mostrar mensajes de éxito o error
-    function mostrarMensaje(mensaje, tipo = "success") {
-        const alertBox = document.createElement("div");
-        alertBox.classList.add("alert", tipo === "success" ? "success" : "error");
-        alertBox.innerHTML = `
-            <span class="alert-icon">${tipo === "success" ? "✅" : "❌"}</span> 
-            ${mensaje}
-        `;
-        document.body.appendChild(alertBox);
-
+    function showMessage(text, type = "success") {
+        // 🔧 Crear el contenedor si no existe
+        let container = document.getElementById("message-container");
+        if (!container) {
+            container = document.createElement("div");
+            container.id = "message-container";
+            document.body.appendChild(container);
+        }
+    
+        // 🧊 Crear el mensaje
+        const message = document.createElement("div");
+        message.className = `message ${type}`;
+    
+        const icon = {
+            success: "✅",
+            error: "❌",
+            warning: "⚠️"
+        }[type] || "";
+    
+        message.innerHTML = `<span class="message-icon">${icon}</span> ${text}`;
+    
+        container.appendChild(message);
+    
         setTimeout(() => {
-            alertBox.classList.add("show");
-        }, 100);
-
-        setTimeout(() => {
-            alertBox.classList.remove("show");
-            setTimeout(() => alertBox.remove(), 300);
+            message.remove();
         }, 3000);
     }
+    
 
     // 📌 Obtener ID del paciente desde localStorage
     const idPaciente = localStorage.getItem("id_paciente");
     if (!idPaciente) {
-        mostrarMensaje("No hay paciente seleccionado.", "error");
+        showMessage("No hay paciente seleccionado.", "error");
         window.location.href = "/principal";
         throw new Error("No hay paciente seleccionado.");
     }
@@ -43,7 +53,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (!idTerapeuta) {
                 console.error("❌ No se encontró id_terapeuta en localStorage.");
-                mostrarMensaje("Error: No se encontró el terapeuta actual.", "error");
+                showMessage("Error: No se encontró el terapeuta actual.", "error");
                 return;
             }
 
@@ -55,7 +65,7 @@ document.addEventListener("DOMContentLoaded", () => {
             renderSesionesPorTerapeuta(data.terapeutas);
             updatePagination(data.total_pages, page);
         } catch (error) {
-            mostrarMensaje("Error al obtener sesiones", "error");
+            showMessage("Error al obtener sesiones", "error");
             console.error(error);
         }
     }
@@ -307,7 +317,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const idTerapeuta = localStorage.getItem("id_terapeuta");
 
         if (!desc || !date || !time || !idTerapeuta) {
-            mostrarMensaje("Completa todos los campos.", "error");
+            showMessage("Completa todos los campos.", "warning");
             return;
         }
 
@@ -329,11 +339,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 throw new Error(`Error: ${errorData.detail}`);
             }
 
-            mostrarMensaje("Sesión creada exitosamente", "success");
+            showMessage("Sesión creada exitosamente", "success");
             // Refetch and render sessions to update the container
             fetchSesiones(currentPage);
         } catch (error) {
-            mostrarMensaje("Error al crear sesión: " + error.message, "error");
+            showMessage("Error al crear sesión: " + error.message, "error");
         }
     }
 

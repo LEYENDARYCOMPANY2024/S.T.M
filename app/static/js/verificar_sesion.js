@@ -24,14 +24,27 @@ export function verificarSesionYRedirigir() {
     }
 
     function mostrarYRedirigir(mensaje) {
-        const alerta = document.createElement("div");
-        alerta.className = "alert error show";
-        alerta.innerHTML = mensaje;
-        document.body.appendChild(alerta);
-
+        // Crear contenedor si no existe
+        let container = document.getElementById("message-container");
+        if (!container) {
+            container = document.createElement("div");
+            container.id = "message-container";
+            document.body.appendChild(container);
+        }
+    
+        // Crear el mensaje con el diseño de ejercicios
+        const message = document.createElement("div");
+        message.className = "message error";
+        message.textContent = mensaje;
+    
+        container.appendChild(message);
+    
+        // Esperar 3s para redirigir y limpiar sesión
         setTimeout(() => {
-            localStorage.clear();
+            message.remove(); // Quita el mensaje
+            localStorage.clear(); // Limpia token u otros datos
             window.location.href = "/";
         }, 3000);
     }
+    
 }

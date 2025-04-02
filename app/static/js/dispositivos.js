@@ -1,14 +1,42 @@
+
+import { verificarSesionYRedirigir } from "./verificar_sesion.js";
+
 document.addEventListener("DOMContentLoaded", async function () {
+
+    if (!verificarSesionYRedirigir()) return; // ⛔ Si no hay sesión, no continúa
     const deviceList = document.getElementById("device-list");
     const homeButton = document.querySelector(".home-button");
     const pacienteId = localStorage.getItem("id_paciente");
     const sesionId = localStorage.getItem("id_sesion");
     const terapeutaId = localStorage.getItem("id_terapeuta");
 
-    if (!pacienteId) {
-        alert("No hay paciente seleccionado.");
-        window.location.href = "/principal";
-        return;
+    // 📌 Función para mostrar mensajes de éxito o error
+    function showMessage(text, type = "success") {
+        // 🔧 Crear el contenedor si no existe
+        let container = document.getElementById("message-container");
+        if (!container) {
+            container = document.createElement("div");
+            container.id = "message-container";
+            document.body.appendChild(container);
+        }
+    
+        // 🧊 Crear el mensaje
+        const message = document.createElement("div");
+        message.className = `message ${type}`;
+    
+        const icon = {
+            success: "✅",
+            error: "❌",
+            warning: "⚠️"
+        }[type] || "";
+    
+        message.innerHTML = `<span class="message-icon">${icon}</span> ${text}`;
+    
+        container.appendChild(message);
+    
+        setTimeout(() => {
+            message.remove();
+        }, 3000);
     }
       
         if (homeButton) {
@@ -40,8 +68,6 @@ document.addEventListener("DOMContentLoaded", async function () {
       
             document.getElementById("confirmarInicio").onclick = async () => {
               overlay.remove();
-      
-              const sesionId = localStorage.getItem("id_sesion"); // ✅ mover aquí
       
               if (sesionId) {
                 try {
