@@ -38,12 +38,12 @@ class Terapeuta(Base):
     num_int = Column(String, nullable=True)
     foto_perfil = Column(LargeBinary, nullable=True)  # ✅ Imagen
     documento_cedula = Column(LargeBinary, nullable=True)   # ✅ PDF
-
     
+    pacientes_pivote = relationship("TerapeutaPaciente", back_populates="terapeuta", overlaps="pacientes")
     dispositivos = relationship("DispositivoIOT", back_populates="terapeuta")
 
     # 🔹 Relación con `Paciente` a través de `TerapeutaPaciente`
-    pacientes = relationship("Paciente", secondary="terapeuta_paciente", back_populates="terapeutas")  # ✅ Agregado
+    pacientes = relationship("Paciente", secondary="terapeuta_paciente", back_populates="terapeutas", overlaps="pacientes_pivote,terapeuta")
 
 # 📌 Modelo para respuesta (sin contraseña)
 class TerapeutaResponse(TerapeutaBase):
@@ -57,6 +57,11 @@ class TerapeutaPaciente(Base):
     id_terapeuta_paciente = Column(Integer, primary_key=True, autoincrement=True)
     id_terapeuta_tp_fk = Column(Integer, ForeignKey("terapeutas.id_terapeuta"), nullable=False)
     id_paciente_tp_fk = Column(Integer, ForeignKey("pacientes.id_paciente"), nullable=False)
+    
+    paciente = relationship("Paciente", back_populates="terapeutas_pivote", overlaps="terapeutas")
+    terapeuta = relationship("Terapeuta", back_populates="pacientes_pivote", overlaps="pacientes")
+
+
     
     historial_progreso = relationship("HistorialProgreso", back_populates="terapeuta_paciente")
 

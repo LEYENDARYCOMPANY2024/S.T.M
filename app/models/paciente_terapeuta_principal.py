@@ -22,6 +22,9 @@ class Paciente(Base):
 
 
 
-    terapeutas = relationship("Terapeuta", secondary="terapeuta_paciente", back_populates="pacientes")
+    terapeutas = relationship("Terapeuta", secondary="terapeuta_paciente", back_populates="pacientes", overlaps="terapeutas_pivote,paciente")
     historial_clinico = relationship("HistorialClinico", back_populates="paciente", uselist=False)
     sesiones = relationship("PacienteSesion", back_populates="paciente")  # ✅ Agregado
+    terapeutas_pivote = relationship("TerapeutaPaciente", back_populates="paciente", overlaps="terapeutas")
+
+

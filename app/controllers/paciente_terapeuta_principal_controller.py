@@ -115,7 +115,6 @@ def toggle_estado_paciente(
         return {"message": "Paciente en estado inactivo exitosamente"}
 
     elif action == "reactivate":
-        # ✅ Verificar si se ingresó un motivo
         if not motivo:
             raise ValueError("Es obligatorio proporcionar un motivo para la reactivación.")
 
@@ -124,8 +123,18 @@ def toggle_estado_paciente(
         db.refresh(paciente)
 
         if create_new_record:
-            nuevo_resumen = f"Reactivado: {motivo}"
+            # 🔒 Cerrar historial anterior (si existe)
+            ultimo_historial = db.query(HistorialProgreso).filter(
+                HistorialProgreso.id_terapeuta_paciente_fk == relacion.id_terapeuta_paciente,
+                HistorialProgreso.fecha_fin.is_(None)
+            ).order_by(HistorialProgreso.id_historial.desc()).first()
 
+            if ultimo_historial:
+                ultimo_historial.fecha_fin = date.today()
+                db.commit()
+
+            # 🆕 Crear nuevo historial
+            nuevo_resumen = f"Reactivado: {motivo}"
             nuevo_periodo = HistorialProgreso(
                 id_terapeuta_paciente_fk=relacion.id_terapeuta_paciente,
                 fecha_inicio=date.today(),

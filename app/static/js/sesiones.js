@@ -147,9 +147,18 @@ document.addEventListener("DOMContentLoaded", () => {
                 terapeutaSection.classList.add("mis-sesiones");
             }
 
+            const fechaInicio = terapeuta.fecha_inicio || "Sin dato";
+            const fechaFin = (terapeuta.id_terapeuta == idTerapeutaActual || !terapeuta.fecha_fin)
+                ? "Aún no finaliza"
+                : terapeuta.fecha_fin;
+
             const terapeutaTitle = document.createElement("h3");
-            terapeutaTitle.textContent = `Terapeuta: ${terapeuta.terapeuta}`;
+            terapeutaTitle.innerHTML = `
+                Terapeuta: ${terapeuta.terapeuta}<br>
+                <small>Desde: ${fechaInicio} &nbsp;&nbsp;&nbsp; Hasta: ${fechaFin}</small>
+            `;
             terapeutaSection.appendChild(terapeutaTitle);
+
 
             const sesionesContainer = document.createElement("div");
             sesionesContainer.classList.add("terapeuta-sessions");
