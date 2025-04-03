@@ -1,7 +1,6 @@
-from sqlalchemy import Column, Integer, String, Date, ForeignKey, Boolean, DateTime
+from sqlalchemy import Column, Integer, String, Date, ForeignKey, Boolean
 from sqlalchemy.orm import relationship
 from database import Base
-from sqlalchemy.sql import func
 
 class DispositivoIOT(Base):
     __tablename__ = "dispositivos_iot"
@@ -36,13 +35,3 @@ class SesionDispositivo(Base):
 
     graficas = relationship("GraficaDispositivo", back_populates="sesion_dispositivo")
     paciente_dispositivo = relationship("PacienteDispositivo")
-
-class ConfiguracionDispositivo(Base):
-    __tablename__ = "configuracion_dispositivo"
-
-    id_config = Column(Integer, primary_key=True, index=True)
-    uuid = Column(String, index=True, unique=True)
-    id_paciente = Column(Integer)
-    id_sesion_dispositivo = Column(Integer)
-    lado_pierna = Column(String)
-    timestamp = Column(DateTime(timezone=True), server_default=func.now())
