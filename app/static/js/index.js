@@ -635,3 +635,14 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+
+document.querySelectorAll('.faq-header').forEach(button => {
+    button.addEventListener('click', function() {
+        const content = this.nextElementSibling;
+        content.classList.toggle('active');
+        
+        // Cambiar el signo +/-
+        this.querySelector('.faq-icon').textContent = content.classList.contains('active') ? "−" : "+";
+    });
+});
