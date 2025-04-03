@@ -240,23 +240,35 @@ def obtener_paciente_activo(uuid: str, db: Session = Depends(get_db)):
     }
 
 
+
 @router.post("/esp/configurar_paciente")
-def configurar_paciente_route(payload: dict = Body(...)):
-    """
-    Endpoint para que el front o el ESP configuren un paciente
-    en un dispositivo dado (por uuid, id_sesion_dispositivo, etc.).
-    """
+def configurar_paciente_route(payload: dict = Body(...), db: Session = Depends(get_db)):
     uuid = payload.get("uuid")
     id_paciente = payload.get("id_paciente")
     id_sesion_dispositivo = payload.get("id_sesion_dispositivo")
-    lado_pierna = payload.get("lado_pierna")  # opcional
+    lado_pierna = payload.get("lado_pierna")
 
-    # Validación simple
     if not uuid or not isinstance(id_paciente, int) or not isinstance(id_sesion_dispositivo, int):
         raise HTTPException(status_code=400, detail="Faltan datos o tipos de datos inválidos")
 
-    print(f"✅ Configuración recibida: uuid={uuid}, id_paciente={id_paciente}, "
-          f"id_sesion_dispositivo={id_sesion_dispositivo}, lado_pierna={lado_pierna}")
+    # Guardar configuración
+    from models.dispositivos_models import ConfiguracionDispositivo
+
+    existente = db.query(ConfiguracionDispositivo).filter(ConfiguracionDispositivo.uuid == uuid).first()
+    if existente:
+        existente.id_paciente = id_paciente
+        existente.id_sesion_dispositivo = id_sesion_dispositivo
+        existente.lado_pierna = lado_pierna
+    else:
+        nueva = ConfiguracionDispositivo(
+            uuid=uuid,
+            id_paciente=id_paciente,
+            id_sesion_dispositivo=id_sesion_dispositivo,
+            lado_pierna=lado_pierna
+        )
+        db.add(nueva)
+
+    db.commit()
 
     return {
         "mensaje": "Configuración enviada correctamente",
@@ -265,6 +277,7 @@ def configurar_paciente_route(payload: dict = Body(...)):
         "id_sesion_dispositivo": id_sesion_dispositivo,
         "lado_pierna": lado_pierna
     }
+
 
 @router.get("/esp/id_paciente_por_uuid/{uuid}")
 def obtener_info_por_uuid(uuid: str, db: Session = Depends(get_db)):
@@ -309,5 +322,19 @@ def obtener_info_por_uuid(uuid: str, db: Session = Depends(get_db)):
 
 
 
+
+@router.get("/dispositivos/configuracion_actual/{uuid}")
+def obtener_configuracion_dispositivo(uuid: str, db: Session = Depends(get_db)):
+    from models.dispositivos_models import ConfiguracionDispositivo
+
+    config = db.query(ConfiguracionDispositivo).filter(ConfiguracionDispositivo.uuid == uuid).first()
+    if not config:
+        raise HTTPException(status_code=404, detail="Configuración no encontrada para este UUID")
+
+    return {
+        "id_paciente": config.id_paciente,
+        "id_sesion_dispositivo": config.id_sesion_dispositivo,
+        "lado_pierna": config.lado_pierna
+    }
 
 
