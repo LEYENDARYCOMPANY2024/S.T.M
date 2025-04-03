@@ -41,26 +41,25 @@ def actualizar_permiso_envio(uuid: str, permiso: PermisoEnvio, db: Session = Dep
 
 @router.get("/dispositivos/estado/{uuid}")
 def obtener_estado_dispositivo_route(uuid: str, db: Session = Depends(get_db)):
-    """
-    Retorna el estado (activo/desactivado) de un dispositivo basado en su UUID.
-    """
     dispositivo = db.query(DispositivoIOT).filter(DispositivoIOT.uuid == uuid).first()
     if not dispositivo:
         raise HTTPException(status_code=404, detail="Dispositivo no registrado")
 
-    paciente_dispositivo = db.query(PacienteDispositivo).filter(
+    # 🔁 Buscar todas las relaciones de este dispositivo
+    relaciones_pd = db.query(PacienteDispositivo).filter(
         PacienteDispositivo.id_dispositivo_pd_fk == dispositivo.id_dispositivo
-    ).first()
+    ).all()
 
-    if not paciente_dispositivo:
-        return {"estado": "desactivado"}
+    for rel in relaciones_pd:
+        sesion = db.query(SesionDispositivo).filter(
+            SesionDispositivo.id_dispositivo_pd_fk == rel.id_paciente_dispositivo,
+            SesionDispositivo.estado_activado == "activado"
+        ).first()
+        if sesion:
+            return {"estado": "activo"}
 
-    sesion_activa = db.query(SesionDispositivo).filter(
-        SesionDispositivo.id_dispositivo_pd_fk == paciente_dispositivo.id_paciente_dispositivo,
-        SesionDispositivo.estado_activado == "activado"
-    ).first()
+    return {"estado": "desactivado"}
 
-    return {"estado": "activo" if sesion_activa else "desactivado"}
 
 
 @router.get("/dispositivos/{paciente_id}/{terapeuta_id}", response_model=list[DispositivoResponse])
