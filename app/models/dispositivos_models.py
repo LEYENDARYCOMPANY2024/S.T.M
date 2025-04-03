@@ -23,8 +23,9 @@ class PacienteDispositivo(Base):
     id_paciente_pd_fk = Column(Integer, ForeignKey("pacientes.id_paciente"), nullable=False)
     id_dispositivo_pd_fk = Column(Integer, ForeignKey("dispositivos_iot.id_dispositivo"), nullable=False)
 
-    dispositivo = relationship("DispositivoIOT")
-    paciente = relationship("Paciente")
+    dispositivo = relationship("DispositivoIOT", back_populates="paciente_dispositivos")
+    paciente = relationship("Paciente", back_populates="paciente_dispositivos")
+
 
 class SesionDispositivo(Base):
     __tablename__ = "sesion_dispositivo"
