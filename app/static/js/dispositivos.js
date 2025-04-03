@@ -140,7 +140,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     function addDeviceRow(device) {
         const row = document.createElement("tr");
         const disabledAttr = sesionId ? "" : "disabled";
-
+    
         row.innerHTML = `
             <td>${device.nombre_dispositivo}</td>
             <td>${new Date(device.fecha_registro).toLocaleDateString()}</td>
@@ -156,59 +156,83 @@ document.addEventListener("DOMContentLoaded", async function () {
                 </label>
             </td>
         `;
-
+    
         row.querySelector("input[type='checkbox']").addEventListener("change", async function () {
             if (!sesionId) {
                 alert("Debe iniciar una sesión para activar dispositivos.");
                 this.checked = false;
                 return;
             }
-
+    
             const deviceId = this.getAttribute("data-id");
             const uuidAttr = this.getAttribute("data-uuid");
-
+    
             try {
                 const response = await fetch(`/dispositivos/${pacienteId}/${sesionId}/${deviceId}/toggle`, {
                     method: "PUT"
                 });
-
+    
                 if (!response.ok) throw new Error("No se pudo cambiar el estado del dispositivo.");
-
+    
                 const result = await response.json();
                 const uuid = result.uuid || uuidAttr;
-
-                
-
+    
                 if (result.estado === "activado") {
-                    // Guardar sesión_dispositivo_id
+                    // ✅ Guardar ID de sesión_dispositivo
                     let ids = JSON.parse(localStorage.getItem("sesion_dispositivo_ids")) || [];
                     if (!ids.includes(result.sesion_dispositivo_id)) {
                         ids.push(result.sesion_dispositivo_id);
                         localStorage.setItem("sesion_dispositivo_ids", JSON.stringify(ids));
                     }
-                
-                    // También guardamos el lado si existe
-                    const lado = localStorage.getItem(`lado_pierna_${result.sesion_dispositivo_id}`) || "";
+    
+                    // ✅ Lógica para asignar lado automáticamente
+                    const ladoKey = `lado_pierna_${result.sesion_dispositivo_id}`;
+                    let lado = localStorage.getItem(ladoKey);
+    
+                    if (!lado) {
+                        const todosLados = Object.keys(localStorage)
+                            .filter(k => k.startsWith("lado_pierna_"))
+                            .map(k => localStorage.getItem(k));
+    
+                        if (!todosLados.includes("izquierda")) {
+                            lado = "izquierda";
+                        } else if (!todosLados.includes("derecha")) {
+                            lado = "derecha";
+                        } else {
+                            lado = "izquierda"; // por defecto si ambos están ocupados
+                        }
+    
+                        localStorage.setItem(ladoKey, lado);
+                    }
+    
+                    // ✅ Guardar lado en backend
+                    await fetch(`/dispositivos/lado_pierna/${result.sesion_dispositivo_id}`, {
+                        method: "PUT",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ lado })
+                    });
+    
+                    // ✅ Enviar al ESP
                     if (uuid) {
                         await enviarDatosAlESP(uuid, parseInt(pacienteId), result.sesion_dispositivo_id, lado);
                     }
-                }                
-                 else {
+                } else {
+                    // 🔻 Si se desactiva, quitar de localStorage
                     let ids = JSON.parse(localStorage.getItem("sesion_dispositivo_ids")) || [];
                     ids = ids.filter(id => id !== result.sesion_dispositivo_id);
                     localStorage.setItem("sesion_dispositivo_ids", JSON.stringify(ids));
                 }
-
+    
                 console.log(`Estado actualizado: ${result.estado}`);
                 fetchDevices();
-
+    
             } catch (error) {
                 console.error("Error al cambiar estado del dispositivo:", error.message);
             }
         });
-
+    
         deviceList.appendChild(row);
-    }
+    }    
 
     fetchDevices();
 });
