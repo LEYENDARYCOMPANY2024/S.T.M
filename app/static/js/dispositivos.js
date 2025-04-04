@@ -186,24 +186,32 @@ document.addEventListener("DOMContentLoaded", async function () {
                     }
     
                     // ✅ Lógica para asignar lado automáticamente
+                    // ✅ Asignación automática del lado
                     const ladoKey = `lado_pierna_${result.sesion_dispositivo_id}`;
                     let lado = localStorage.getItem(ladoKey);
-    
+
                     if (!lado) {
-                        const todosLados = Object.keys(localStorage)
-                            .filter(k => k.startsWith("lado_pierna_"))
-                            .map(k => localStorage.getItem(k));
-    
-                        if (!todosLados.includes("izquierda")) {
-                            lado = "izquierda";
-                        } else if (!todosLados.includes("derecha")) {
-                            lado = "derecha";
-                        } else {
-                            lado = "izquierda"; // por defecto si ambos están ocupados
-                        }
-    
-                        localStorage.setItem(ladoKey, lado);
+                    // Verifica si ya hay un lado ocupado globalmente
+                    const ladosAsignados = Object.keys(localStorage)
+                        .filter(k => k.startsWith("lado_pierna_"))
+                        .map(k => localStorage.getItem(k));
+
+                    if (!ladosAsignados.includes("izquierda")) {
+                        lado = "izquierda";
+                    } else if (!ladosAsignados.includes("derecha")) {
+                        lado = "derecha";
+                    } else {
+                        // Si ambos están usados, asigna al que tenga menos sesiones
+                        const conteo = {
+                        izquierda: ladosAsignados.filter(l => l === "izquierda").length,
+                        derecha: ladosAsignados.filter(l => l === "derecha").length
+                        };
+                        lado = conteo.izquierda <= conteo.derecha ? "izquierda" : "derecha";
                     }
+
+                    localStorage.setItem(ladoKey, lado);
+                    }
+
     
                     // ✅ Guardar lado en backend
                     await fetch(`/dispositivos/lado_pierna/${result.sesion_dispositivo_id}`, {
