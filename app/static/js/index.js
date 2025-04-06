@@ -407,6 +407,33 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // Cookie consent banner
+    const cookieBanner = document.getElementById('cookie-banner');
+    const acceptCookiesButton = document.getElementById('accept-cookies');
+    const declineCookiesButton = document.getElementById('decline-cookies');
+    
+    if (cookieBanner && acceptCookiesButton && declineCookiesButton) {
+        // Check if user has already made a choice
+        const cookieChoice = localStorage.getItem('cookieChoice');
+        
+        if (!cookieChoice) {
+            // Show the banner if no choice has been made
+            cookieBanner.classList.add('active');
+        }
+        
+        acceptCookiesButton.addEventListener('click', function() {
+            localStorage.setItem('cookieChoice', 'accepted');
+            cookieBanner.classList.remove('active');
+            // Here you would enable any cookie-dependent features
+        });
+        
+        declineCookiesButton.addEventListener('click', function() {
+            localStorage.setItem('cookieChoice', 'declined');
+            cookieBanner.classList.remove('active');
+            // Here you would ensure cookies are not used
+        });
+    }
+
     // Animated elements on scroll
     function revealOnScroll() {
         const sections = document.querySelectorAll('.section');
@@ -607,4 +634,15 @@ document.addEventListener('DOMContentLoaded', function() {
             window.location.href = "/login"; // Redirige a la página de login
         });
     }
+});
+
+
+document.querySelectorAll('.faq-header').forEach(button => {
+    button.addEventListener('click', function() {
+        const content = this.nextElementSibling;
+        content.classList.toggle('active');
+        
+        // Cambiar el signo +/-
+        this.querySelector('.faq-icon').textContent = content.classList.contains('active') ? "−" : "+";
+    });
 });

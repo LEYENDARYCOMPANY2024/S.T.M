@@ -321,8 +321,8 @@ body {
 }
 
 .day {
-    background: linear-gradient(135deg, #74ebd5, #ACB6E5);
-    color: #000;
+    background: #08232b;
+    color: white;
     transition: 0.3s;
     cursor: pointer;
 }
@@ -334,8 +334,7 @@ body {
 
 .header {
     background: var(--accent-purple);
-    background: linear-gradient(135deg, #00c6ff, #0072ff);
-
+    background: #08232b;
     padding: 3px;
     border-radius: 10px;
     margin: 4px;

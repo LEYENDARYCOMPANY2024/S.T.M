@@ -322,6 +322,98 @@ body {
     box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
 }
 
+/* Estilos generales para la sección FAQ */
+.faq-section {
+    background: transparent;
+    border-radius: 12px;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.25);
+    padding: 25px;
+    margin: 20px auto;
+    width: 90%;
+    max-width: 900px;
+    backdrop-filter: blur(5px); /* Efecto de desenfoque */
+}
+
+/* Título de la sección */
+.faq-container h2 {
+    font-size: 26px;
+    font-weight: bold;
+    color: #fff;
+    text-align: center;
+    margin-bottom: 15px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Contenedor del acordeón */
+.faq-accordion {
+    padding: 10px;
+    border-radius: 8px;
+}
+
+/* Ítems del acordeón */
+.faq-item {
+    margin-bottom: 10px;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+/* Botón del acordeón */
+.faq-header {
+    background: #4a6368; /* Azul oscuro elegante */
+    color: white;
+    font-size: 17px;
+    font-weight: bold;
+    padding: 14px;
+    width: 100%;
+    text-align: left;
+    border: none;
+    cursor: pointer;
+    border-radius: 6px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+
+/* Cambio de color y efecto al pasar el cursor */
+.faq-header:hover {
+    background: #5a767c;
+    transform: scale(1.02);
+}
+
+/* Contenido del acordeón */
+.faq-content {
+    background: #3e5155; /* Azul grisáceo */
+    color: white;
+    padding: 12px;
+    border-radius: 6px;
+    margin-top: 5px;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out, max-height 0.3s ease-in-out;
+    max-height: 0;
+    overflow: hidden;
+}
+
+/* Ícono de expansión */
+.faq-icon {
+    font-weight: bold;
+    font-size: 20px;
+    transition: transform 0.3s ease;
+}
+
+/* Cuando el contenido está activo */
+.faq-content.active {
+    display: block;
+    opacity: 1;
+    max-height: 500px; /* Altura suficiente para mostrar el contenido */
+}
+
+/* Rotación del ícono cuando se expande */
+.faq-header.active .faq-icon {
+    transform: rotate(180deg);
+}
+
 /* SECCIONES GENERALES */
 .section {
     padding: 5rem 0;
@@ -1159,22 +1251,31 @@ footer {
 .app-download {
     text-align: center;
     background: #041115;
-    padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    padding: 40px; /* Aumenta el padding para hacerlo más grande */
+    border-radius: 15px;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
     color: white;
-    max-width: 400px;
-    margin: 20px auto;
+    max-width: 600px; /* Aumenta el ancho máximo */
+    margin: 30px auto;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Efecto hover para dar sensación de profundidad */
+.app-download:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
 }
 
 .app-download h3 {
-    margin-bottom: 10px;
-    font-size: 1.5em;
+    margin-bottom: 15px;
+    font-size: 2em; /* Tamaño más grande */
+    font-weight: bold;
 }
 
 .app-download p {
-    font-size: 1em;
-    margin-bottom: 15px;
+    font-size: 1.2em; /* Aumenta el tamaño del texto */
+    margin-bottom: 20px;
+    line-height: 1.5;
 }
 
 .download-button {

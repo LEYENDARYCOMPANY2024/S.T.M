@@ -167,40 +167,41 @@
             </div>
         </section>
 
-        <section id="faq" class="section">
-            <div class="section-container">
-                <h2><span class="section-icon" aria-hidden="true">❓</span> Preguntas Frecuentes</h2>
-                <div class="accordion">
-                    <div class="accordion-item">
-                        <button class="accordion-header" aria-expanded="false">
+        <section id="faq" class="faq-section">
+            <div class="faq-container">
+                <h2><span class="faq-icon" aria-hidden="true">❓</span> Preguntas Frecuentes</h2>
+                <div class="faq-accordion">
+                    <div class="faq-item">
+                        <button class="faq-header" aria-expanded="false">
                             ¿Cómo puedo integrar este sistema en mi clínica?
-                            <span class="accordion-icon">+</span>
+                            <span class="faq-icon">+</span>
                         </button>
-                        <div class="accordion-content">
+                        <div class="faq-content">
                             <p>Nuestro equipo técnico se encarga de la instalación y configuración completa del sistema en su clínica. Además, proporcionamos capacitación para su personal sobre el uso efectivo de la plataforma.</p>
                         </div>
                     </div>
-                    <div class="accordion-item">
-                        <button class="accordion-header" aria-expanded="false">
+                    <div class="faq-item">
+                        <button class="faq-header" aria-expanded="false">
                             ¿Qué tipo de pacientes pueden beneficiarse?
-                            <span class="accordion-icon">+</span>
+                            <span class="faq-icon">+</span>
                         </button>
-                        <div class="accordion-content">
+                        <div class="faq-content">
                             <p>El sistema está diseñado para pacientes con diversos trastornos de la marcha, incluyendo aquellos relacionados con accidentes cerebrovasculares, parálisis cerebral, lesiones medulares, enfermedades neurodegenerativas y lesiones ortopédicas.</p>
                         </div>
                     </div>
-                    <div class="accordion-item">
-                        <button class="accordion-header" aria-expanded="false">
+                    <div class="faq-item">
+                        <button class="faq-header" aria-expanded="false">
                             ¿Es seguro para todos los pacientes?
-                            <span class="accordion-icon">+</span>
+                            <span class="faq-icon">+</span>
                         </button>
-                        <div class="accordion-content">
+                        <div class="faq-content">
                             <p>Sí, nuestro sistema utiliza sensores no invasivos y totalmente seguros. Cada implementación es supervisada por profesionales capacitados para garantizar la seguridad y comodidad del paciente.</p>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
+        
 
         <section id="redes-sociales" class="section alt-bg">
             <div class="section-container">
@@ -270,7 +271,7 @@
                     <h3>Nuestra Aplicación Móvil</h3>
                     <p>Descarga nuestra aplicación móvil y accede a todas las funcionalidades desde cualquier lugar.</p>
                     <div class="qr-code">
-                        <img src="/static/images/appQR.jpg" alt="Código QR para descargar la app" width="200" height="200">
+                        <img src="/static/images/appQR.png" alt="Código QR para descargar la app" width="200" height="200">
                     </div>
                 </div>
                 
@@ -346,7 +347,14 @@
         </div>
     </div>
 
-    
+    <!-- Cookie consent banner -->
+    <div id="cookie-banner" class="cookie-banner">
+        <p>Utilizamos cookies para mejorar su experiencia en nuestro sitio web. Al continuar navegando, acepta nuestra <a href="/politica-cookies">política de cookies</a>.</p>
+        <div class="cookie-buttons">
+            <button id="accept-cookies">Aceptar</button>
+            <button id="decline-cookies">Rechazar</button>
+        </div>
+    </div>
 
     <!-- Scripts -->
     <script src="/static/js/index.js" defer></script>
