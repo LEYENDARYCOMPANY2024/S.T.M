@@ -36,4 +36,15 @@ class OcupacionEnum(str, Enum):
     estudiante = "estudiante"
     jubilado = "jubilado"
     pensionado = "pensionado"
+<<<<<<< HEAD
     otro = "otro"
+=======
+    otro = "otro"
+    
+    
+
+
+class EstadoNivelEnum(str, Enum):
+    desbloqueado = "desbloqueado"
+    bloqueado = "bloqueado"
+>>>>>>> pruebas

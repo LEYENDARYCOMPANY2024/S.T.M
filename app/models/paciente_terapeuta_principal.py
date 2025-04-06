@@ -20,8 +20,21 @@ class Paciente(Base):
     contrasena_p = Column(String, nullable=True)
     estado_paciente = Column(String, nullable=False)
 
+<<<<<<< HEAD
     # 🔹 Relación con `Terapeuta` a través de `TerapeutaPaciente`
     terapeutas = relationship("Terapeuta", secondary="terapeuta_paciente", back_populates="pacientes")  # ✅ Agregado
     
     # 🔹 Relación inversa con HistorialClinico
     historial_clinico = relationship("HistorialClinico", back_populates="paciente", uselist=False)
+=======
+
+
+    terapeutas = relationship("Terapeuta", secondary="terapeuta_paciente", back_populates="pacientes", overlaps="terapeutas_pivote,paciente")
+    historial_clinico = relationship("HistorialClinico", back_populates="paciente", uselist=False)
+    sesiones = relationship("PacienteSesion", back_populates="paciente")  # ✅ Agregado
+    terapeutas_pivote = relationship("TerapeutaPaciente", back_populates="paciente", overlaps="terapeutas")
+    paciente_dispositivos = relationship("PacienteDispositivo", back_populates="paciente")
+
+
+
+>>>>>>> pruebas

@@ -331,6 +331,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Testimonial slider
     const testimonials = document.querySelectorAll('.testimonial');
+<<<<<<< HEAD
     const dots = document.querySelectorAll('.dot');
     let currentSlide = 0;
     
@@ -377,6 +378,62 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+=======
+    const dotsContainer = document.querySelector('.pagination-dots');
+    let currentSlide = 0;
+    let slideInterval = null;
+
+    function showSlide(index) {
+        const dots = document.querySelectorAll('.dot');
+
+        testimonials.forEach((testimonial, i) => {
+            testimonial.style.display = i === index ? 'block' : 'none';
+        });
+
+        dots.forEach((dot, i) => {
+            dot.classList.toggle('active', i === index);
+        });
+
+        currentSlide = index;
+    }
+
+    function startAutoSlide() {
+        clearInterval(slideInterval); // Previene múltiples intervalos
+        slideInterval = setInterval(() => {
+            const nextSlide = (currentSlide + 1) % testimonials.length;
+            showSlide(nextSlide);
+        }, 5000);
+    }
+
+    if (testimonials.length > 0 && dotsContainer) {
+        // Limpiar y generar dots según testimonios
+        dotsContainer.innerHTML = '';
+        testimonials.forEach((_, index) => {
+            const dot = document.createElement('span');
+            dot.classList.add('dot');
+            if (index === 0) dot.classList.add('active');
+
+            dot.addEventListener('click', () => {
+                showSlide(index);
+                startAutoSlide(); // Reinicia correctamente
+            });
+
+            dotsContainer.appendChild(dot);
+        });
+
+        showSlide(0);         // Mostrar el primero
+        startAutoSlide();     // Iniciar autoplay correctamente
+
+        const slider = document.querySelector('.testimonials-slider');
+        if (slider) {
+            slider.addEventListener('mouseenter', () => clearInterval(slideInterval));
+            slider.addEventListener('mouseleave', startAutoSlide);
+        }
+    }
+
+    
+
+>>>>>>> pruebas
     // Contact form submission
     const contactForm = document.getElementById('contact-form');
     
@@ -627,3 +684,17 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+<<<<<<< HEAD
+=======
+
+
+document.querySelectorAll('.faq-header').forEach(button => {
+    button.addEventListener('click', function() {
+        const content = this.nextElementSibling;
+        content.classList.toggle('active');
+        
+        // Cambiar el signo +/-
+        this.querySelector('.faq-icon').textContent = content.classList.contains('active') ? "−" : "+";
+    });
+});
+>>>>>>> pruebas

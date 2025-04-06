@@ -7,7 +7,11 @@
 
 /* Custom Properties */
 :root {
+<<<<<<< HEAD
     --primary-gradient: #1565C0;
+=======
+    --primary-gradient: #08232b;
+>>>>>>> pruebas
     --glass-bg: rgba(255, 255, 255, 0.15);
     --glass-hover: rgba(255, 255, 255, 0.25);
     --transition: all 0.3s ease;
@@ -98,6 +102,7 @@ body {
 }
 
 /* Patients List */
+<<<<<<< HEAD
 .patients-list {
     display: flex;
     flex-direction: column;
@@ -130,6 +135,113 @@ body {
     background: var(--glass-hover);
 }
 
+=======
+:root {
+    --primary-color: #4a90e2;
+    --secondary-color: #7ed6df;
+    --background-color: rgba(255, 255, 255, 0.1);
+    --hover-background: rgba(255, 255, 255, 0.2);
+    --text-color: #ffffff;
+    --shadow-color: rgba(0, 0, 0, 0.2);
+    --border-color: rgba(255, 255, 255, 0.3);
+    --active-color: #6bff6b;
+    --inactive-color: #ff6b6b;
+}
+
+.patients-list {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* Fixed to 3 columns */
+    grid-template-rows: repeat(2, 1fr); /* Fixed to 2 rows */
+    gap: 2rem;
+    padding: 2rem;
+    max-width: 1200px;
+    margin: auto;
+    height: calc(2 * (300px + 2rem)); /* Ensure fixed height */
+}
+
+.patient-card {
+    background: var(--background-color);
+    color: var(--text-color);
+    padding: 2rem;
+    border-radius: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    box-shadow: 0 5px 15px var(--shadow-color);
+    border: 1px solid var(--border-color);
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease-in-out;
+    position: relative;
+    overflow: hidden;
+    padding-bottom: 3rem;
+    aspect-ratio: 1 / 1; /* Ensure square-like cards */
+    width: 100%; /* Full width of grid cell */
+    height: 100%; /* Full height of grid cell */
+}
+
+/* If fewer than 6 cards, use grid-template-areas to center them */
+.patients-list:has(.patient-card:nth-child(-n+3)) {
+    grid-template-areas: 
+        "a b c"
+        ". . .";
+}
+
+.patients-list:has(.patient-card:nth-child(4)) {
+    grid-template-areas: 
+        "a b c"
+        "d . .";
+}
+
+.patients-list:has(.patient-card:nth-child(5)) {
+    grid-template-areas: 
+        "a b c"
+        "d e .";
+}
+
+.patients-list:has(.patient-card:nth-child(6)) {
+    grid-template-areas: 
+        "a b c"
+        "d e f";
+}
+
+.patients-list .patient-card:nth-child(1) { grid-area: a; }
+.patients-list .patient-card:nth-child(2) { grid-area: b; }
+.patients-list .patient-card:nth-child(3) { grid-area: c; }
+.patients-list .patient-card:nth-child(4) { grid-area: d; }
+.patients-list .patient-card:nth-child(5) { grid-area: e; }
+.patients-list .patient-card:nth-child(6) { grid-area: f; }
+
+/* Rest of the existing styles remain the same */
+.patient-card:hover {
+    transform: translateY(-8px);
+    background: var(--hover-background);
+    box-shadow: 0 10px 25px var(--shadow-color);
+}
+
+.patient-card .user-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    color: var(--primary-color);
+}
+
+.patient-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 1rem;
+}
+
+.patient-info span {
+    margin-bottom: 0.5rem;
+}
+
+.toggle-container {
+    position: absolute;
+    bottom: 1rem;
+    right: 1rem;
+}
+>>>>>>> pruebas
 /* Enter Button */
 .enter-btn {
     background: none;
@@ -146,6 +258,7 @@ body {
     text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
 }
 
+<<<<<<< HEAD
 /* Add Button */
 .add-btn {
     background: var(--glass-bg);
@@ -206,6 +319,11 @@ body {
 /* Variables globales */
 :root {
     --primary-gradient: #1565C0;
+=======
+/* Variables globales */
+:root {
+    --primary-gradient: #08232b;
+>>>>>>> pruebas
     --glass-bg: rgba(255, 255, 255, 0.15);
     --glass-hover: rgba(255, 255, 255, 0.25);
     --transition: all 0.3s ease;
@@ -290,6 +408,7 @@ body {
 }
 
 /* Lista de pacientes */
+<<<<<<< HEAD
 .patients-list {
     display: flex;
     flex-direction: column;
@@ -317,6 +436,9 @@ body {
     transform: translateY(-5px);
     background: var(--glass-hover);
 }
+=======
+
+>>>>>>> pruebas
 
 .enter-btn {
     background: none;
@@ -370,6 +492,7 @@ body {
     justify-content: center;
     align-items: center;
 }
+<<<<<<< HEAD
 
 .modal-content {
     background: var(--primary-gradient);
@@ -377,13 +500,68 @@ body {
     border-radius: 20px;
     width: 90%;
     max-width: 500px;
+=======
+.modal-content {
+    background-color: #08232b;
+    width: 10%;  /* Almost full width */
+    max-width: 800px;  /* Much wider max-width */
+    padding: 2.5rem;
+    border-radius: 20px;
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+}
+
+
+.modal-content::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 6px;  /* Thickness of the red line */
+    background: linear-gradient(to right, #ff0000, #ff4500);  /* Gradient red line */
+    z-index: 10;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .modal-content {
+        width: 98%;  /* Even wider on smaller screens */
+        padding: 1.5rem;
+    }
+}
+
+/* Ensure form inputs are full width */
+.modal-content form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    width: 100%;
+}
+
+.modal-content input,
+.modal-content select {
+    width: 100%;
+    padding: 1rem;
+}
+
+.modal-content {
+    width: 50%;  /* Almost full width */
+    max-width: 800px;  /* Much wider max-width */
+    padding: 2.5rem;
+    border-radius: 20px;
+>>>>>>> pruebas
     box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
 }
 
 .modal-content h2 {
     text-align: center;
+<<<<<<< HEAD
     margin-bottom: 1.5rem;
     font-size: 1.8rem;
+=======
+    margin-bottom: 2rem;  /* More space below title */
+    font-size: 2rem;  /* Larger title */
+>>>>>>> pruebas
 }
 
 .modal-content form {
@@ -414,7 +592,11 @@ body {
 }
 
 .submit-btn {
+<<<<<<< HEAD
     background: rgba(255, 255, 255, 0.2);
+=======
+    background: linear-gradient(135deg, #00bcd4, #009688);
+>>>>>>> pruebas
     color: white;
     border: none;
     padding: 1rem;
@@ -426,17 +608,30 @@ body {
 }
 
 .submit-btn:hover {
+<<<<<<< HEAD
     background: rgba(255, 255, 255, 0.3);
+=======
+    background: linear-gradient(135deg, #00acc1, #00796b);
+>>>>>>> pruebas
     transform: translateY(-2px);
 }
 
 /* Responsive */
 @media (max-width: 768px) {
     .modal-content {
+<<<<<<< HEAD
         width: 95%;
         padding: 1.5rem;
     }
 
+=======
+        width: 98%;  /* Even wider on smaller screens */
+        padding: 2rem;
+        max-width: 95%;
+    }
+
+
+>>>>>>> pruebas
     .patient-card {
         width: 95%;
         padding: 1rem;
@@ -455,6 +650,7 @@ body {
     }
 }
 /* Agregar al CSS existente */
+<<<<<<< HEAD
 .close-modal-btn {
     position: absolute;
     top: 10px;
@@ -488,6 +684,38 @@ body {
     max-width: 500px;
     box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
 }
+=======
+/* Estilos del encabezado del modal */
+/* Estilos del botón de cerrar */
+.close-modal-btn {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 1.8rem;
+    font-weight: bold;
+    cursor: pointer;
+    color: red;
+    transition: 0.3s ease;
+}
+
+.close-modal-btn:hover {
+    color: #ff4d4d; /* Cambia de color al pasar el mouse */
+    transform: scale(1.1);
+}
+
+/* Asegurar que el modal tenga posición relativa */
+.modal-content {
+    position: relative;
+    padding: 20px;
+    border-radius: 8px;
+}
+
+
+
+
+>>>>>>> pruebas
 /* Estilos para el select y sus opciones */
 .modal-content select {
     width: 100%;
@@ -510,12 +738,18 @@ body {
 .modal-content select option[value=""][disabled] {
     color: rgba(255, 255, 255, 0.8);
 }
+<<<<<<< HEAD
 /* Estilos para la alerta de éxito */
 .alert {
+=======
+/* Notificaciones y mensajes */
+#message-container {
+>>>>>>> pruebas
     position: fixed;
     top: 20px;
     left: 50%;
     transform: translateX(-50%);
+<<<<<<< HEAD
     padding: 15px 30px;
     border-radius: 10px;
     background: #1565C0 ;
@@ -539,6 +773,63 @@ body {
     margin-right: 10px;
     font-size: 24px;
 }
+=======
+    z-index: 3000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: auto;
+    max-width: 90%;
+  }
+  
+  .message {
+    background-color: #989ad5;
+    color: black;
+    padding: 12px 24px;
+    border-radius: 8px;
+    margin: 8px 0;
+    box-shadow: 0 4px 12px rgba(152, 154, 213, 0.4);
+    font-family: 'Arial', sans-serif;
+    font-size: 16px;
+    opacity: 0;
+    transform: translateY(-20px);
+    animation: message-appear-top 0.3s forwards, message-fade-top 0.3s 2.7s forwards;
+    text-align: center;
+    min-width: 200px;
+    border-left: 4px solid #7679c0;
+    position: relative;
+  }
+  
+  .message.success {
+    background-color: #98d5aa;
+    border-left-color: #50c57c;
+  }
+  
+  .message.warning {
+    background-color: #d5c698;
+    border-left-color: #c0b576;
+  }
+  
+  .message.error {
+    background-color: #d59898;
+    border-left-color: #c07676;
+  }
+  
+  @keyframes message-appear-top {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+  }
+  
+  @keyframes message-fade-top {
+    to {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+  }
+
+>>>>>>> pruebas
 
 .estado-btn {
     background: none;
@@ -570,7 +861,11 @@ body {
 }
 
 .tab-btn.active {
+<<<<<<< HEAD
     background-color: #1565;
+=======
+    background: linear-gradient(135deg, #134e5e, #71b280);
+>>>>>>> pruebas
     color: white;
 }
 
@@ -722,9 +1017,12 @@ body {
   .reset-btn:hover {
     transform: rotate(360deg);
   }
+<<<<<<< HEAD
   
 
 
+=======
+>>>>>>> pruebas
 
 
 /* Modal de Confirmación */
@@ -785,6 +1083,82 @@ body {
     background: #c82333;
 }
 
+<<<<<<< HEAD
+=======
+/* Estilos para la ventana de confirmación */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background-color: #08232b;
+    width: 50%;  /* Almost full width */
+    max-width: 500px;  /* Much wider max-width */
+    padding: 2.5rem;
+    border-radius: 20px;
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+}
+
+.confirm-box h2 {
+    margin: 0;
+    font-size: 20px;
+    color: white;
+}
+
+.confirm-box p {
+    margin: 10px 0;
+    font-size: 16px;
+    color: white;
+}
+
+.confirm-buttons {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-around;
+}
+
+/* Estilos para los botones */
+.btn-confirm {
+    background-color: #28a745; /* Verde */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s ease-in-out;
+}
+
+.btn-confirm:hover {
+    background-color: #218838;
+}
+
+.btn-cancel {
+    background-color: #dc3545; /* Rojo */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s ease-in-out;
+}
+
+.btn-cancel:hover {
+    background-color: #c82333;
+}
+
+
+>>>>>>> pruebas
 #searchPacienteBtn {
     width: 30%;
     height: 2.2rem;  /* 🔹 Altura reducida */
@@ -793,7 +1167,11 @@ body {
     margin-bottom: 0.5rem; /* 🔹 Agrega margen abajo */
     border: none;
     border-radius: 10px;
+<<<<<<< HEAD
     background: rgba(255, 255, 255, 0.2);
+=======
+    background: linear-gradient(135deg, #00bcd4, #009688);
+>>>>>>> pruebas
     color: white;
     font-size: 0.9rem;
     cursor: pointer;
@@ -805,7 +1183,11 @@ body {
 }
 
 #searchPacienteBtn:hover {
+<<<<<<< HEAD
     background: rgba(255, 255, 255, 0.3);
+=======
+    background: linear-gradient(135deg, #00acc1, #00796b);
+>>>>>>> pruebas
     transform: translateY(-2px);
 }
 
@@ -825,3 +1207,8 @@ body {
     background-color: transparent; /* Color más oscuro al pasar el mouse */
 }
 
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> pruebas

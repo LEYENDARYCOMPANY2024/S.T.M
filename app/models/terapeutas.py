@@ -1,6 +1,10 @@
 from pydantic import BaseModel, constr, EmailStr  # ✅ Solo importar lo necesario desde Pydantic
 from typing import Optional
+<<<<<<< HEAD
 from sqlalchemy import Column, Integer, String, ForeignKey
+=======
+from sqlalchemy import Column, Integer, String, ForeignKey, LargeBinary
+>>>>>>> pruebas
 from sqlalchemy.orm import relationship
 
 from database import Base  # ✅ Base debe venir de SQLAlchemy, no de Pydantic
@@ -31,9 +35,25 @@ class Terapeuta(Base):
     segundo_apellido = Column(String, nullable=True)
     correo = Column(String, unique=True, nullable=False)
     contrasena = Column(String, nullable=False)
+<<<<<<< HEAD
 
     # 🔹 Relación con `Paciente` a través de `TerapeutaPaciente`
     pacientes = relationship("Paciente", secondary="terapeuta_paciente", back_populates="terapeutas")  # ✅ Agregado
+=======
+    codigo_postal = Column(String, nullable=True)
+    calle = Column(String, nullable=True)
+    colonia = Column(String, nullable=True)
+    num_ext = Column(String, nullable=True)
+    num_int = Column(String, nullable=True)
+    foto_perfil = Column(LargeBinary, nullable=True)  # ✅ Imagen
+    documento_cedula = Column(LargeBinary, nullable=True)   # ✅ PDF
+    
+    pacientes_pivote = relationship("TerapeutaPaciente", back_populates="terapeuta", overlaps="pacientes")
+    dispositivos = relationship("DispositivoIOT", back_populates="terapeuta")
+
+    # 🔹 Relación con `Paciente` a través de `TerapeutaPaciente`
+    pacientes = relationship("Paciente", secondary="terapeuta_paciente", back_populates="terapeutas", overlaps="pacientes_pivote,terapeuta")
+>>>>>>> pruebas
 
 # 📌 Modelo para respuesta (sin contraseña)
 class TerapeutaResponse(TerapeutaBase):
@@ -48,4 +68,19 @@ class TerapeutaPaciente(Base):
     id_terapeuta_tp_fk = Column(Integer, ForeignKey("terapeutas.id_terapeuta"), nullable=False)
     id_paciente_tp_fk = Column(Integer, ForeignKey("pacientes.id_paciente"), nullable=False)
     
+<<<<<<< HEAD
     historial_progreso = relationship("HistorialProgreso", back_populates="terapeuta_paciente")
+=======
+    paciente = relationship("Paciente", back_populates="terapeutas_pivote", overlaps="terapeutas")
+    terapeuta = relationship("Terapeuta", back_populates="pacientes_pivote", overlaps="pacientes")
+
+
+    
+    historial_progreso = relationship("HistorialProgreso", back_populates="terapeuta_paciente")
+
+
+# 📌 Modelo para recibir `JSON` en lugar de `FormData`
+class LoginRequest(BaseModel):
+    nombre_usuario: str
+    contrasena: str
+>>>>>>> pruebas

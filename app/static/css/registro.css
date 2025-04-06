@@ -9,7 +9,11 @@ body {
     justify-content: center;
     align-items: center;
     height: 100vh;
+<<<<<<< HEAD
     background: #1565C0 ;
+=======
+    background: #08232b;
+>>>>>>> pruebas
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
@@ -32,12 +36,20 @@ body {
     margin-bottom: 25px;
     color: white;
     font-size: 32px;
+<<<<<<< HEAD
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+=======
+    text-shadow: 1px 1px 2px rgb(255, 255, 255);
+>>>>>>> pruebas
 }
 
 .input-container {
     position: relative;
     margin: 25px 0;
+<<<<<<< HEAD
+=======
+    color: white;
+>>>>>>> pruebas
 }
 
 .input-container input {
@@ -53,8 +65,12 @@ body {
 }
 
 .input-container input:focus {
+<<<<<<< HEAD
     background: rgba(255, 255, 255, 0.5);
     box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+=======
+    box-shadow: 0 0 15px rgb(0, 0, 0);
+>>>>>>> pruebas
 }
 
 .input-container .icon {
@@ -65,11 +81,27 @@ body {
     color: #fff;
     font-size: 20px;
 }
+<<<<<<< HEAD
+=======
+.input-container input {
+    color: black; /* Cambia el color del texto a negro */
+    background: rgba(255, 255, 255, 0.9); /* Fondo más blanco */
+}
+
+.input-container input::placeholder {
+    color: gray; /* Color del placeholder */
+}
+
+>>>>>>> pruebas
 
 .register-container button {
     width: 100%;
     padding: 14px;
+<<<<<<< HEAD
     background: #1565;
+=======
+    background: linear-gradient(135deg, #00bcd4, #009688);
+>>>>>>> pruebas
     border: none;
     border-radius: 10px;
     color: white;
@@ -80,17 +112,29 @@ body {
 }
 
 .register-container button:hover {
+<<<<<<< HEAD
     background: #1565;
+=======
+    background: linear-gradient(135deg, #00acc1, #00796b);
+>>>>>>> pruebas
     transform: scale(1.07);
 }
 
 .login-link {
     margin-top: 20px;
+<<<<<<< HEAD
     color: white;
 }
 
 .login-link a {
     color: #f0e68c;
+=======
+    color: #c0c6f0;
+}
+
+.login-link a {
+    color: #c0c6f0;
+>>>>>>> pruebas
     text-decoration: none;
     font-weight: bold;
 }
@@ -99,6 +143,7 @@ body {
     text-decoration: underline;
 }
 
+<<<<<<< HEAD
 /* Estilos para la alerta de éxito */
 .alert {
     position: fixed;
@@ -128,3 +173,176 @@ body {
     margin-right: 10px;
     font-size: 24px;
 }
+=======
+/* Notificaciones y mensajes */
+#message-container {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: auto;
+    max-width: 90%;
+  }
+  
+  .message {
+    background-color: #989ad5;
+    color: black;
+    padding: 12px 24px;
+    border-radius: 8px;
+    margin: 8px 0;
+    box-shadow: 0 4px 12px rgba(152, 154, 213, 0.4);
+    font-family: 'Arial', sans-serif;
+    font-size: 16px;
+    opacity: 0;
+    transform: translateY(-20px);
+    animation: message-appear-top 0.3s forwards, message-fade-top 0.3s 2.7s forwards;
+    text-align: center;
+    min-width: 200px;
+    border-left: 4px solid #7679c0;
+    position: relative;
+  }
+  
+  .message.success {
+    background-color: #98d5aa;
+    border-left-color: #50c57c;
+  }
+  
+  .message.warning {
+    background-color: #d5c698;
+    border-left-color: #c0b576;
+  }
+  
+  .message.error {
+    background-color: #d59898;
+    border-left-color: #c07676;
+  }
+  
+  @keyframes message-appear-top {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+  }
+  
+  @keyframes message-fade-top {
+    to {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+  }
+
+/* Estilo para el contenedor del input */
+.input-container {
+    position: relative;
+    margin-bottom: 15px;
+}
+
+/* Estilo para el icono del ojo */
+#togglePassword {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #666;
+    z-index: 10;
+}
+
+/* Ajuste para el campo de contraseña */
+#contrasena {
+    padding-right: 35px; /* Espacio para el icono */
+    width: 100%;
+    box-sizing: border-box;
+}
+
+        /* Estilos para el modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 700px;
+            max-height: 80vh;
+            overflow-y: auto;
+            border-radius: 8px;
+            position: relative;
+        }
+
+        .close-button {
+            position: absolute;
+            right: 15px;
+            top: 10px;
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close-button:hover {
+            color: black;
+        }
+
+        /* Estilos para el botón de aceptar en el modal */
+        .accept-terms-btn {
+            background-color: gray;
+            color: transparent;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            display: block;
+            margin: 20px auto 0;
+            font-weight: bold;
+        }
+
+        .accept-terms-btn:hover {
+            background-color: #dde0f4;
+        }
+        .password-strength-container {
+            width: 100%;
+            margin-top: 10px;
+        }
+        
+        .strength-bar {
+            width: 100%;
+            height: 12px;
+            background: transparent;
+            border-radius: 6px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        #strengthIndicator {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #ff4d4d, #ffa94d, #ffeb3b, #4caf50);
+            border-radius: 6px;
+            transition: width 0.4s ease-in-out;
+        }
+        
+
+        #registerButton:disabled {
+            background-color: #999 !important;
+            cursor: not-allowed;
+            opacity: 0.6;
+            transform: none !important;
+        }
+        
+>>>>>>> pruebas

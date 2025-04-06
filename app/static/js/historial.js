@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 document.addEventListener("DOMContentLoaded", async function () {
     // ──────────────────────────────────────────
     //  Mensajes de retroalimentación
@@ -14,6 +15,40 @@ document.addEventListener("DOMContentLoaded", async function () {
         setTimeout(() => {
             alertBox.classList.remove("show");
             setTimeout(() => alertBox.remove(), 300);
+=======
+import { verificarSesionYRedirigir } from "./verificar_sesion.js";
+
+document.addEventListener("DOMContentLoaded", async function () {
+
+    if (!verificarSesionYRedirigir()) return; // ✅ aquí la usas
+    // ──────────────────────────────────────────
+    // 📌 Función para mostrar mensajes de éxito o error
+    function showMessage(text, type = "success") {
+        // 🔧 Crear el contenedor si no existe
+        let container = document.getElementById("message-container");
+        if (!container) {
+            container = document.createElement("div");
+            container.id = "message-container";
+            document.body.appendChild(container);
+        }
+    
+        // 🧊 Crear el mensaje
+        const message = document.createElement("div");
+        message.className = `message ${type}`;
+    
+        const icon = {
+            success: "",
+            error: "",
+            warning: ""
+        }[type] || "";
+    
+        message.innerHTML = `<span class="message-icon">${icon}</span> ${text}`;
+    
+        container.appendChild(message);
+    
+        setTimeout(() => {
+            message.remove();
+>>>>>>> pruebas
         }, 3000);
     }
 
@@ -21,7 +56,11 @@ document.addEventListener("DOMContentLoaded", async function () {
     //  Verificar id del paciente en localStorage
     const idPaciente = localStorage.getItem("id_paciente");
     if (!idPaciente) {
+<<<<<<< HEAD
         mostrarMensaje("No hay paciente seleccionado.", "error");
+=======
+        showMessage("No hay paciente seleccionado.", "error");
+>>>>>>> pruebas
         window.location.href = "/principal";
         return;
     }
@@ -40,7 +79,11 @@ document.addEventListener("DOMContentLoaded", async function () {
         try {
             const response = await fetch(`/historial/paciente/${idPaciente}`);
             if (!response.ok) {
+<<<<<<< HEAD
                 mostrarMensaje("No se encontraron datos del paciente.", "error");
+=======
+                showMessage("No se encontraron datos del paciente.", "error");
+>>>>>>> pruebas
                 return;
             }
             const pacienteData = await response.json();
@@ -52,13 +95,21 @@ document.addEventListener("DOMContentLoaded", async function () {
             document.getElementById("edad").value = pacienteData.edad || "";
             document.getElementById("escolaridad").value = pacienteData.escolaridad || "";
             document.getElementById("sexo").value = pacienteData.genero || "";
+<<<<<<< HEAD
             document.getElementById("estadoCivil").value = pacienteData.estado_civil || "";
+=======
+            document.getElementById("estadoCivil").value = pacienteData.estado_civil || "soltero";
+>>>>>>> pruebas
             document.getElementById("ocupacion").value = pacienteData.ocupacion || "";
 
             // Mostrar u ocultar sección de mujeres
             actualizarSeccionMujeres();
         } catch (error) {
+<<<<<<< HEAD
             mostrarMensaje("Error al cargar datos del paciente.", "error");
+=======
+            showMessage("Error al cargar datos del paciente.", "error");
+>>>>>>> pruebas
             console.error("❌ Error al cargar datos del paciente:", error);
         }
     }
@@ -71,7 +122,11 @@ document.addEventListener("DOMContentLoaded", async function () {
         try {
             const response = await fetch(`/historial/${idPaciente}`);
             if (!response.ok) {
+<<<<<<< HEAD
                 mostrarMensaje("No se encontró historial para este paciente.", "error");
+=======
+                showMessage("No se encontró historial para este paciente.", "error");
+>>>>>>> pruebas
                 return;
             }
             const data = await response.json();
@@ -79,6 +134,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
             // Restaurar todos los campos (radio, texto, textarea, select) excepto Datos del Paciente
             Object.keys(historial).forEach(key => {
+<<<<<<< HEAD
                 // Obtenemos el valor guardado, por ejemplo, 'htaNo'
                 const valorGuardado = historial[key];
                 if (valorGuardado && valorGuardado.includes('Si') || valorGuardado.includes('No')) {
@@ -102,6 +158,28 @@ document.addEventListener("DOMContentLoaded", async function () {
 
         } catch (error) {
             mostrarMensaje("Error al cargar historial clínico.", "error");
+=======
+                const valorGuardado = historial[key];
+                const elemento = document.getElementById(key);
+
+                if (elemento) {
+                    // Elementos normales (texto, textarea, select)
+                    elemento.value = valorGuardado;
+                } else if (valorGuardado && (valorGuardado.includes('Si') || valorGuardado.includes('No') || valorGuardado.includes('inicial') || valorGuardado.includes('final'))) {
+                    // Radios con patrón Sí/No o casos especiales (inicial/final)
+                    const radio = document.getElementById(valorGuardado);
+                    if (radio) radio.checked = true;
+                }
+            });
+
+
+            // Actualiza la configuración de ca
+            // mpos dependientes
+            configurarCamposCondicionales();
+
+        } catch (error) {
+            showMessage("Error al cargar historial clínico.", "error");
+>>>>>>> pruebas
             console.error("❌ Error al cargar historial clínico:", error);
         }
     }
@@ -130,12 +208,21 @@ document.addEventListener("DOMContentLoaded", async function () {
             });
 
             if (!res.ok) {
+<<<<<<< HEAD
                 mostrarMensaje("Error al guardar los datos del paciente.", "error");
                 return;
             }
             mostrarMensaje("Datos del paciente guardados con éxito.");
         } catch (error) {
             mostrarMensaje("Error al guardar los datos del paciente.", "error");
+=======
+                showMessage("Error al guardar los datos del paciente.", "error");
+                return;
+            }
+            showMessage("Datos del paciente guardados con éxito.", "success");
+        } catch (error) {
+            showMessage("Error al guardar los datos del paciente.", "error");
+>>>>>>> pruebas
             console.error("❌ Error al guardar los datos del paciente:", error);
         }
     }
@@ -201,19 +288,32 @@ document.addEventListener("DOMContentLoaded", async function () {
         };
 
         try {
+<<<<<<< HEAD
             const res = await fetch(`/historial/`, {
+=======
+            const res = await fetch(/historial/, {
+>>>>>>> pruebas
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payloadHistorial)
             });
 
             if (!res.ok) {
+<<<<<<< HEAD
                 mostrarMensaje("Error al guardar el historial clínico.", "error");
                 return;
             }
             mostrarMensaje("Historial clínico guardado con éxito.");
         } catch (error) {
             mostrarMensaje("Error al guardar historial clínico.", "error");
+=======
+                showMessage("Error al guardar el historial clínico.", "error");
+                return;
+            }
+            showMessage("Historial clínico guardado con éxito.", "success");
+        } catch (error) {
+            showMessage("Error al guardar historial clínico.", "error");
+>>>>>>> pruebas
             console.error("❌ Error al guardar historial clínico:", error);
         }
     }
@@ -250,3 +350,64 @@ document.addEventListener("DOMContentLoaded", async function () {
     await cargarHistorial();       // datos del JSON historial
     configurarCamposCondicionales();
 });
+<<<<<<< HEAD
+=======
+
+
+    const homeButton = document.querySelector(".home-button");
+
+    if (homeButton) {
+        homeButton.addEventListener("click", (e) => {
+            e.preventDefault(); // Prevenir redirección automática
+
+            const overlay = document.createElement("div");
+            overlay.className = "modal-overlay";
+
+            const modal = document.createElement("div");
+            modal.className = "modal-confirm";
+
+            modal.innerHTML = `
+                <h2>¿Ir al inicio?</h2>
+                <p>⚠ Al volver al inicio, <strong>se cerrará esta sección</strong> y podrías perder el progreso actual.<br>
+                ¿Deseas continuar?</p>
+                <div class="modal-buttons">
+                    <button class="btn-secondary" id="cancelarInicio">Cancelar</button>
+                    <button class="btn-danger" id="confirmarInicio">Ir al inicio</button>
+                </div>
+            `;
+
+            overlay.appendChild(modal);
+            document.body.appendChild(overlay);
+
+            document.getElementById("cancelarInicio").onclick = () => {
+                overlay.remove();
+            };
+
+            document.getElementById("confirmarInicio").onclick = async () => {
+                overlay.remove();
+
+                const sesionId = localStorage.getItem("id_sesion");
+
+                if (sesionId) {
+                    try {
+                        await fetch(`/dispositivos/desactivar/${sesionId}`, {
+                            method: "PUT"
+                        });
+                        console.log("🔌 Dispositivos desactivados correctamente.");
+                    } catch (error) {
+                        console.error("❌ Error al desactivar dispositivos:", error);
+                    }
+                }
+
+                // Limpiar almacenamiento
+                console.log("🏠 Limpiando localStorage al volver a principal...");
+                localStorage.removeItem("id_sesion");
+                localStorage.removeItem("nombre_sesion");
+                localStorage.removeItem("sesion_dispositivo_ids");
+
+                window.location.href = "/principal";
+            };
+        });
+    }
+
+>>>>>>> pruebas

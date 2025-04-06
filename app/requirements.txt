@@ -8,6 +8,10 @@ attrs==25.1.0
 bcrypt==4.2.1
 certifi==2025.1.31
 cffi==1.17.1
+<<<<<<< HEAD
+=======
+charset-normalizer==3.4.1
+>>>>>>> pruebas
 click==8.1.8
 cryptography==44.0.1
 deprecation==2.1.0
@@ -43,8 +47,15 @@ PyJWT==2.10.1
 python-dateutil==2.9.0.post0
 python-dotenv==1.0.1
 python-multipart==0.0.20
+<<<<<<< HEAD
 PyYAML==6.0.2
 realtime==2.4.0
+=======
+pytz==2025.1
+PyYAML==6.0.2
+realtime==2.4.0
+requests==2.32.3
+>>>>>>> pruebas
 rich==13.9.4
 rich-toolkit==0.13.2
 shellingham==1.5.4
@@ -58,6 +69,10 @@ supabase==2.13.0
 supafunc==0.9.3
 typer==0.15.1
 typing_extensions==4.12.2
+<<<<<<< HEAD
+=======
+urllib3==2.3.0
+>>>>>>> pruebas
 uvicorn==0.34.0
 uvloop==0.21.0
 watchfiles==1.0.4

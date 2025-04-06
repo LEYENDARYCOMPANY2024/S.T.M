@@ -1,5 +1,6 @@
 document.addEventListener("DOMContentLoaded", async function () {
 
+<<<<<<< HEAD
     // Función para mostrar mensajes de forma uniforme
     function mostrarMensaje(mensaje, tipo = "success") {
         const alertBox = document.createElement("div");
@@ -54,16 +55,75 @@ document.addEventListener("DOMContentLoaded", async function () {
 
 
     function mostrarConfirmacionEstilizada2(mensaje) {
+=======
+    const token = localStorage.getItem("session_token");
+
+    // 📌 Función para mostrar mensajes de éxito o error
+    function showMessage(text, type = "success") {
+        // 🔧 Crear el contenedor si no existe
+        let container = document.getElementById("message-container");
+        if (!container) {
+            container = document.createElement("div");
+            container.id = "message-container";
+            document.body.appendChild(container);
+        }
+    
+        // 🧊 Crear el mensaje
+        const message = document.createElement("div");
+        message.className = `message ${type}`;
+    
+        const icon = {
+            success: "",
+            error: "",
+            warning: ""
+        }[type] || "";
+    
+        message.innerHTML = `<span class="message-icon">${icon}</span> ${text}`;
+    
+        container.appendChild(message);
+    
+        setTimeout(() => {
+            message.remove();
+        }, 3000);
+    }
+    
+
+    // 📌 Función para mostrar mensajes de error antes de redirigir
+    function mostrarMensajeYRedirigir(mensaje) {
+        showMessage(mensaje, "error"); // 🔥 Muestra el mensaje en pantalla
+
+        setTimeout(() => {
+            localStorage.removeItem("session_token");
+            window.location.href = "/";
+        }, 3000); // 🔥 Espera 3 segundos antes de redirigir
+    }
+
+
+    // Función para mostrar una ventana de confirmación estilizada
+    // ✅ Confirmación reutilizable
+    function mostrarConfirmacionEstilizada(mensaje, opciones = {}) {
+        const {
+            soloAceptar = false,
+            textoAceptar = "Sí",
+            textoCancelar = "No"
+        } = opciones;
+
+>>>>>>> pruebas
         return new Promise((resolve) => {
             const overlay = document.createElement("div");
             overlay.classList.add("modal-overlay");
 
             const confirmBox = document.createElement("div");
             confirmBox.classList.add("modal-content", "confirm-box");
+<<<<<<< HEAD
+=======
+
+>>>>>>> pruebas
             confirmBox.innerHTML = `
                 <h2>Confirmación</h2>
                 <p>${mensaje}</p>
                 <div class="confirm-buttons">
+<<<<<<< HEAD
                     <button id="confirmYes" class="btn-confirm">Enterado</button>
                 </div>
             `;
@@ -71,17 +131,41 @@ document.addEventListener("DOMContentLoaded", async function () {
             overlay.appendChild(confirmBox);
             document.body.appendChild(overlay);
     
+=======
+                    <button id="confirmYes" class="btn-confirm">${textoAceptar}</button>
+                    ${soloAceptar ? "" : `<button id="confirmNo" class="btn-cancel">${textoCancelar}</button>`}
+                </div>
+            `;
+
+            overlay.appendChild(confirmBox);
+            document.body.appendChild(overlay);
+
+>>>>>>> pruebas
             document.getElementById("confirmYes").addEventListener("click", () => {
                 resolve(true);
                 overlay.remove();
             });
+<<<<<<< HEAD
+=======
+
+            if (!soloAceptar) {
+                document.getElementById("confirmNo").addEventListener("click", () => {
+                    resolve(false);
+                    overlay.remove();
+                });
+            }
+>>>>>>> pruebas
         });
     }
 
 
     
     // Función para solicitar un motivo de reactivación con opción de cancelar.
+<<<<<<< HEAD
     // Si se pulsa "Cancelar" se muestra un mensaje y no se activa al paciente.
+=======
+    // ✅ Solicitar motivo (con validación)
+>>>>>>> pruebas
     function solicitarMotivoReactivacion(mensaje) {
         return new Promise((resolve) => {
             const overlay = document.createElement("div");
@@ -89,6 +173,10 @@ document.addEventListener("DOMContentLoaded", async function () {
 
             const confirmBox = document.createElement("div");
             confirmBox.classList.add("modal-content", "confirm-box");
+<<<<<<< HEAD
+=======
+
+>>>>>>> pruebas
             confirmBox.innerHTML = `
                 <h2>Reactivación Requerida</h2>
                 <p>${mensaje}</p>
@@ -98,6 +186,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                     <button id="cancelMotivo" class="btn-cancel">Cancelar</button>
                 </div>
             `;
+<<<<<<< HEAD
     
             overlay.appendChild(confirmBox);
             document.body.appendChild(overlay);
@@ -106,19 +195,36 @@ document.addEventListener("DOMContentLoaded", async function () {
                 const motivo = document.getElementById("motivoReactivacionInput").value.trim();
                 if (!motivo) {
                     mostrarMensaje("Debes proporcionar un motivo para la reactivación.", "error");
+=======
+
+            overlay.appendChild(confirmBox);
+            document.body.appendChild(overlay);
+
+            document.getElementById("confirmMotivo").addEventListener("click", () => {
+                const motivo = document.getElementById("motivoReactivacionInput").value.trim();
+                if (!motivo) {
+                    showMessage("Debes proporcionar un motivo para la reactivación.", "warning");
+>>>>>>> pruebas
                     return;
                 }
                 resolve(motivo);
                 overlay.remove();
             });
+<<<<<<< HEAD
     
             document.getElementById("cancelMotivo").addEventListener("click", () => {
                 mostrarMensaje("Cancelaste la reactivación. El paciente permanecerá inactivo.", "error");
+=======
+
+            document.getElementById("cancelMotivo").addEventListener("click", () => {
+                showMessage("Cancelaste la reactivación. El paciente permanecerá inactivo.", "error");
+>>>>>>> pruebas
                 resolve(null);
                 overlay.remove();
             });
         });
     }
+<<<<<<< HEAD
     
     const token = localStorage.getItem("session_token");
     if (!token) {
@@ -126,10 +232,23 @@ document.addEventListener("DOMContentLoaded", async function () {
         return;
     }
     
+=======
+
+    if (!token) {
+        console.warn("⚠️ No hay token en localStorage, redirigiendo a login...");
+        mostrarMensajeYRedirigir("Tu sesión ha expirado. Inicia sesión nuevamente.", "warning");
+        return;
+    }
+
+    console.log("📌 Token detectado en `principal.js`:", token);
+
+    // 📌 Función para decodificar el token y obtener el ID del terapeuta
+>>>>>>> pruebas
     function parseJwt(token) {
         try {
             return JSON.parse(atob(token.split(".")[1]));
         } catch (e) {
+<<<<<<< HEAD
             return null;
         }
     }
@@ -138,13 +257,36 @@ document.addEventListener("DOMContentLoaded", async function () {
     if (!decodedToken || !decodedToken.sub) {
         localStorage.removeItem("session_token");
         window.location.href = "/login";
+=======
+            console.error("❌ Error al decodificar el token:", e);
+            return null;
+        }
+    }
+
+    const decodedToken = parseJwt(token);
+    if (!decodedToken || !decodedToken.sub || !decodedToken.exp) {
+        console.warn("⚠️ Token inválido o corrupto, eliminando...");
+        mostrarMensajeYRedirigir("Tu sesión es inválida. Inicia sesión nuevamente.", "warning");
+        return;
+    }
+
+    // 📌 Verificar si el token ha expirado
+    const currentTime = Math.floor(Date.now() / 1000);
+    if (decodedToken.exp < currentTime) {
+        console.warn("⏳ Token expirado, redirigiendo a login...");
+        mostrarMensajeYRedirigir("Tu sesión ha expirado. Inicia sesión nuevamente.", "warning");
+>>>>>>> pruebas
         return;
     }
     const idTerapeuta = decodedToken.sub;
     
     let currentPageActivos = 1;
     let currentPageInactivos = 1;
+<<<<<<< HEAD
     let patientsPerPage = 5;
+=======
+    let patientsPerPage = 6; // Explicitly set to 6
+>>>>>>> pruebas
     
     // Referencias del DOM
     const btnActivos       = document.getElementById("btn-activos");
@@ -166,6 +308,13 @@ document.addEventListener("DOMContentLoaded", async function () {
     
     // Perfil
     const profileIcon    = document.getElementById("profileIcon");
+<<<<<<< HEAD
+=======
+
+    // 📌 Guardar el ID del terapeuta en localStorage
+    localStorage.setItem("id_terapeuta", idTerapeuta); // ✅ Guardamos el id del terapeuta
+    console.log(`📌 Usuario autenticado - ID Terapeuta: ${idTerapeuta}`);
+>>>>>>> pruebas
     
     function cambiarPestaña(tipo) {
         if (tipo === "activos") {
@@ -238,17 +387,25 @@ document.addEventListener("DOMContentLoaded", async function () {
     // Función para cambiar el estado (inactivar/activar)
     async function cambiarEstadoPaciente(button, idPaciente, estadoActual) {
         try {
+<<<<<<< HEAD
             let action = estadoActual === "activo" ? "inactivate" : "reactivate";
             let bodyData = { action, motivo: null, create_new_record: false };
     
             const confirmacion = await mostrarConfirmacionEstilizada(
                 estadoActual === "activo"
+=======
+            const accion = estadoActual === "activo" ? "inactivate" : "reactivate";
+    
+            const confirmacion = await mostrarConfirmacionEstilizada(
+                accion === "inactivate"
+>>>>>>> pruebas
                     ? "¿Estás seguro de desactivar al paciente?"
                     : "¿Estás seguro de activar al paciente?"
             );
     
             if (!confirmacion) return;
     
+<<<<<<< HEAD
             if (action === "reactivate") {
                 // Solicitar motivo y reactivar sin mostrar una segunda confirmación
                 let motivoReactivacion = await solicitarMotivoReactivacion(
@@ -276,6 +433,30 @@ document.addEventListener("DOMContentLoaded", async function () {
                     body: JSON.stringify(bodyData),
                 }
             );
+=======
+            if (accion === "reactivate") {
+                const motivo = await solicitarMotivoReactivacion("Motivo de reactivación (obligatorio):");
+                if (!motivo) return;
+    
+                const nuevoPeriodo = await mostrarConfirmacionEstilizada(
+                    "Cuando actives al paciente activarás un nuevo periodo.",
+                    { soloAceptar: true, textoAceptar: "Enterado" }
+                );
+    
+                await reactivarPaciente(idPaciente, motivo, nuevoPeriodo);
+                return; // Ya actualizamos todo desde ahí
+            }
+    
+            // Si la acción es inactivar
+            const response = await fetch(`/pacientes/${idPaciente}/estado?id_terapeuta=${idTerapeuta}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
+                body: JSON.stringify({ action: "inactivate" })
+            });
+>>>>>>> pruebas
     
             if (!response.ok) throw new Error("❌ Error al cambiar el estado del paciente.");
             await response.json();
@@ -284,17 +465,28 @@ document.addEventListener("DOMContentLoaded", async function () {
             setTimeout(() => {
                 button.classList.toggle("active");
                 button.classList.toggle("inactive");
+<<<<<<< HEAD
                 button.setAttribute("data-estado", action === "inactivate" ? "inactivo" : "activo");
+=======
+                button.setAttribute("data-estado", "inactivo");
+>>>>>>> pruebas
                 button.classList.remove("toggle-anim");
     
                 cargarPacientesActivos(1);
                 cargarPacientesInactivos(1);
             }, 500);
     
+<<<<<<< HEAD
             mostrarMensaje("Estado del paciente actualizado correctamente.", "success");
     
         } catch (error) {
             mostrarMensaje(error.message, "error");
+=======
+            showMessage("Paciente desactivado correctamente.", "success");
+    
+        } catch (error) {
+            showMessage(error.message, "error");
+>>>>>>> pruebas
         }
     }
     
@@ -351,6 +543,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         });
     }
     
+<<<<<<< HEAD
     // 🔹 Función para seleccionar un paciente y cargar su historial clínico
     async function seleccionarPaciente(id_paciente) {
         try {
@@ -401,15 +594,64 @@ document.addEventListener("DOMContentLoaded", async function () {
     
     
     
+=======
+    // 🔹 Función para seleccionar un paciente y cargar su historial clínico (con validación de estado)
+    // 🔹 Función para seleccionar un paciente y cargar su historial clínico (con validación de estado)
+    async function seleccionarPaciente(id_paciente) {
+        try {
+            const response = await fetch(`/pacientes/estado/${id_paciente}`, {
+                method: "GET",
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error("No se pudo obtener la información del paciente.");
+            }
+
+            const data = await response.json();
+
+            if (data.estado_paciente !== "activo") {
+                showMessage("El paciente debe estar activo para ver su detalle de sesión.", "warning");
+                return;
+            }
+
+            // 🔥 Limpieza completa del localStorage antes de cambiar de paciente
+            const tokenBackup = localStorage.getItem("session_token");
+            const terapeutaBackup = localStorage.getItem("id_terapeuta");
+
+            localStorage.clear(); // borra todo
+            localStorage.setItem("session_token", tokenBackup); // recupera sesión
+            localStorage.setItem("id_terapeuta", terapeutaBackup); // recupera terapeuta
+
+            localStorage.setItem("id_paciente", id_paciente); // guarda paciente nuevo
+            window.location.href = "/historial_clinico";
+
+        } catch (error) {
+            console.error("❌ Error al validar estado del paciente:", error);
+            showMessage("Error al validar el estado del paciente.", "error");
+        }
+    }
+
+
+
+>>>>>>> pruebas
     function actualizarPaginacion(totalPages, currentPage, cargarFuncion, selector) {
         const paginationContainer = document.querySelector(selector);
         if (!paginationContainer) return;
         paginationContainer.innerHTML = "";
     
         if (totalPages > 1) {
+<<<<<<< HEAD
             let maxVisiblePages = 10;
             let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
             let endPage   = Math.min(totalPages, startPage + maxVisiblePages - 1);
+=======
+            let maxVisiblePages = 6; // Limit to 6 visible pages
+            let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+            let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+>>>>>>> pruebas
     
             if (endPage - startPage < maxVisiblePages - 1) {
                 startPage = Math.max(1, endPage - maxVisiblePages + 1);
@@ -479,7 +721,11 @@ document.addEventListener("DOMContentLoaded", async function () {
     searchPacienteBtn.addEventListener("click", async function () {
         const codigo = codigoPacienteInput.value.trim();
         if (!codigo) {
+<<<<<<< HEAD
             mostrarMensaje("Introduce un código de paciente.", "error");
+=======
+            showMessage("Introduce un código de paciente.", "warning");
+>>>>>>> pruebas
             return;
         }
     
@@ -499,7 +745,11 @@ document.addEventListener("DOMContentLoaded", async function () {
             console.log("📥 Paciente encontrado:", data);
     
             if (data.estado_paciente === "activo") {
+<<<<<<< HEAD
                 mostrarMensaje("Este paciente ya está activo con otro terapeuta.", "error");
+=======
+                showMessage("Este paciente ya está activo con otro terapeuta.", "error");
+>>>>>>> pruebas
                 return;
             }
     
@@ -520,10 +770,18 @@ document.addEventListener("DOMContentLoaded", async function () {
                 throw new Error(errorMessage.detail || "Error al asignar paciente.");
             }
     
+<<<<<<< HEAD
             mostrarMensaje(`Paciente ${data.nombre} ${data.primer_apellido} agregado como inactivo.`, "success");
     
             cargarPacientesInactivos();
     
+=======
+            showMessage(`Paciente ${data.nombre} ${data.primer_apellido} agregado como inactivo.`, "success");
+    
+            cargarPacientesInactivos();
+            
+            modal.style.display = "none";
+>>>>>>> pruebas
             // Mostrar ventana de motivo para reactivar
             const confirmMotivo = await solicitarMotivoReactivacion(`El paciente ${data.nombre} ${data.primer_apellido} está inactivo. ¿Deseas activarlo?`);
             if (confirmMotivo) {
@@ -533,8 +791,13 @@ document.addEventListener("DOMContentLoaded", async function () {
             modal.style.display = "none";
     
         } catch (error) {
+<<<<<<< HEAD
             console.error("❌ Error en la búsqueda:", error);
             mostrarMensaje(error.message, "error");
+=======
+            console.error("Error en la búsqueda:", error);
+            showMessage(error.message, "error");
+>>>>>>> pruebas
         }
     });
     
@@ -564,7 +827,11 @@ document.addEventListener("DOMContentLoaded", async function () {
                 console.log("📥 Paciente encontrado:", data);
     
                 if (data.estado_paciente === "activo") {
+<<<<<<< HEAD
                     mostrarMensaje("Este paciente ya está activo con otro terapeuta y no puede ser reasignado.", "error");
+=======
+                    showMessage("Este paciente ya está activo con otro terapeuta y no puede ser reasignado.", "error");
+>>>>>>> pruebas
                     return;
                 }
     
@@ -585,7 +852,11 @@ document.addEventListener("DOMContentLoaded", async function () {
                     throw new Error(errorMessage.detail || "Error al asignar paciente.");
                 }
     
+<<<<<<< HEAD
                 mostrarMensaje("Paciente asignado con éxito.", "success");
+=======
+                showMessage("Paciente asignado con éxito.", "success");
+>>>>>>> pruebas
     
                 const confirmMotivo = await solicitarMotivoReactivacion(`El paciente ${data.nombre} ${data.primer_apellido} está inactivo. ¿Deseas activarlo?`);
                 if (confirmMotivo) {
@@ -595,8 +866,13 @@ document.addEventListener("DOMContentLoaded", async function () {
                 modal.style.display = "none";
     
             } catch (error) {
+<<<<<<< HEAD
                 console.error("❌ Error en la búsqueda:", error);
                 mostrarMensaje(error.message, "error");
+=======
+                console.error("Error en la búsqueda:", error);
+                showMessage(error.message, "error");
+>>>>>>> pruebas
             }
     
         } else {
@@ -624,6 +900,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                 const searchValue = searchInput.value.trim();
                 cargarPacientesActivos(1, searchValue);
     
+<<<<<<< HEAD
                 mostrarMensaje("Paciente registrado con éxito.", "success");
                 modal.style.display = "none";
     
@@ -633,6 +910,50 @@ document.addEventListener("DOMContentLoaded", async function () {
             }
         }
     });
+=======
+                showMessage("Paciente registrado con éxito.", "success");
+                modal.style.display = "none";
+    
+            } catch (error) {
+                console.error("Error en la solicitud:", error);
+                showMessage("" + error.message, "error");
+            }
+        }
+    });
+
+    // ✅ Función reutilizable para reactivar paciente
+    async function reactivarPaciente(idPaciente, motivo, crearNuevoPeriodo = true) {
+        try {
+            const bodyData = {
+                action: "reactivate",
+                motivo: motivo,
+                create_new_record: crearNuevoPeriodo
+            };
+
+            const response = await fetch(`/pacientes/${idPaciente}/estado?id_terapeuta=${idTerapeuta}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
+                body: JSON.stringify(bodyData)
+            });
+
+            if (!response.ok) throw new Error("❌ Error al reactivar paciente.");
+            await response.json();
+
+            showMessage("Paciente reactivado exitosamente.", "success");
+
+            // Recargar listas
+            await cargarPacientesActivos();
+            await cargarPacientesInactivos();
+
+        } catch (error) {
+            console.error("Error al reactivar:", error);
+            mostrarMensaje(error.message, "error");
+        }
+    }
+>>>>>>> pruebas
     
     
     function iniciarPestañas() {
@@ -649,8 +970,17 @@ document.addEventListener("DOMContentLoaded", async function () {
     const logoutBtn = document.getElementById("logoutBtn");
     if (logoutBtn) {
         logoutBtn.addEventListener("click", () => {
+<<<<<<< HEAD
             localStorage.removeItem("session_token");
             window.location.href = "/login";
         });
     }
 });
+=======
+            console.warn("⚠️ Cierre de sesión desde botón.");
+            localStorage.clear();
+            window.location.href = "/";
+        });        
+    }
+});
+>>>>>>> pruebas

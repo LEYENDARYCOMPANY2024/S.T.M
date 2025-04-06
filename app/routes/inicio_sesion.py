@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from controllers.iniciar_sesion import autenticar_terapeuta
+<<<<<<< HEAD
 
 router = APIRouter()
 
@@ -9,6 +10,12 @@ class LoginRequest(BaseModel):
     nombre_usuario: str
     contrasena: str
 
+=======
+from models.terapeutas import LoginRequest
+
+router = APIRouter()
+
+>>>>>>> pruebas
 @router.post("/login")
 async def login_action(request: LoginRequest):
     resultado = autenticar_terapeuta(request.nombre_usuario, request.contrasena)

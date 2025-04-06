@@ -10,6 +10,7 @@ def generar_codigo_paciente():
     return ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
 
 def create_or_assign_paciente(db: Session, paciente_data: dict, id_terapeuta: int):
+<<<<<<< HEAD
     """
     Busca un paciente por su código único. Si ya existe, lo asigna al terapeuta.
     Si no existe, crea un nuevo paciente y lo asigna.
@@ -19,6 +20,12 @@ def create_or_assign_paciente(db: Session, paciente_data: dict, id_terapeuta: in
 
     if paciente_existente:
         # Verificar si ya está asignado al terapeuta
+=======
+    paciente_existente = db.query(Paciente).filter(Paciente.codigo == paciente_data.get("codigo")).first()
+
+    if paciente_existente:
+        # 🔍 Buscar si ya existe relación terapeuta-paciente
+>>>>>>> pruebas
         relacion_existente = db.query(TerapeutaPaciente).filter(
             TerapeutaPaciente.id_terapeuta_tp_fk == id_terapeuta,
             TerapeutaPaciente.id_paciente_tp_fk == paciente_existente.id_paciente
@@ -27,6 +34,7 @@ def create_or_assign_paciente(db: Session, paciente_data: dict, id_terapeuta: in
         if relacion_existente:
             raise ValueError("Este paciente ya está asignado a este terapeuta.")
 
+<<<<<<< HEAD
         # Si el paciente existe pero con otro terapeuta, solo se crea la relación
         nueva_relacion = TerapeutaPaciente(
             id_terapeuta_tp_fk=id_terapeuta,
@@ -37,6 +45,30 @@ def create_or_assign_paciente(db: Session, paciente_data: dict, id_terapeuta: in
         return {"message": "Paciente asignado a nuevo terapeuta.", "codigo": paciente_existente.codigo}
 
     # 🔹 SOLO CAMPOS QUE ESTÁN EN EL FORMULARIO
+=======
+        # ✅ Crear solo una vez la relación (si no existe)
+        relacion = TerapeutaPaciente(
+            id_terapeuta_tp_fk=id_terapeuta,
+            id_paciente_tp_fk=paciente_existente.id_paciente
+        )
+        db.add(relacion)
+        db.commit()
+        db.refresh(relacion)
+
+        # ✅ Crear historial solo si es una nueva relación
+        historial = HistorialProgreso(
+            id_terapeuta_paciente_fk=relacion.id_terapeuta_paciente,
+            fecha_inicio=date.today(),
+            fecha_fin=None,
+            resumen="Paciente reasignado"
+        )
+        db.add(historial)
+        db.commit()
+
+        return {"message": "Paciente asignado a nuevo terapeuta.", "codigo": paciente_existente.codigo}
+
+    # 🔹 Si no existe el paciente, lo creamos como siempre
+>>>>>>> pruebas
     required_fields = ["nombre", "primer_apellido", "edad", "genero"]
     for field in required_fields:
         if not paciente_data.get(field):
@@ -48,7 +80,11 @@ def create_or_assign_paciente(db: Session, paciente_data: dict, id_terapeuta: in
     nuevo_paciente = Paciente(
         nombre=paciente_data["nombre"],
         primer_apellido=paciente_data["primer_apellido"],
+<<<<<<< HEAD
         segundo_apellido=paciente_data.get("segundo_apellido"),  # Opcional
+=======
+        segundo_apellido=paciente_data.get("segundo_apellido"),
+>>>>>>> pruebas
         edad=paciente_data["edad"],
         codigo=paciente_data["codigo"],
         genero=paciente_data["genero"],
@@ -59,6 +95,7 @@ def create_or_assign_paciente(db: Session, paciente_data: dict, id_terapeuta: in
     db.commit()
     db.refresh(nuevo_paciente)
 
+<<<<<<< HEAD
     nueva_relacion = TerapeutaPaciente(
         id_terapeuta_tp_fk=id_terapeuta,
         id_paciente_tp_fk=nuevo_paciente.id_paciente
@@ -68,6 +105,18 @@ def create_or_assign_paciente(db: Session, paciente_data: dict, id_terapeuta: in
 
     historial = HistorialProgreso(
         id_terapeuta_paciente_fk=nueva_relacion.id_terapeuta_paciente,
+=======
+    relacion = TerapeutaPaciente(
+        id_terapeuta_tp_fk=id_terapeuta,
+        id_paciente_tp_fk=nuevo_paciente.id_paciente
+    )
+    db.add(relacion)
+    db.commit()
+    db.refresh(relacion)
+
+    historial = HistorialProgreso(
+        id_terapeuta_paciente_fk=relacion.id_terapeuta_paciente,
+>>>>>>> pruebas
         fecha_inicio=date.today(),
         fecha_fin=None,
         resumen="Paciente agregado"
@@ -78,6 +127,10 @@ def create_or_assign_paciente(db: Session, paciente_data: dict, id_terapeuta: in
     return {"message": "Paciente registrado exitosamente.", "codigo": nuevo_paciente.codigo}
 
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> pruebas
 def toggle_estado_paciente(
     db: Session,
     id_paciente: int,
@@ -115,7 +168,10 @@ def toggle_estado_paciente(
         return {"message": "Paciente en estado inactivo exitosamente"}
 
     elif action == "reactivate":
+<<<<<<< HEAD
         # ✅ Verificar si se ingresó un motivo
+=======
+>>>>>>> pruebas
         if not motivo:
             raise ValueError("Es obligatorio proporcionar un motivo para la reactivación.")
 
@@ -124,8 +180,23 @@ def toggle_estado_paciente(
         db.refresh(paciente)
 
         if create_new_record:
+<<<<<<< HEAD
             nuevo_resumen = f"Reactivado: {motivo}"
 
+=======
+            # 🔒 Cerrar historial anterior (si existe)
+            ultimo_historial = db.query(HistorialProgreso).filter(
+                HistorialProgreso.id_terapeuta_paciente_fk == relacion.id_terapeuta_paciente,
+                HistorialProgreso.fecha_fin.is_(None)
+            ).order_by(HistorialProgreso.id_historial.desc()).first()
+
+            if ultimo_historial:
+                ultimo_historial.fecha_fin = date.today()
+                db.commit()
+
+            # 🆕 Crear nuevo historial
+            nuevo_resumen = f"Reactivado: {motivo}"
+>>>>>>> pruebas
             nuevo_periodo = HistorialProgreso(
                 id_terapeuta_paciente_fk=relacion.id_terapeuta_paciente,
                 fecha_inicio=date.today(),
