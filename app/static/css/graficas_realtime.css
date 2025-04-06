@@ -1,0 +1,153 @@
+/* grafica_realtime.css */
+
+
+.chart-buttons button {
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: bold;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    background-color: #00bcd4;
+    color: white;
+    transition: background-color 0.3s ease;
+}
+
+.chart-buttons button:hover {
+    background-color: #0097a7;
+}
+.charts {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+#grafica_realtime {
+    width: 100%;
+    max-width: 800px;
+    height: 300px;
+    margin: 20px auto; /* Esto la centra */
+    display: block;
+    border-radius: 10px;
+    border: 2px solid white;
+    background-color: #0b2a3d;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+}
+
+
+.chart-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin: 15px 0;
+}
+
+
+
+
+.charts {
+    display: flex;
+    flex-direction: column; /* Pone la gráfica arriba y los botones abajo */
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+#grafica_chartjs {
+  width: 100%;
+  max-width: 800px;
+  height: 300px;
+  margin: 10px auto;
+  display: block;
+  border-radius: 10px;
+  border: 2px solid white;
+  background-color: #0b2a3d;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+  position: static !important;
+  object-fit: initial !important;
+  padding-bottom: 30px;
+}
+
+#grafica_smoothie {
+  width: 100%;
+  max-width: 800px;
+  height: 300px;
+  margin: 10px auto;
+  display: block;
+  border-radius: 10px;
+  border: 2px solid white;
+  background-color: #0b2a3d;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+  position: static !important;
+  object-fit: initial !important;
+  padding-bottom: 30px;
+}
+
+
+.chart-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px; /* Espacio entre los botones */
+    flex-wrap: wrap; /* Si hay muchos botones, se acomodan en otra línea */
+    margin-top: 10px;
+}
+
+
+.leyenda-piernas {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-bottom: 1rem;
+  }
+  
+  .item-leyenda {
+    color: white;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .cuadro-color {
+    width: 20px;
+    height: 20px;
+    display: inline-block;
+    border-radius: 4px;
+  }
+  
+
+  .estado-envio {
+    font-weight: bold;
+    margin-left: 10px;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 14px;
+  }
+  
+  .estado-envio.status-true {
+    background-color: #4CAF50;
+    color: white;
+  }
+  
+  .estado-envio.status-false {
+    background-color: #f44336;
+    color: white;
+  }
+  
+
+  .btn-switch {
+    background-color: #222;         /* Fondo oscuro */
+    color: #fff;                    /* Texto blanco */
+    border: 2px solid #4CAF50;      /* Borde con color de tu paleta */
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: bold;
+    transition: background-color 0.3s;
+  }
+  
+  .btn-switch:hover {
+    background-color: #4CAF50;      /* Verde al pasar el mouse */
+    color: #000;                    /* Texto oscuro para contraste */
+  }
+  

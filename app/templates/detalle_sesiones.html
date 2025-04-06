@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sesión de Monitoreo</title>
+
+  <!-- Estilos -->
+  <link rel="stylesheet" href="/static/css/detalle_sesiones.css" />
+  <link rel="stylesheet" href="/static/css/graficas_realtime.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+  <!-- Librerías -->
+  <script src="/static/libs/supabase.min.js"></script>
+  <script src="/static/libs/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
+  <script src="/static/libs/smoothie.min.js"></script>
+</head>
+<body>
+
+  <!-- Top bar -->
+  <div class="top-bar">
+    <div class="user-icon">
+      <i class="bi bi-person-circle"></i>
+    </div>
+  </div>
+
+  <!-- Navegación lateral -->
+  <nav class="navigation">
+    <div class="menu-icon">
+      <a href="/principal" class="home-button"><i class="bi bi-house-fill"></i></a>
+    </div>
+    <a href="/historial_clinico"><i class="bi bi-clock-history me-2"></i> Historia Clínica</a>
+    <a href="/sesiones" class="selected"><i class="bi bi-menu-down me-2"></i> Sesiones</a>
+    <a href="/dispositivos"><i class="bi bi-cpu me-2"></i> Dispositivos</a>
+    <a href="/niveles_ejercicios"><i class="bi bi-person-walking me-2"></i> Ejercicios</a>
+    <a href="/chat"><i class="bi bi-chat-dots me-2"></i> Chat</a>
+  </nav>
+
+  <!-- Encabezado -->
+  <header class="header">
+    <div class="back-arrow" id="salir-detalle"><i class="bi bi-box-arrow-left"></i></div>
+    <div>
+      <h1 id="session-title">Sesión</h1>
+      <p id="session-date">📅 Cargando fecha...</p>
+      <p id="session-time">⏰ Cargando hora...</p>
+    </div>
+  </header>
+
+  <!-- Contenedor principal -->
+  <div class="main-container">
+    <div class="content-grid">
+      <!-- Panel izquierdo (MediaPipe) -->
+      <div class="panel">
+        <div class="panel-header">Visualización</div>
+        <div class="panel-content">
+          <div class="video-container">
+            <video id="videoElement" autoplay playsinline></video>
+            <canvas id="canvasElement"></canvas>
+            <video id="recordedVideo" controls playsinline></video>
+            <div class="placeholder">La previsualización aparecerá aquí</div>
+          </div>
+          <div class="button-row">
+            <button id="startButton" class="btn-primary">
+                <i class="fas fa-video"></i> Iniciar Cámara
+            </button>
+        
+            <button id="recordButton" class="btn-danger" disabled>
+                <i class="fas fa-circle"></i> Grabar
+            </button>
+        
+            <button id="stopButton" class="btn-secondary" disabled>
+                <i class="fas fa-stop"></i> Detener
+            </button>
+        
+            <button id="processButton" class="btn-success" disabled>
+                <i class="fas fa-cogs"></i> Procesar
+            </button>
+        
+            <button id="resetVideoButton" class="btn">
+                <i class="fas fa-redo"></i> Reiniciar Video
+            </button>
+        </div>
+        
+          <div class="control-group">
+            <div class="control-group-title">Filtros</div>
+            <div class="filter-buttons" id="groupFilter"></div>
+          </div>
+          <div class="control-group">
+            <div class="control-group-title">Controles de Visualización</div>
+            <div class="slider-control">
+              <span>Velocidad de procesamiento:</span>
+              <input type="range" id="speedSlider" min="1" max="20" value="3"/>
+              <span id="speedValue">3</span>
+            </div>
+            <div class="slider-control">
+              <span>Tamaño de puntos:</span>
+              <input type="range" id="pointSizeSlider" min="3" max="15" value="6"/>
+              <span id="pointSizeValue">6px</span>
+            </div>
+            <div class="checkbox-group">
+              <label><input type="checkbox" id="showLabels" checked/> Mostrar etiquetas</label>
+              <label><input type="checkbox" id="showConnections" checked/> Mostrar conexiones</label>
+              <label><input type="checkbox" id="showHoverInfo" checked/> Info al pasar mouse</label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Panel derecho (tabla) -->
+      <div class="panel">
+        <div class="panel-header">Datos de Puntos de Pose</div>
+        <div class="panel-content">
+          <div class="slider-control">
+            <span>Seleccionar Frame:</span>
+            <input type="range" id="frameSlider" min="0" max="0" value="0"/>
+            <span><span id="frameValue">0</span> / <span id="totalFrameValue">0</span></span>
+          </div>
+          <div class="data-header">
+            <input type="text" id="tableFilter" class="search-input" placeholder="Filtrar puntos..."/>
+            <button id="exportButton" class="btn-secondary" disabled>Exportar CSV</button>
+          </div>
+          <div class="table-container">
+            <table id="dataTable">
+              <thead>
+                <tr>
+                  <th>Punto</th>
+                  <th>Grupo</th>
+                  <th>Color</th>
+                  <th>X</th>
+                  <th>Y</th>
+                  <th>Visibilidad</th>
+                </tr>
+              </thead>
+              <tbody id="tableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Gráfica y nota -->
+  <div class="container">
+    <div class="left-panel">
+      <div class="charts">
+        <button id="toggleChart" class="btn-switch">Cambiar a Chart.js</button>
+        <canvas id="grafica_smoothie" width="800" height="300"></canvas>
+        <canvas id="grafica_chartjs"></canvas>
+        <div class="chart-buttons">
+          <button id="pauseButton" onclick="pausarGraficaActual()">▶️ Iniciar</button>
+          <button onclick="reiniciarGrafica()">🔄 Reiniciar</button>
+          <button onclick="exportarGraficaActual()">💾 Guardar CSV</button>
+          <button onclick="importarCSVActual()">📥 Importar CSV</button>
+          <input type="file" id="importInput_chartjs" accept=".csv" style="display:none" onchange="chartjs_importarCSV(event)">
+          <input type="file" id="importInput_smoothie" accept=".csv" style="display:none" onchange="smoothie_importarCSV(event)">
+        </div>
+        <div id="dispositivos-activos" class="device-controls">
+          <h3>Dispositivos Activos</h3>
+        </div>
+        <button id="finalizarSesion" class="btn-danger">🛑 Finalizar Sesión</button>
+      </div>
+    </div>
+
+    <div class="right-column">
+      <div class="description-box">
+        <div class="black-header">Descripción</div>
+        <div class="description-lines">
+          <textarea id="session-description" class="line" placeholder="Escribe la descripción aquí..." rows="3"></textarea>
+        </div>
+      </div>
+      <div class="evolution-box">
+        <div class="black-header">Nota Evolutiva</div>
+        <div class="evolution-lines">
+          <textarea id="nota-evolutiva" class="line" placeholder="Escribe aquí..." rows="10" cols="50" style="resize: none;"></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="message-container"></div>
+
+  <!-- Scripts -->
+
+  <script>
+    window.tipoGraficaActiva = "chartjs"; // o "smoothie" si prefieres iniciar con Smoothie
+  </script>
+  
+  <script>
+    window.reinicioPendiente = false;
+    let currentChart = 'chartjs';
+
+    document.getElementById("toggleChart").addEventListener("click", () => {
+      if (window.reinicioPendiente) {
+        alert("🔄 Reinicia la gráfica antes de cambiar de tipo.");
+        return;
+      }
+    
+      const smoothieCanvas = document.getElementById("grafica_smoothie");
+      const chartjsCanvas = document.getElementById("grafica_chartjs");
+      const toggleBtn = document.getElementById("toggleChart");
+    
+      if (currentChart === 'smoothie') {
+        smoothieCanvas.style.display = "none";
+        chartjsCanvas.style.display = "block";
+        currentChart = 'chartjs';
+        toggleBtn.textContent = "Cambiar a Smoothie";
+        smoothie_realtimePaused = true;
+        chartjs_realtimePaused = false;
+        window.tipoGraficaActiva = "chartjs"; // ✅ Agrega esta línea
+    
+        // 🟢 Agrega esto si no lo tienes
+        if (window.chartjs_suscribirRealtime) chartjs_suscribirRealtime();
+    
+      } else {
+        chartjsCanvas.style.display = "none";
+        smoothieCanvas.style.display = "block";
+        currentChart = 'smoothie';
+        toggleBtn.textContent = "Cambiar a Chart.js";
+        chartjs_realtimePaused = true;
+        smoothie_realtimePaused = false;
+        window.tipoGraficaActiva = "smoothie"; // ✅ Agrega esta línea
+    
+        // 🟢 Agrega esto si no lo tienes
+        if (window.smoothie_suscribirseRealtime) smoothie_suscribirseRealtime();
+      }
+    });
+    
+    
+
+    function marcarCambioChart() {
+      window.reinicioPendiente = true;
+    }
+
+    function reiniciarGrafica() {
+      window.reinicioPendiente = false;
+    
+      if (currentChart === 'smoothie') {
+        if (typeof window.smoothie_reiniciarGrafica === "function") {
+          window.smoothie_reiniciarGrafica();
+        }
+      } else {
+        if (typeof window.chartjs_reiniciarChartJS === "function") {
+          window.chartjs_reiniciarChartJS();
+        }
+      }
+    }
+    
+    function exportarGraficaActual() {
+        if (currentChart === "chartjs" && typeof chartjs_exportarCSV === "function") {
+          chartjs_exportarCSV();
+        } else if (currentChart === "smoothie" && typeof smoothie_exportarCSV === "function") {
+          smoothie_exportarCSV();
+        } else {
+          alert("⚠️ No se puede exportar en este momento.");
+        }
+      }
+      function pausarGraficaActual() {
+        if (currentChart === "chartjs" && typeof window.chartjs_togglePause === "function") {
+          window.chartjs_togglePause();
+        } else if (currentChart === "smoothie" && typeof window.smoothie_togglePause === "function") {
+          window.smoothie_togglePause();
+        }
+      }
+
+      function importarCSVActual() {
+        if (currentChart === "chartjs") {
+          document.getElementById("importInput_chartjs").click();
+        } else if (currentChart === "smoothie") {
+          document.getElementById("importInput_smoothie").click();
+        }
+      }
+
+    // Asegura que el botón empiece con texto correcto
+    window.addEventListener('DOMContentLoaded', () => {
+        document.getElementById("grafica_smoothie").style.display = "none";
+        document.getElementById("grafica_chartjs").style.display = "block";
+        document.getElementById("pauseButton").textContent = "▶️ Iniciar";
+      });
+  </script>
+  <script src="/static/js/mediapipe.js"></script>
+  <script src="/static/js/grafica_chart.js" defer></script>
+  <script src="/static/js/grafica_smoothie.js" defer></script>
+  <script src="/static/js/detalle_sesiones.js"></script>
+  <script>
+    window.handleImportCSV = function (event) {
+      if (window.tipoGraficaActiva === "chartjs") {
+        chartjs_importarCSV(event);
+      } else if (window.tipoGraficaActiva === "smoothie") {
+        smoothie_importarCSV(event);
+      } else {
+        console.warn("❓ Tipo de gráfica desconocido");
+      }
+    };
+    
+  </script>
+</body>
+</html>

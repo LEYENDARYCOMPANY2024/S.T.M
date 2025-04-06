@@ -1,0 +1,961 @@
+/* Reset and Base Styles */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+/* Custom Properties */
+:root {
+    --primary-gradient: #08232b;
+    --glass-bg: rgba(255, 255, 255, 0.15);
+    --glass-hover: rgba(255, 255, 255, 0.25);
+    --transition: all 0.3s ease;
+}
+
+/* Body Styles */
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: var(--primary-gradient);
+    background-attachment: fixed;
+    background-size: cover;
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    color: white;
+    
+}
+
+/* Top Bar */
+.top-bar {
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    padding: 1.5rem;
+    text-align: right;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.user-icon i {
+    color: white;
+    font-size: 2.5rem;
+    transition: var(--transition);
+}
+
+.user-icon i:hover {
+    transform: scale(1.1);
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+/* Search Bar */
+.search-bar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 2rem auto;
+    max-width: 600px;
+    padding: 0 1rem;
+}
+
+.search-bar input {
+    width: 100%;
+    padding: 1rem 1.5rem;
+    font-size: 1.1rem;
+    border: 2px solid transparent;
+    border-radius: 12px;
+    background: var(--glass-bg);
+    color: white;
+    transition: var(--transition);
+}
+
+.search-bar input::placeholder {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.search-bar input:focus {
+    outline: none;
+    background: var(--glass-hover);
+    border-color: rgba(255, 255, 255, 0.3);
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+}
+
+/* Close Button */
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    margin-left: 1rem;
+    cursor: pointer;
+    color: white;
+    transition: var(--transition);
+}
+
+.close-btn:hover {
+    transform: rotate(90deg);
+    color: rgba(255, 255, 255, 0.8);
+}
+
+/* Patients List */
+:root {
+    --primary-color: #4a90e2;
+    --secondary-color: #7ed6df;
+    --background-color: rgba(255, 255, 255, 0.1);
+    --hover-background: rgba(255, 255, 255, 0.2);
+    --text-color: #ffffff;
+    --shadow-color: rgba(0, 0, 0, 0.2);
+    --border-color: rgba(255, 255, 255, 0.3);
+    --active-color: #6bff6b;
+    --inactive-color: #ff6b6b;
+}
+
+.patients-list {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* Fixed to 3 columns */
+    grid-template-rows: repeat(2, 1fr); /* Fixed to 2 rows */
+    gap: 2rem;
+    padding: 2rem;
+    max-width: 1200px;
+    margin: auto;
+    height: calc(2 * (300px + 2rem)); /* Ensure fixed height */
+}
+
+.patient-card {
+    background: var(--background-color);
+    color: var(--text-color);
+    padding: 2rem;
+    border-radius: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    box-shadow: 0 5px 15px var(--shadow-color);
+    border: 1px solid var(--border-color);
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease-in-out;
+    position: relative;
+    overflow: hidden;
+    padding-bottom: 3rem;
+    aspect-ratio: 1 / 1; /* Ensure square-like cards */
+    width: 100%; /* Full width of grid cell */
+    height: 100%; /* Full height of grid cell */
+}
+
+/* If fewer than 6 cards, use grid-template-areas to center them */
+.patients-list:has(.patient-card:nth-child(-n+3)) {
+    grid-template-areas: 
+        "a b c"
+        ". . .";
+}
+
+.patients-list:has(.patient-card:nth-child(4)) {
+    grid-template-areas: 
+        "a b c"
+        "d . .";
+}
+
+.patients-list:has(.patient-card:nth-child(5)) {
+    grid-template-areas: 
+        "a b c"
+        "d e .";
+}
+
+.patients-list:has(.patient-card:nth-child(6)) {
+    grid-template-areas: 
+        "a b c"
+        "d e f";
+}
+
+.patients-list .patient-card:nth-child(1) { grid-area: a; }
+.patients-list .patient-card:nth-child(2) { grid-area: b; }
+.patients-list .patient-card:nth-child(3) { grid-area: c; }
+.patients-list .patient-card:nth-child(4) { grid-area: d; }
+.patients-list .patient-card:nth-child(5) { grid-area: e; }
+.patients-list .patient-card:nth-child(6) { grid-area: f; }
+
+/* Rest of the existing styles remain the same */
+.patient-card:hover {
+    transform: translateY(-8px);
+    background: var(--hover-background);
+    box-shadow: 0 10px 25px var(--shadow-color);
+}
+
+.patient-card .user-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    color: var(--primary-color);
+}
+
+.patient-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 1rem;
+}
+
+.patient-info span {
+    margin-bottom: 0.5rem;
+}
+
+.toggle-container {
+    position: absolute;
+    bottom: 1rem;
+    right: 1rem;
+}
+/* Enter Button */
+.enter-btn {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: var(--transition);
+    padding: 0.5rem;
+}
+
+.enter-btn:hover {
+    transform: translateX(5px);
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+/* Variables globales */
+:root {
+    --primary-gradient: #08232b;
+    --glass-bg: rgba(255, 255, 255, 0.15);
+    --glass-hover: rgba(255, 255, 255, 0.25);
+    --transition: all 0.3s ease;
+}
+
+/* Reset básico */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+/* Estilos base */
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: var(--primary-gradient);
+    background-attachment: fixed;
+    background-size: cover;
+    min-height: 100vh;
+    color: white;
+    overflow-x: hidden;
+}
+
+/* Barra superior */
+.top-bar {
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px);
+    padding: 1.5rem;
+    text-align: right;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.user-icon i {
+    color: white;
+    font-size: 2.5rem;
+    transition: var(--transition);
+}
+
+.user-icon i:hover {
+    transform: scale(1.1);
+}
+
+/* Barra de búsqueda */
+.search-bar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 2rem auto;
+    max-width: 600px;
+    padding: 0 1rem;
+}
+
+.search-bar input {
+    width: 100%;
+    padding: 1rem 1.5rem;
+    font-size: 1.1rem;
+    border: none;
+    border-radius: 12px;
+    background: var(--glass-bg);
+    color: white;
+    transition: var(--transition);
+}
+
+.search-bar input::placeholder {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.search-bar input:focus {
+    outline: none;
+    background: var(--glass-hover);
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    margin-left: 1rem;
+    cursor: pointer;
+    color: white;
+}
+
+/* Lista de pacientes */
+
+
+.enter-btn {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+/* Botón de agregar */
+.add-btn {
+    background: var(--glass-bg);
+    border: none;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(12px);
+    z-index: 1000;
+    transition: var(--transition);
+}
+
+.add-btn i {
+    font-size: 1.8rem;
+    color: white;
+}
+
+.add-btn:hover {
+    transform: scale(1.1);
+    background: var(--glass-hover);
+}
+
+/* Modal */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(5px);
+    z-index: 1001;
+    justify-content: center;
+    align-items: center;
+}
+.modal-content {
+    background-color: #08232b;
+    width: 10%;  /* Almost full width */
+    max-width: 800px;  /* Much wider max-width */
+    padding: 2.5rem;
+    border-radius: 20px;
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+}
+
+
+.modal-content::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 6px;  /* Thickness of the red line */
+    background: linear-gradient(to right, #ff0000, #ff4500);  /* Gradient red line */
+    z-index: 10;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .modal-content {
+        width: 98%;  /* Even wider on smaller screens */
+        padding: 1.5rem;
+    }
+}
+
+/* Ensure form inputs are full width */
+.modal-content form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    width: 100%;
+}
+
+.modal-content input,
+.modal-content select {
+    width: 100%;
+    padding: 1rem;
+}
+
+.modal-content {
+    width: 50%;  /* Almost full width */
+    max-width: 800px;  /* Much wider max-width */
+    padding: 2.5rem;
+    border-radius: 20px;
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+}
+
+.modal-content h2 {
+    text-align: center;
+    margin-bottom: 2rem;  /* More space below title */
+    font-size: 2rem;  /* Larger title */
+}
+
+.modal-content form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.modal-content input,
+.modal-content select {
+    width: 100%;
+    padding: 1rem;
+    border: none;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    font-size: 1rem;
+}
+
+.modal-content input::placeholder {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.modal-content input:focus,
+.modal-content select:focus {
+    outline: none;
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.submit-btn {
+    background: linear-gradient(135deg, #00bcd4, #009688);
+    color: white;
+    border: none;
+    padding: 1rem;
+    border-radius: 10px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    margin-top: 1rem;
+    transition: var(--transition);
+}
+
+.submit-btn:hover {
+    background: linear-gradient(135deg, #00acc1, #00796b);
+    transform: translateY(-2px);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .modal-content {
+        width: 98%;  /* Even wider on smaller screens */
+        padding: 2rem;
+        max-width: 95%;
+    }
+
+
+    .patient-card {
+        width: 95%;
+        padding: 1rem;
+        font-size: 1rem;
+    }
+
+    .add-btn {
+        width: 50px;
+        height: 50px;
+        bottom: 1.5rem;
+        right: 1.5rem;
+    }
+
+    .add-btn i {
+        font-size: 1.5rem;
+    }
+}
+/* Agregar al CSS existente */
+/* Estilos del encabezado del modal */
+/* Estilos del botón de cerrar */
+.close-modal-btn {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 1.8rem;
+    font-weight: bold;
+    cursor: pointer;
+    color: red;
+    transition: 0.3s ease;
+}
+
+.close-modal-btn:hover {
+    color: #ff4d4d; /* Cambia de color al pasar el mouse */
+    transform: scale(1.1);
+}
+
+/* Asegurar que el modal tenga posición relativa */
+.modal-content {
+    position: relative;
+    padding: 20px;
+    border-radius: 8px;
+}
+
+
+
+
+/* Estilos para el select y sus opciones */
+.modal-content select {
+    width: 100%;
+    padding: 1rem;
+    border: none;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.modal-content select option {
+    background: white;  /* Fondo blanco para las opciones */
+    color: black;      /* Texto negro para las opciones */
+    padding: 1rem;     /* Padding para mejor espaciado */
+}
+
+/* Para asegurar que el placeholder del select sea blanco */
+.modal-content select option[value=""][disabled] {
+    color: rgba(255, 255, 255, 0.8);
+}
+/* Notificaciones y mensajes */
+#message-container {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 3000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: auto;
+    max-width: 90%;
+  }
+  
+  .message {
+    background-color: #989ad5;
+    color: black;
+    padding: 12px 24px;
+    border-radius: 8px;
+    margin: 8px 0;
+    box-shadow: 0 4px 12px rgba(152, 154, 213, 0.4);
+    font-family: 'Arial', sans-serif;
+    font-size: 16px;
+    opacity: 0;
+    transform: translateY(-20px);
+    animation: message-appear-top 0.3s forwards, message-fade-top 0.3s 2.7s forwards;
+    text-align: center;
+    min-width: 200px;
+    border-left: 4px solid #7679c0;
+    position: relative;
+  }
+  
+  .message.success {
+    background-color: #98d5aa;
+    border-left-color: #50c57c;
+  }
+  
+  .message.warning {
+    background-color: #d5c698;
+    border-left-color: #c0b576;
+  }
+  
+  .message.error {
+    background-color: #d59898;
+    border-left-color: #c07676;
+  }
+  
+  @keyframes message-appear-top {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+  }
+  
+  @keyframes message-fade-top {
+    to {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+  }
+
+
+.estado-btn {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    margin-left: 10px;
+}
+.estado-btn:hover {
+    opacity: 0.7;
+}
+
+
+
+.tab-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.tab-btn {
+    background-color: #ddd;
+    border: none;
+    padding: 10px 20px;
+    margin: 0 5px;
+    cursor: pointer;
+    font-size: 16px;
+    border-radius: 5px;
+}
+
+.tab-btn.active {
+    background: linear-gradient(135deg, #134e5e, #71b280);
+    color: white;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content:not(.hidden) {
+    display: block;
+}
+
+.hidden {
+    display: none;
+}
+
+
+
+
+/* Estilos para la paginación */
+.pagination-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(255, 255, 255, 0.2);
+    padding: 10px;
+    border-radius: 20px;
+    box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(10px);
+    z-index: 1000;
+}
+
+.pagination-btn {
+    background: rgba(255, 255, 255, 0.3);
+    border: none;
+    padding: 10px 15px;
+    font-size: 16px;
+    color: white;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin: 0 5px;
+}
+
+.pagination-btn:hover {
+    background: rgba(255, 255, 255, 0.5);
+    transform: scale(1.1);
+}
+
+.pagination-btn.active {
+    background: #1565;
+    color: white;
+    font-weight: bold;
+    box-shadow: 0px 0px 10px rgb(255, 255, 255);
+}
+
+.pagination-nav {
+    font-weight: bold;
+}
+
+.pagination-dots {
+    font-size: 18px;
+    color: rgba(255, 255, 255, 0.7);
+    padding: 10px;
+}
+
+
+/* Estilos del botón de cambio de estado */
+.toggle-btn {
+    width: 60px;
+    height: 30px;
+    border-radius: 20px;
+    border: none;
+    position: relative;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.3s ease;
+    overflow: hidden;
+}
+
+.toggle-btn .toggle-slider {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: white;
+    position: absolute;
+    top: 2px;
+    left: 3px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Estado activo (verde) */
+.toggle-btn.active {
+    background: #28a745;
+    box-shadow: 0px 0px 15px rgba(40, 167, 69, 0.8);
+}
+
+.toggle-btn.active .toggle-slider {
+    transform: translateX(30px);
+    box-shadow: 0px 0px 10px rgba(255, 255, 255, 0.5);
+}
+
+/* Estado inactivo (rojo) */
+.toggle-btn.inactive {
+    background: #dc3545;
+    box-shadow: 0px 0px 15px rgba(220, 53, 69, 0.8);
+}
+
+.toggle-btn.inactive .toggle-slider {
+    transform: translateX(0);
+    box-shadow: 0px 0px 10px rgba(255, 255, 255, 0.5);
+}
+
+/* Animación de cambio de estado */
+.toggle-anim {
+    transform: scale(1.1);
+}
+
+.patient-info {
+    display: flex;
+    align-items: center; /* Mantener el código y el nombre en la misma línea */
+}
+
+/* Código del paciente con mejor contraste y visibilidad */
+.patient-code {
+    font-size: 1rem;
+    font-weight: bold;
+    color: #ffffff; /* Blanco puro para mayor contraste */
+    background: rgba(255, 255, 255, 0.3); /* Fondo más sólido con transparencia */
+    padding: 6px 14px;
+    border-radius: 10px;
+    display: inline-block;
+    margin-left: 20px; /* Espacio a la derecha del nombre */
+    box-shadow: 0px 0px 12px rgba(255, 255, 255, 0.6); /* Brillo más fuerte */
+    border: 1px solid rgba(255, 255, 255, 0.5); /* Borde blanco semitransparente */
+    text-shadow: 0px 0px 5px rgba(255, 255, 255, 0.7); /* Efecto de resplandor */
+}
+
+
+
+.reset-btn {
+    /* Ajusta colores y dimensiones a tu gusto */
+    cursor: pointer;
+    transition: transform 0.3s ease;
+  }
+  
+  .reset-btn:hover {
+    transform: rotate(360deg);
+  }
+
+
+/* Modal de Confirmación */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1001;
+}
+
+.confirm-box {
+    background: var(--primary-gradient);
+    padding: 2rem;
+    border-radius: 20px;
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+}
+
+.confirm-buttons {
+    margin-top: 1rem;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.btn-confirm, .btn-cancel {
+    padding: 10px 20px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-confirm {
+    background: #28a745;
+    color: white;
+}
+
+.btn-confirm:hover {
+    background: #218838;
+}
+
+.btn-cancel {
+    background: #dc3545;
+    color: white;
+}
+
+.btn-cancel:hover {
+    background: #c82333;
+}
+
+/* Estilos para la ventana de confirmación */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background-color: #08232b;
+    width: 50%;  /* Almost full width */
+    max-width: 500px;  /* Much wider max-width */
+    padding: 2.5rem;
+    border-radius: 20px;
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+}
+
+.confirm-box h2 {
+    margin: 0;
+    font-size: 20px;
+    color: white;
+}
+
+.confirm-box p {
+    margin: 10px 0;
+    font-size: 16px;
+    color: white;
+}
+
+.confirm-buttons {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-around;
+}
+
+/* Estilos para los botones */
+.btn-confirm {
+    background-color: #28a745; /* Verde */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s ease-in-out;
+}
+
+.btn-confirm:hover {
+    background-color: #218838;
+}
+
+.btn-cancel {
+    background-color: #dc3545; /* Rojo */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s ease-in-out;
+}
+
+.btn-cancel:hover {
+    background-color: #c82333;
+}
+
+
+#searchPacienteBtn {
+    width: 30%;
+    height: 2.2rem;  /* 🔹 Altura reducida */
+    padding: 0.3rem 1rem; /* 🔹 Padding pequeño */
+    margin-top: 0.5rem; /* 🔹 Agrega margen arriba */
+    margin-bottom: 0.5rem; /* 🔹 Agrega margen abajo */
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #00bcd4, #009688);
+    color: white;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#searchPacienteBtn:hover {
+    background: linear-gradient(135deg, #00acc1, #00796b);
+    transform: translateY(-2px);
+}
+
+.reset-btn {
+    background-color: transparent; /* Rojo llamativo */
+    color: black; /* Texto en blanco */
+    border: none; /* Sin borde */
+    padding: 10px 20px; /* Espaciado interno */
+    font-size: 16px; /* Tamaño del texto */
+    font-weight: bold; /* Texto en negrita */
+    border-radius: 5px; /* Bordes redondeados */
+    cursor: pointer; /* Cambia el cursor al pasar por encima */
+    transition: background-color 0.3s ease;
+}
+
+.reset-btn:hover {
+    background-color: transparent; /* Color más oscuro al pasar el mouse */
+}
+
+
+

@@ -1,0 +1,817 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --primary-color: #ffffff;
+    --secondary-color: #70c1ff;
+    --border-color: #ffffff;
+    --hover-color: rgba(255, 255, 255, 0.1);
+    --background-dark: #08232b;
+    --background-light: rgba(255, 255, 255, 0.05);
+    --accent-purple: #00bcd4;
+    --accent-pink: #d4619f;
+    --shadow-color: rgba(0, 0, 0, 0.5);
+    --accent-gradient: linear-gradient(135deg, #00bcd4, #009688);
+    --accent-gradient-hover: linear-gradient(135deg, #00acc1, #00796b);
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: var(--background-dark);
+    color: var(--primary-color);
+    line-height: 1.6;
+    overflow-x: hidden;
+}
+
+/* Top Navigation Bar */
+.top-bar {
+    background: var(--background-dark);
+    padding: 10px 5%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 10px var(--shadow-color);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.menu-icon, .user-icon {
+    color: var(--primary-color);
+    font-size: clamp(18px, 4vw, 24px);
+    cursor: pointer;
+    padding: 5px;
+    transition: transform 0.3s ease;
+}
+
+.menu-icon:hover, .user-icon:hover {
+    transform: scale(1.1);
+}
+
+/* Main Navigation */
+.navigation {
+    background: var(--background-light);
+    padding: 10px 0;
+    display: flex;
+    justify-content: center;
+    gap: clamp(10px, 3vw, 50px);
+    border-bottom: 1px solid #444;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+.navigation a {
+    color: var(--primary-color);
+    text-decoration: none;
+    padding: 12px clamp(5px, 2vw, 20px);
+    font-size: clamp(14px, 2.5vw, 18px);
+    border-radius: 5px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    white-space: nowrap;
+    text-align: center;
+}
+
+.navigation a::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: linear-gradient(135deg, #a4f2e1, #cbd3f2);
+    transition: width 0.3s ease, left 0.3s ease;
+}
+
+.navigation a:hover::before {
+    width: 100%;
+    left: 0;
+}
+
+.navigation a:hover {
+    background-color: var(--hover-color);
+}
+
+.navigation a:active {
+    transform: scale(0.98);
+}
+
+.navigation a.selected {
+    background: linear-gradient(135deg, #134e5e, #71b280);
+    color: black;
+}
+
+.navigation a.selected:hover {
+    background: linear-gradient(135deg, #1e6776, #8fd7a0);
+}
+
+.d-flex {
+    display: flex;
+}
+
+.align-items-center {
+    align-items: center;
+}
+
+.me-2 {
+    margin-right: 0.5rem;
+}
+
+/* Responsive */
+@media screen and (max-width: 768px) {
+    .navigation {
+        flex-direction: column;
+        align-items: center;
+        padding: 5px 0;
+        gap: 5px;
+    }
+
+    .navigation a {
+        width: 90%;
+        padding: 10px 5px;
+    }
+
+    .top-bar {
+        padding: 10px 3%;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .top-bar {
+        padding: 8px 2%;
+    }
+
+    .menu-icon, .user-icon {
+        font-size: 16px;
+        padding: 3px;
+    }
+
+    .navigation a {
+        font-size: 14px;
+        padding: 8px 5px;
+    }
+}
+
+/* Mobile Menu */
+.mobile-menu {
+    display: none;
+    background: var(--background-light);
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2000;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+}
+
+.mobile-menu.active {
+    display: flex;
+}
+
+.close-menu {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-size: 24px;
+    cursor: pointer;
+    color: var(--accent-purple);
+}
+
+.container {
+    width: 95%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 30px 15px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 30px;
+    flex-wrap: nowrap;
+    background: var(--background-light);
+    border-radius: 12px;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 25px 50px var(--shadow-color);
+}
+
+.session-button {
+    background: var(--accent-purple);
+    color: white;
+    padding: 30px;
+    border-radius: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    width: 100%;
+    max-width: 500px;
+    height: 100px;
+    box-shadow: 0 25px 50px var(--shadow-color);
+    margin-bottom: 20px;
+}
+
+.session-button span {
+    font-size: 1.5rem;
+}
+
+.session-button .icon {
+    width: 24px;
+    height: 24px;
+    border: 2px solid white;
+    border-radius: 50%;
+    position: relative;
+}
+
+.session-button .icon::after {
+    content: '→';
+    color: white;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.add-session {
+    background: var(--background-light);
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    width: 100%;
+    max-width: 500px;
+    box-shadow: 0 15px 30px var(--shadow-color);
+}
+
+.add-session h2 {
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+    text-align: center;
+    color: var(--primary-color);
+}
+
+.input-field {
+    background-color: transparent;
+    color: white;
+    padding: 12px;
+    margin-bottom: 15px;
+    width: 100%;
+    border: 2px solid var(--border-color);
+    border-radius: 5px;
+    font-size: 0.9rem;
+}
+
+.calendar {
+    background: transparent;
+    padding: 15px;
+    border-radius: 15px;
+    margin: 20px 0;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+    border: 2px solid var(--border-color);
+    width: 100%;
+}
+
+.month {
+    font-size: 20px;
+    margin-bottom: 15px;
+    color: white;
+    text-align: center;
+}
+
+.controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.calendar button {
+    padding: 8px 12px;
+    background: var(--accent-purple);
+    background: linear-gradient(135deg, #74ebd5, #ACB6E5);
+
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: 0.3s;
+    font-size: 16px;
+}
+
+.calendar button:hover {
+    background: linear-gradient(135deg, #a4f2e1, #cbd3f2);
+    color: var(--accent-purple);
+}
+
+.days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+}
+
+.day, .empty {
+    padding: 10px 5px;
+    border-radius: 10px;
+    text-align: center;
+    font-size: 14px;
+}
+
+.day {
+    background: #08232b;
+    color: white;
+    transition: 0.3s;
+    cursor: pointer;
+}
+
+.day:hover {
+    background: var(--accent-purple);
+    color: white;
+}
+
+.header {
+    background: var(--accent-purple);
+    background: #08232b;
+    padding: 3px;
+    border-radius: 10px;
+    margin: 4px;
+    font-size: 14px;
+}
+
+.create-button,
+.btn {
+    background: linear-gradient(135deg, #00bcd4, #009688);
+    color: white;
+    padding: 10px 25px;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    display: block;
+    margin: 20px auto 0;
+    font-size: 0.9rem;
+    width: 100%;
+    max-width: 200px;
+    text-align: center;
+    transition: var(--transition);
+}
+
+.create-button:hover{
+    background: linear-gradient(135deg, #00acc1, #00796b);
+    transform: translateY(-2px);
+}
+
+.btn:hover {
+    background: #0097a7;
+}
+
+.btn svg {
+    fill: white;
+}
+
+
+/* Responsive containers */
+@media (max-width: 1024px) {
+    .navigation {
+        gap: 20px;
+    }
+
+    .container {
+        padding: 20px 10px;
+    }
+}
+
+@media (max-width: 768px) {
+    .navigation {
+        gap: 10px;
+        justify-content: space-around;
+    }
+
+    .navigation a {
+        padding: 10px 15px;
+        font-size: 16px;
+    }
+
+    .session-button, .add-session {
+        max-width: 100%;
+    }
+
+    .container {
+        flex-direction: column;
+        gap: 20px;
+    }
+}
+
+@media (max-width: 600px) {
+    .navigation {
+        flex-direction: column;
+        gap: 5px;
+        padding: 10px;
+    }
+
+    .navigation a {
+        width: 100%;
+        text-align: center;
+        margin: 3px 0;
+    }
+
+    .session-button {
+        padding: 20px;
+        height: 80px;
+    }
+
+    .session-button span {
+        font-size: 1.2rem;
+    }
+
+    .days {
+        gap: 2px;
+    }
+
+    .day, .empty {
+        padding: 8px 2px;
+        font-size: 12px;
+    }
+
+    .header {
+        font-size: 12px;
+        padding: 2px;
+    }
+}
+
+@media (max-width: 400px) {
+    .top-bar {
+        padding: 10px;
+    }
+
+    .menu-icon, .user-icon {
+        font-size: 20px;
+    }
+
+    .add-session h2 {
+        font-size: 1.2rem;
+    }
+
+    .month {
+        font-size: 18px;
+    }
+
+    .day, .empty {
+        padding: 5px 1px;
+        font-size: 10px;
+    }
+}
+
+/* Notificaciones y mensajes */
+#message-container {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: auto;
+    max-width: 90%;
+  }
+  
+  .message {
+    background-color: #989ad5;
+    color: black;
+    padding: 12px 24px;
+    border-radius: 8px;
+    margin: 8px 0;
+    box-shadow: 0 4px 12px rgba(152, 154, 213, 0.4);
+    font-family: 'Arial', sans-serif;
+    font-size: 16px;
+    opacity: 0;
+    transform: translateY(-20px);
+    animation: message-appear-top 0.3s forwards, message-fade-top 0.3s 2.7s forwards;
+    text-align: center;
+    min-width: 200px;
+    border-left: 4px solid #7679c0;
+    position: relative;
+  }
+  
+  .message.success {
+    background-color: #98d5aa;
+    border-left-color: #50c57c;
+  }
+  
+  .message.warning {
+    background-color: #d5c698;
+    border-left-color: #c0b576;
+  }
+  
+  .message.error {
+    background-color: #d59898;
+    border-left-color: #c07676;
+  }
+  
+  @keyframes message-appear-top {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+  }
+  
+  @keyframes message-fade-top {
+    to {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+  }
+
+
+
+/* Paginación */
+#pagination {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    justify-content: center;
+    background: var(--background-light);
+    padding: 10px 15px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px var(--shadow-color);
+}
+
+#pagination button {
+    background-color: var(--accent-purple);
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    margin: 0 5px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+#pagination button:hover {
+    background-color: #00acc1;
+}
+
+#pagination button.active {
+    background-color: #00acc1;
+    font-weight: bold;
+}
+
+#pagination button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+/* Otros */
+.home-button {
+    font-size: 24px;
+    color: var(--accent-purple);
+    text-decoration: none;
+    margin-left: 10px;
+}
+
+.home-button:hover {
+    color: #74ebd5;
+}
+
+.day.disabled {
+    color: #ccc;
+    pointer-events: none;
+    text-decoration: line-through;
+}
+
+#sessions-page {
+    display: flex;
+    flex-direction: row-reverse;
+    gap: 30px;
+    padding: 30px;
+    background: var(--background-light);
+    border-radius: 12px;
+    box-shadow: 0 5px 15px var(--shadow-color);
+    align-items: flex-start;
+}
+
+#add-session-container {
+    width: 300px;
+    background: var(--background-light);
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 5px 15px var(--shadow-color);
+    position: sticky;
+    top: 30px;
+    align-self: flex-start;
+}
+
+#add-session-container h2 {
+    text-align: center;
+    color: var(--primary-color);
+    margin-bottom: 20px;
+}
+
+#add-session-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+#add-session-form input,
+#add-session-form textarea {
+    width: 100%;
+    padding: 10px;
+    background: rgba(255,255,255,0.05);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 8px;
+}
+
+#add-session-form button {
+    background-color: var(--accent-purple);
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#add-session-form button:hover {
+    background-color: #00acc1;
+}
+
+.terapeuta-section {
+    background: var(--background-light);
+    
+    backdrop-filter: blur(5px);
+    padding: 20px;
+    border-radius: 12px;
+}
+
+.terapeuta-section h3 {
+    margin-bottom: 20px;
+    color: var(--secondary-color);
+    text-align: center;
+}
+
+.terapeuta-sessions {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+}
+
+.session-grid-item {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 15px;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    color: white;
+}
+
+
+.session-grid-item:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 20px var(--shadow-color);
+}
+
+.session-grid-item .session-content h4 {
+    margin-bottom: 10px;
+    color: var(--secondary-color);
+}
+
+.session-grid-item .session-content p {
+    margin: 5px 0;
+    color: #ccc;
+}
+
+
+ 
+/* Fondo oscuro translúcido */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(8, 35, 43, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    backdrop-filter: blur(4px);
+}
+
+/* Modal de confirmación estilo dark-glass */
+.modal-confirm {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 16px;
+    padding: 24px 28px;
+    max-width: 420px;
+    width: 90%;
+    color: var(--primary-color);
+    font-size: 15px;
+    line-height: 1.6;
+    box-shadow: 0 10px 25px var(--shadow-color);
+    animation: fadeIn 0.3s ease;
+    text-align: center;
+    backdrop-filter: blur(10px);
+}
+
+.modal-confirm h2 {
+    margin-bottom: 15px;
+    font-size: 20px;
+    color: var(--accent-purple);
+}
+
+.modal-confirm p {
+    margin-bottom: 20px;
+    font-size: 14px;
+    color: #f0f0f0;
+}
+
+/* Botones */
+.modal-buttons {
+    display: flex;
+    justify-content: space-around;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.modal-buttons .btn-secondary,
+.modal-buttons .btn-danger {
+    flex: 1;
+    padding: 10px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.3s ease;
+}
+
+.modal-buttons .btn-secondary {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--primary-color);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.modal-buttons .btn-secondary:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.modal-buttons .btn-danger {
+    background: var(--accent-gradient);
+    color: black;
+}
+
+.modal-buttons .btn-danger:hover {
+    background: var(--accent-gradient-hover);
+}
+
+
+.modal-sesiones {
+    max-height: 80vh;
+    overflow-y: auto;
+    padding: 20px;
+}
+
+.modal-sesiones-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 15px 0;
+}
+
+.modal-sesion-btn {
+    background: rgba(255, 255, 255, 0.07);
+    color: #fff;
+    padding: 10px;
+    border: 1px solid #ffffff22;
+    border-radius: 8px;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.modal-sesion-btn:hover {
+    background: rgba(0, 188, 212, 0.3);
+}
+
+.terapeuta-section {
+    background: var(--background-light);
+    backdrop-filter: blur(5px);
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 30px; /* 👈 Espacio entre terapeutas */
+}
+
+.mis-sesiones {
+    background: rgba(0, 188, 212, 0.15);
+    border: 2px solid var(--accent-purple);
+    box-shadow: 0 0 20px rgba(0, 188, 212, 0.3);
+}

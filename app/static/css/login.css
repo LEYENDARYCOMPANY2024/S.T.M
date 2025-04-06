@@ -1,0 +1,190 @@
+/* Estilos generales */
+body {
+    background: #08232b; /* Fondo oscuro */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    font-family: Arial, sans-serif;
+}
+
+/* Contenedor del login */
+.login-container {
+    background: rgba(255, 255, 255, 0.15); /* Fondo más transparente */
+    padding: 100px; /* Ajustado para equilibrar mejor el espacio */
+    border-radius: 50px;
+    text-align: center;
+    color: white;
+    width: 350px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); /* Sombra sutil */
+    backdrop-filter: blur(10px); /* Efecto de desenfoque */
+}
+
+/* Título */
+h2 {
+    color: white;
+    font-size: 40px;
+    margin-bottom: 35px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+/* Estilos de los campos */
+.input-container {
+    display: flex;
+    align-items: center;
+    background: white;
+    border-radius: 70px;
+    padding: 0;
+    margin: 40px 0;
+    transition: all 0.3s ease-in-out;
+    overflow: hidden; /* Para mantener los iconos dentro del borde redondeado */
+}
+
+.input-container:hover {
+    background: white;
+}
+
+.input-container input {
+    border: none;
+    background: transparent;
+    flex: 1;
+    padding: 12px;
+    color: black; /* Cambiado a negro para que sea visible en fondo blanco */
+    font-size: 16px;
+    outline: none;
+    font-weight: bold; /* Texto en negrita al escribir */
+}
+
+/* Iconos */
+.icon {
+    background: white;
+    border-radius: 50%;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    margin: 5px;
+    font-size: 20px;
+    color: #08232b;
+}
+
+/* Icono de toggle password */
+#togglePassword {
+    color: #08232b; /* Ajustado para que sea visible */
+    font-size: 20px;
+    padding: 10px;
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+/* Placeholder color */
+::placeholder {
+    color: rgba(0, 0, 0, 0.5); /* Cambiado para que sea visible en fondo blanco */
+    font-weight: normal; /* Placeholder normal, texto escrito en negrita */
+}
+
+/* Botón de inicio de sesión */
+button {
+    background: linear-gradient(135deg, #00bcd4, #009688);
+    color: black;
+    font-weight: bold;
+    border: none;
+    border-radius: 50px;
+    padding: 20px;
+    width: 100%;
+    cursor: pointer;
+    margin-top: 25px;
+    font-size: 20px;
+    transition: all 0.3s ease-in-out;
+    box-shadow: 0 4px 6px rgba(255, 255, 255, 0.2);
+}
+
+button:hover {
+    background: linear-gradient(135deg, #00acc1, #00796b);
+    transform: scale(1.05);
+}
+
+/* Enlace de registro */
+.login-link {
+    margin-top: 30px;
+    color: #c0c6f0;
+    font-size: 20px;
+}
+
+.login-link a {
+    color: #c0c6f0;
+    font-weight: bold;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+
+
+.login-link a:hover {
+    color: #ffcc00;
+}
+
+/* Notificaciones y mensajes */
+#message-container {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: auto;
+    max-width: 90%;
+  }
+  
+  .message {
+    background-color: #989ad5;
+    color: black;
+    padding: 12px 24px;
+    border-radius: 8px;
+    margin: 8px 0;
+    box-shadow: 0 4px 12px rgba(152, 154, 213, 0.4);
+    font-family: 'Arial', sans-serif;
+    font-size: 16px;
+    opacity: 0;
+    transform: translateY(-20px);
+    animation: message-appear-top 0.3s forwards, message-fade-top 0.3s 2.7s forwards;
+    text-align: center;
+    min-width: 200px;
+    border-left: 4px solid #7679c0;
+    position: relative;
+  }
+  
+  .message.success {
+    background-color: #98d5aa;
+    border-left-color: #50c57c;
+  }
+  
+  .message.warning {
+    background-color: #d5c698;
+    border-left-color: #c0b576;
+  }
+  
+  .message.error {
+    background-color: #d59898;
+    border-left-color: #c07676;
+  }
+  
+  @keyframes message-appear-top {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+  }
+  
+  @keyframes message-fade-top {
+    to {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+  }
