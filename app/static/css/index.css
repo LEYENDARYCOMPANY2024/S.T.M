@@ -423,7 +423,9 @@ body {
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 2rem;
+    text-align: center;
 }
+
 
 .section h2 {
     font-size: 2.5rem;
@@ -1246,6 +1248,12 @@ footer {
         scroll-behavior: auto !important;
     }
 }
+.app-button {
+    display: flex;
+    justify-content: center;
+    text-decoration: none; /* quita el subrayado del <a> */
+    margin-top: 10px; /* espacio arriba del botón, opcional */
+}
 
 
 .app-download {
@@ -1292,14 +1300,6 @@ footer {
     transition: background 0.3s ease;
 }
 
-.download-button svg {
-    width: 20px;
-    height: 20px;
-}
-
-.download-button:hover {
-    background-color: #c0c6f0 ;
-}
 
 
         /* Estilos para el contenedor de términos */
