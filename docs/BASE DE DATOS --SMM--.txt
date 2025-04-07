@@ -1,0 +1,250 @@
+Base de datos --S.M.M.---
+
+SUPABASE (postgres)
+
+create table public.terapeutas (
+  id_terapeuta serial not null,
+  nombre_usuario character varying(100) not null,
+  nombre character varying(100) not null,
+  primer_apellido character varying(100) not null,
+  segundo_apellido character varying(100) null,
+  correo character varying(255) not null,
+  contrasena text not null,
+  documento_cedula bytea null,
+  codigo_postal character varying(10) null,
+  calle character varying(255) null,
+  colonia character varying(255) null,
+  num_ext character varying(10) null,
+  num_int character varying(10) null,
+  foto_perfil bytea null,
+  constraint terapeutas_pkey primary key (id_terapeuta),
+  constraint terapeutas_correo_key unique (correo),
+  constraint terapeutas_nombre_usuario_key unique (nombre_usuario)
+) TABLESPACE pg_default;
+
+create table public.terapeuta_paciente (
+  id_terapeuta_paciente serial not null,
+  id_terapeuta_tp_fk integer not null,
+  id_paciente_tp_fk integer not null,
+  constraint terapeuta_paciente_pkey primary key (id_terapeuta_paciente),
+  constraint terapeuta_paciente_id_paciente_tp_fk_fkey foreign KEY (id_paciente_tp_fk) references pacientes (id_paciente) on delete CASCADE,
+  constraint terapeuta_paciente_id_terapeuta_tp_fk_fkey foreign KEY (id_terapeuta_tp_fk) references terapeutas (id_terapeuta) on delete CASCADE
+) TABLESPACE pg_default;
+
+create index IF not exists idx_terapeuta_paciente on public.terapeuta_paciente using btree (id_terapeuta_tp_fk, id_paciente_tp_fk) TABLESPACE pg_default;
+
+
+create table public.sesiones (
+  id_sesion serial not null,
+  descripcion_sesion text not null,
+  fecha_inicio date not null,
+  hora_inicio timestamp with time zone not null,
+  nota_evolutiva text null,
+  video_mediapipe_t jsonb not null,
+  finalizada boolean null default false,
+  constraint sesiones_pkey primary key (id_sesion)
+) TABLESPACE pg_default;
+
+create index IF not exists idx_sesiones_fecha on public.sesiones using btree (fecha_inicio) TABLESPACE pg_default;
+
+create table public.sesion_dispositivo (
+  id_sesion_dispositivo serial not null,
+  id_sesion_fk integer not null,
+  id_dispositivo_pd_fk integer not null,
+  estado_activado public.estado_dispositivo_enum null default 'desactivado'::estado_dispositivo_enum,
+  constraint sesion_dispositivo_pkey primary key (id_sesion_dispositivo),
+  constraint sesion_dispositivo_id_dispositivo_pd_fk_fkey foreign KEY (id_dispositivo_pd_fk) references paciente_dispositivo (id_paciente_dispositivo) on delete CASCADE,
+  constraint sesion_dispositivo_id_sesion_fk_fkey foreign KEY (id_sesion_fk) references sesiones (id_sesion) on delete CASCADE
+) TABLESPACE pg_default;
+
+create unique INDEX IF not exists idx_dispositivo_sesion on public.sesion_dispositivo using btree (id_dispositivo_pd_fk) TABLESPACE pg_default
+where
+  (
+    estado_activado = 'activado'::estado_dispositivo_enum
+  );
+
+create table public.pacientes (
+  id_paciente serial not null,
+  nombre character varying(100) not null,
+  primer_apellido character varying(100) not null,
+  segundo_apellido character varying(100) null,
+  edad integer null,
+  codigo character varying(50) not null,
+  genero public.genero_enum not null,
+  estado_civil public.estado_civil_enum null,
+  escolaridad public.escolaridad_enum null,
+  ocupacion public.ocupacion_enum null,
+  nombre_usuario_p character varying(100) null,
+  contrasena_p text null,
+  estado_paciente public.estado_paciente_enum not null,
+  correo_electronico_p text null,
+  foto_perfil bytea null,
+  codigo_restablecimiento character varying null,
+  fecha_expiracion_codigo timestamp with time zone null,
+  constraint pacientes_pkey primary key (id_paciente),
+  constraint pacientes_codigo_key unique (codigo),
+  constraint pacientes_nombre_usuario_p_key unique (nombre_usuario_p),
+  constraint pacientes_edad_check check (
+    (
+      (edad > 0)
+      and (edad < 120)
+    )
+  )
+) TABLESPACE pg_default;
+
+create index IF not exists idx_pacientes_nombre on public.pacientes using btree (nombre, primer_apellido) TABLESPACE pg_default;
+
+
+create table public.paciente_sesiones_p (
+  id_paciente_sesion serial not null,
+  id_paciente_ps_fk integer not null,
+  id_sesion_ps_fk integer not null,
+  id_terapeuta_fk integer not null,
+  constraint paciente_sesiones_p_pkey primary key (id_paciente_sesion),
+  constraint paciente_sesiones_p_id_paciente_ps_fk_fkey foreign KEY (id_paciente_ps_fk) references pacientes (id_paciente) on delete CASCADE,
+  constraint paciente_sesiones_p_id_sesion_ps_fk_fkey foreign KEY (id_sesion_ps_fk) references sesiones (id_sesion) on delete CASCADE,
+  constraint paciente_sesiones_p_id_terapeuta_fk_fkey foreign KEY (id_terapeuta_fk) references terapeutas (id_terapeuta)
+) TABLESPACE pg_default;
+
+create table public.paciente_nivel (
+  id_paciente_nivel serial not null,
+  id_paciente_fk integer not null,
+  id_nivel_fk integer not null,
+  estado public.estado_nivel_enum null default 'bloqueado'::estado_nivel_enum,
+  fecha_activacion timestamp without time zone null,
+  constraint paciente_nivel_pkey primary key (id_paciente_nivel),
+  constraint paciente_nivel_id_nivel_fk_fkey foreign KEY (id_nivel_fk) references niveles (id_nivel) on delete CASCADE,
+  constraint paciente_nivel_id_paciente_fk_fkey foreign KEY (id_paciente_fk) references pacientes (id_paciente) on delete CASCADE
+) TABLESPACE pg_default;
+
+create table public.paciente_dispositivo (
+  id_paciente_dispositivo serial not null,
+  id_paciente_pd_fk integer not null,
+  id_dispositivo_pd_fk integer not null,
+  constraint paciente_dispositivo_pkey primary key (id_paciente_dispositivo),
+  constraint paciente_dispositivo_id_dispositivo_pd_fk_fkey foreign KEY (id_dispositivo_pd_fk) references dispositivos_iot (id_dispositivo) on delete CASCADE,
+  constraint paciente_dispositivo_id_paciente_pd_fk_fkey foreign KEY (id_paciente_pd_fk) references pacientes (id_paciente) on delete CASCADE
+) TABLESPACE pg_default;
+
+
+create table public.niveles_ejercicios (
+  id_nivel_ejercicio serial not null,
+  id_nivel_fk integer not null,
+  id_ejercicio_fk integer not null,
+  constraint niveles_ejercicios_pkey primary key (id_nivel_ejercicio),
+  constraint niveles_ejercicios_id_ejercicio_fk_fkey foreign KEY (id_ejercicio_fk) references ejercicios (id_ejercicio) on delete CASCADE,
+  constraint niveles_ejercicios_id_nivel_fk_fkey foreign KEY (id_nivel_fk) references niveles (id_nivel) on delete CASCADE
+) TABLESPACE pg_default;
+
+create table public.niveles (
+  id_nivel serial not null,
+  nombre_nivel character varying(100) not null,
+  descripcion text null,
+  orden integer not null,
+  constraint niveles_pkey primary key (id_nivel)
+) TABLESPACE pg_default;
+
+create table public.mensajes (
+  id_mensaje serial not null,
+  id_chat_m_fk integer not null,
+  remitente public.remitente_enum not null,
+  mensaje text not null,
+  enviado_en timestamp with time zone null default now(),
+  constraint mensajes_pkey primary key (id_mensaje),
+  constraint mensajes_id_chat_m_fk_fkey foreign KEY (id_chat_m_fk) references chat (id_chat) on delete CASCADE
+) TABLESPACE pg_default;
+
+create index IF not exists idx_mensajes_chat on public.mensajes using btree (id_chat_m_fk) TABLESPACE pg_default;
+
+create table public.historial_progreso (
+  id_historial serial not null,
+  id_terapeuta_paciente_fk integer not null,
+  fecha_inicio date not null default CURRENT_DATE,
+  fecha_fin date null,
+  resumen text not null,
+  constraint historial_progreso_pkey primary key (id_historial),
+  constraint historial_progreso_id_terapeuta_paciente_fk_fkey foreign KEY (id_terapeuta_paciente_fk) references terapeuta_paciente (id_terapeuta_paciente) on delete CASCADE
+) TABLESPACE pg_default;
+
+
+create table public.historial_clinico (
+  id_historial_clinico serial not null,
+  id_paciente_hc_fk integer not null,
+  datos_historial_clinico jsonb not null,
+  constraint historial_clinico_pkey primary key (id_historial_clinico),
+  constraint historial_clinico_id_paciente_hc_fk_fkey foreign KEY (id_paciente_hc_fk) references pacientes (id_paciente) on delete CASCADE
+) TABLESPACE pg_default;
+
+create table public.graficas_tablas_movil (
+  id_tabla_movil serial not null,
+  id_sesion_fk integer not null,
+  datos_graficas jsonb null,
+  datos_mediapipe jsonb null,
+  fecha_registro timestamp without time zone null default now(),
+  constraint graficas_tablas_movil_pkey primary key (id_tabla_movil),
+  constraint fk_sesion foreign KEY (id_sesion_fk) references sesiones (id_sesion) on delete CASCADE
+) TABLESPACE pg_default;
+
+create table public.graficas_dispositivos (
+  id_grafica_dispositivo serial not null,
+  id_grafica_fk integer not null,
+  id_sesion_dispositivo_fk integer not null,
+  lado_pierna character varying(10) null,
+  constraint graficas_dispositivos_pkey primary key (id_grafica_dispositivo),
+  constraint graficas_dispositivos_id_grafica_fk_fkey foreign KEY (id_grafica_fk) references graficas (id_grafica) on delete CASCADE,
+  constraint graficas_dispositivos_id_sesion_dispositivo_fk_fkey foreign KEY (id_sesion_dispositivo_fk) references sesion_dispositivo (id_sesion_dispositivo) on delete CASCADE,
+  constraint graficas_dispositivos_lado_pierna_check check (
+    (
+      (lado_pierna)::text = any (
+        (
+          array[
+            'izquierda'::character varying,
+            'derecha'::character varying
+          ]
+        )::text[]
+      )
+    )
+  )
+) TABLESPACE pg_default;
+
+create table public.graficas (
+  id_grafica serial not null,
+  nombre_grafica character varying(255) not null,
+  aceleracion_x double precision null,
+  aceleracion_y double precision null,
+  fecha_hora timestamp without time zone null default CURRENT_TIMESTAMP,
+  lado_pierna_gf text null,
+  constraint graficas_pkey primary key (id_grafica)
+) TABLESPACE pg_default;
+
+create table public.ejercicios (
+  id_ejercicio serial not null,
+  nom_ejercicio character varying(255) not null,
+  instrucciones text not null,
+  video_url text null,
+  constraint ejercicios_pkey primary key (id_ejercicio)
+) TABLESPACE pg_default;
+
+create table public.dispositivos_iot (
+  id_dispositivo serial not null,
+  nombre_dispositivo character varying(255) not null,
+  fecha_registro date not null default CURRENT_DATE,
+  tipo_de_dispositivo character varying(255) not null,
+  uuid character varying(255) not null,
+  id_terapeuta_fk integer null,
+  permite_envio boolean null default false,
+  constraint dispositivos_iot_pkey primary key (id_dispositivo),
+  constraint dispositivos_iot_uuid_key unique (uuid),
+  constraint dispositivos_iot_id_terapeuta_fk_fkey foreign KEY (id_terapeuta_fk) references terapeutas (id_terapeuta) on delete CASCADE
+) TABLESPACE pg_default;
+
+create index IF not exists idx_dispositivos_uuid on public.dispositivos_iot using btree (uuid) TABLESPACE pg_default;
+
+
+create table public.chat (
+  id_chat serial not null,
+  iniciado_en timestamp with time zone null default now(),
+  id_terapeuta_paciente_c_fk integer not null,
+  constraint chat_pkey primary key (id_chat),
+  constraint chat_id_terapeuta_paciente_c_fk_fkey foreign KEY (id_terapeuta_paciente_c_fk) references terapeuta_paciente (id_terapeuta_paciente) on delete CASCADE
+) TABLESPACE pg_default;
