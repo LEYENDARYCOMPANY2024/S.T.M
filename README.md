@@ -97,6 +97,28 @@ pip install pyjwt
 pip install psycopg2-binary
 ```
 
+## Para este proyecto se utilizó la plataforma PlatformIO
+
+se puede instalar en las extensiones de visual estudio code, simplemente buscan en la barra de busqueda PlatformIO y en la primera opción aparecerá una extensión con un icono de un alien, se instala y despues ses instalan las librerías automáticamente, los comando de la terminal dedicada para esa plataforma que támbien utiliza arduino son:
+
+```shell
+pio run
+```
+
+`este comando ejecutará el archivo c++ para validar que funcione correctamente ('compilar')`
+
+```shell
+pio run --target upload
+```
+
+`este comando permitirá subir el codigo a la esp32 o el dispositivo que estemos utilizando, solo debemos conectar a un puerto el dispositivo a la computadora y posteriormente ejecutar este comando una vez que el comando llegué a la parte de conexión al puerto presionamos el botón de BOOT para permitir subir el código (esto dependiendo del dispositivo)`
+
+```shell
+pio device monitor
+```
+
+`este comando permitirá revisar el estado del dispositivo o en pocas palabras la ejecución del codigo y ver lo que sucede en la terminal, para ello debe de estar conectado el dispositivo a la computadora mediante cable, se puede reiniciar el monitor presionando en el dispositivo RE de "reset"`
+
 # Crear archivos para la ejecución
 ## Crear el archivo .env (necesario para la conexión a la abse de datos)
 
